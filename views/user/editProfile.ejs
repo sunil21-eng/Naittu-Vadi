@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - AllScouts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Add Cropper.js CSS and JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --danger-color: #e63946;
+            --success-color: #2a9d8f;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+            --sidebar-bg: #2c3e50;
+            --sidebar-active: #3498db;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .edit-profile-header {
+            background-color: var(--light-gray);
+            padding: 40px 0 25px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .edit-profile-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .breadcrumb {
+            justify-content: center;
+            background: transparent;
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .edit-profile-container {
+            display: flex;
+            max-width: 98%;
+            margin: 0 auto 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        /* Sidebar Styles */
+        .edit-profile-sidebar {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+        }
+
+        .edit-profile-sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .edit-profile-sidebar-menu li {
+            margin: 0;
+        }
+
+        .edit-profile-sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .edit-profile-sidebar-menu a:hover {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .edit-profile-sidebar-menu a.edit-profile-active {
+            background-color: var(--sidebar-active);
+            border-left-color: #2980b9;
+            color: white;
+        }
+
+        .edit-profile-sidebar-menu i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .edit-profile-logout-section {
+            padding: 15px 20px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .edit-profile-logout-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .edit-profile-logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .edit-profile-logout-btn i {
+            margin-right: 6px;
+        }
+
+        /* Main Content Styles */
+        .edit-profile-main-content {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .edit-profile-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .edit-profile-back-link:hover {
+            color: #2a75e6;
+        }
+
+        .edit-profile-back-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .edit-profile-page-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        /* Avatar Section */
+        .edit-profile-avatar-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .edit-profile-avatar-container {
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .edit-profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .edit-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .edit-profile-avatar svg {
+            width: 40px;
+            height: 40px;
+            color: #bdc3c7;
+        }
+
+        .edit-profile-camera-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            transition: background-color 0.3s;
+        }
+
+        .edit-profile-camera-icon:hover {
+            background: #2a75e6;
+        }
+
+        .edit-profile-camera-icon svg {
+            width: 16px;
+            height: 16px;
+            color: white;
+        }
+
+        .edit-profile-hidden {
+            display: none;
+        }
+
+        .edit-profile-avatar-actions {
+            flex: 1;
+        }
+
+        .edit-profile-avatar-text {
+            color: #7f8c8d;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        /* Form Styles */
+        .edit-profile-form {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .edit-profile-section-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .edit-profile-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .edit-profile-form-group {
+            margin-bottom: 20px;
+        }
+
+        .edit-profile-form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 0.9rem;
+        }
+
+        .edit-profile-form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .edit-profile-form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+        }
+
+        .edit-profile-form-input:read-only {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            cursor: not-allowed;
+        }
+
+        .edit-profile-form-input.edit-profile-error {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+        }
+
+        .edit-profile-form-hint {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        .edit-profile-date-container {
+            position: relative;
+        }
+
+        .edit-profile-date-input {
+            padding-right: 35px;
+        }
+
+        .edit-profile-calendar-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            pointer-events: none;
+        }
+
+        /* Email Edit Styles */
+        .edit-profile-email-container {
+            position: relative;
+        }
+
+        .edit-profile-email-edit-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .edit-profile-email-edit-btn:hover {
+            background: #2a75e6;
+        }
+
+        .edit-profile-email-edit-btn.cancel {
+            background: #95a5a6;
+        }
+
+        .edit-profile-email-edit-btn.cancel:hover {
+            background: #7f8c8d;
+        }
+
+        /* Button Styles */
+        .edit-profile-form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .edit-profile-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .edit-profile-btn-save {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .edit-profile-btn-save:hover {
+            background-color: #2a75e6;
+            transform: translateY(-1px);
+        }
+
+        .edit-profile-btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .edit-profile-btn-cancel:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-1px);
+        }
+
+        .edit-profile-btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .edit-profile-btn-delete:hover {
+            background-color: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        /* OTP Modal Styles */
+        .edit-profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-profile-modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 6px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .edit-profile-modal-title {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+
+        .edit-profile-modal-text {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .edit-profile-modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        /* Cropper Modal Styles */
+        .edit-profile-cropper-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-profile-cropper-container {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .edit-profile-cropper-title {
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .edit-profile-cropper-preview-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .edit-profile-cropper-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 2px solid #ecf0f1;
+        }
+
+        .edit-profile-cropper-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 20px !important;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .edit-profile-container {
+                flex-direction: column;
+                max-width: 95%;
+            }
+            
+            .edit-profile-sidebar {
+                width: 100%;
+            }
+            
+            .edit-profile-sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .edit-profile-sidebar-menu li {
+                flex-shrink: 0;
+            }
+            
+            .edit-profile-sidebar-menu a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                white-space: nowrap;
+            }
+            
+            .edit-profile-sidebar-menu a.edit-profile-active {
+                border-left: none;
+                border-bottom-color: #2980b9;
+            }
+            
+            .edit-profile-avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .edit-profile-avatar-container {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .edit-profile-form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            
+            .edit-profile-form-actions {
+                flex-direction: column;
+            }
+            
+            .edit-profile-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .edit-profile-main-content {
+                padding: 20px;
+            }
+            
+            .edit-profile-header {
+                padding: 30px 0 20px;
+            }
+            
+            .edit-profile-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .edit-profile-main-content {
+                padding: 15px 12px;
+            }
+            
+            .edit-profile-header {
+                padding: 25px 0 15px;
+            }
+            
+            .edit-profile-title {
+                font-size: 1.3rem;
+            }
+            
+            .edit-profile-avatar-section,
+            .edit-profile-form {
+                padding: 15px;
+            }
+            
+            .edit-profile-cropper-container {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/user/header') %>
+
+    <!-- Edit Profile Header -->
+    <section class="edit-profile-header">
+        <div class="container">
+            <h1 class="edit-profile-title">Edit Profile</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
+                    <li class="breadcrumb-item active">Edit Profile</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Edit Profile Content -->
+    <div class="edit-profile-container">
+        <!-- Sidebar -->
+        <aside class="edit-profile-sidebar">
+            <ul class="edit-profile-sidebar-menu">
+                <li><a href="/profile"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="/my-orders"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                <li><a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                <li><a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a></li>
+                <li><a href="/changePassword"><i class="fas fa-key"></i> Change Password</a></li>
+            </ul>
+            <div class="edit-profile-logout-section">
+                <button class="edit-profile-logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="edit-profile-main-content">
+            <a href="/profile" class="edit-profile-back-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                Back to Profile
+            </a>
+
+            <h1 class="edit-profile-page-title">Edit Profile</h1>
+
+            <!-- Avatar Section with data attributes -->
+            <div class="edit-profile-avatar-section">
+                <div class="edit-profile-avatar-container">
+                    <div class="edit-profile-avatar" id="avatarDisplay" 
+                         data-original-image="<%= user.profileImage && user.profileImage.length > 0 ? user.profileImage[0] : '' %>"
+                         data-has-image="<%= user.profileImage && user.profileImage.length > 0 %>">
+                        <% if (user.profileImage && user.profileImage.length > 0) { %>
+                            <img src="<%= user.profileImage && user.profileImage[0] ? user.profileImage[0] : '/images/default-profile.jpg' %>" id="currentAvatar" alt="Profile Image">
+                        <% } else { %>
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" id="defaultAvatar">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        <% } %>
+                    </div>
+                    <div class="edit-profile-camera-icon" onclick="document.getElementById('fileInput').click()">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                        </svg>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" name="profileImage" accept="image/*" class="edit-profile-hidden">
+
+                <div class="edit-profile-avatar-actions">
+                    <p class="edit-profile-avatar-text">Click the camera icon to change your profile picture</p>
+                    <% if (user.profileImage && user.profileImage.length > 0) { %>
+                        <button type="button" class="edit-profile-btn edit-profile-btn-delete" onclick="deleteProfileImage()">
+                            Delete Image
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="editProfileForm" class="edit-profile-form" method="POST" enctype="multipart/form-data">
+                <h3 class="edit-profile-section-title">Personal Information</h3>
+                
+                <!-- First Name and Last Name in a row -->
+                <div class="edit-profile-form-row">
+                    <div class="edit-profile-form-group">
+                        <label for="firstName" class="edit-profile-form-label">First Name *</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            name="firstName" 
+                            class="edit-profile-form-input"
+                            value="<%= user.firstName || '' %>"
+                            placeholder="Enter your first name"
+                            required
+                        >
+                        <div class="edit-profile-form-hint">Only letters allowed</div>
+                    </div>
+
+                    <div class="edit-profile-form-group">
+                        <label for="lastName" class="edit-profile-form-label">Last Name *</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            name="lastName" 
+                            class="edit-profile-form-input"
+                            value="<%= user.lastName || '' %>"
+                            placeholder="Enter your last name"
+                            required
+                        >
+                        <div class="edit-profile-form-hint">Only letters allowed</div>
+                    </div>
+                </div>
+
+                <!-- Email (now editable) -->
+                <div class="edit-profile-form-group">
+                    <label for="email" class="edit-profile-form-label">Email *</label>
+                    <div class="edit-profile-email-container">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="edit-profile-form-input"
+                            value="<%= user.email || '' %>"
+                            readonly
+                            data-original-email="<%= user.email || '' %>"
+                        >
+                        <button type="button" class="edit-profile-email-edit-btn" id="emailEditBtn" onclick="enableEmailEdit()">
+                            Edit
+                        </button>
+                    </div>
+                    <div class="edit-profile-form-hint" id="emailHint">Click edit to change your email address</div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="edit-profile-form-group">
+                    <label for="phone" class="edit-profile-form-label">Phone Number</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        class="edit-profile-form-input"
+                        value="<%= user.phone || '' %>"
+                        placeholder="Enter your 10-digit phone number"
+                        maxlength="10"
+                    >
+                    <div class="edit-profile-form-hint">10 digits starting with 6, 7, 8, or 9</div>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="edit-profile-form-group">
+                    <label for="dob" class="edit-profile-form-label">Date of Birth</label>
+                    <div class="edit-profile-date-container">
+                        <% 
+                            let dobValue = '';
+                            if (user.dob) {
+                                try { 
+                                    dobValue = new Date(user.dob).toISOString().split('T')[0]; 
+                                } catch(e) { 
+                                    dobValue = user.dob; // Fallback to string value if date parsing fails
+                                }
+                            }
+                        %>
+                        <input 
+                            type="date" 
+                            id="dob" 
+                            name="dob" 
+                            class="edit-profile-form-input edit-profile-date-input"
+                            value="<%= dobValue %>"
+                        >
+                        <svg class="edit-profile-calendar-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                        </svg>
+                    </div>
+                    <div class="edit-profile-form-hint">Must be a past date</div>
+                </div>
+
+                <div class="edit-profile-form-actions">
+                    <button type="button" class="edit-profile-btn edit-profile-btn-cancel" onclick="clearForm()">
+                        Clear Changes
+                    </button>
+                    <button type="submit" class="edit-profile-btn edit-profile-btn-save">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-light py-3 mt-3">
+        <div class="container text-center">
+            <p class="mb-0" style="font-size: 0.85rem;">&copy; 2023 Your Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- OTP Modal -->
+    <div class="edit-profile-modal" id="otpModal">
+        <div class="edit-profile-modal-content">
+            <h2 class="edit-profile-modal-title">Email Verification Required</h2>
+            <p class="edit-profile-modal-text" id="otpMessage">We've sent a verification code to your new email address. Please enter it below:</p>
+            
+            <div class="edit-profile-form-group">
+                <input 
+                    type="text" 
+                    id="otpInput" 
+                    class="edit-profile-form-input"
+                    placeholder="Enter 6-digit OTP"
+                    maxlength="6"
+                >
+            </div>
+            
+            <div class="edit-profile-modal-actions">
+                <button type="button" class="edit-profile-btn edit-profile-btn-cancel" onclick="closeOtpModal()">
+                    Cancel
+                </button>
+                <button type="button" class="edit-profile-btn edit-profile-btn-save" onclick="verifyOtp()">
+                    Verify & Save
+                </button>
+            </div>
+            
+            <p style="margin-top: 12px; font-size: 0.85rem;">
+                <a href="javascript:void(0)" onclick="resendOtp()" style="color: var(--primary-color); text-decoration: none;">
+                    Resend OTP
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Cropper Modal -->
+    <div class="edit-profile-cropper-modal" id="cropperModal">
+        <div class="edit-profile-cropper-container">
+            <h2 class="edit-profile-cropper-title">Crop Your Profile Picture</h2>
+            <div id="cropperImageContainer" style="max-width: 100%; max-height: 350px; overflow: hidden;">
+                <img id="cropperImage" src="" alt="Image to crop" style="max-width: 100%;">
+            </div>
+            
+            <div class="edit-profile-cropper-preview-container">
+                <div class="edit-profile-cropper-preview"></div>
+                <p style="font-size: 0.85rem;">Preview</p>
+            </div>
+            
+            <div class="edit-profile-cropper-actions">
+                <button type="button" class="edit-profile-btn edit-profile-btn-cancel" onclick="closeCropper()">
+                    Cancel
+                </button>
+                <button type="button" class="edit-profile-btn edit-profile-btn-save" onclick="applyCrop()">
+                    Apply Crop
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEmailEditing = false;
+        let originalEmail = '';
+        let cropper = null;
+        let currentFile = null;
+        let croppedFile = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store original email
+            const emailInput = document.getElementById('email');
+            originalEmail = emailInput.value;
+
+            // Form submission handler
+            const form = document.getElementById('editProfileForm');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    await saveProfile();
+                });
+            }
+
+            // File input handler for image preview
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Check file size (5MB limit)
+                        if (file.size > 5 * 1024 * 1024) {
+                            alert('File size must be less than 5MB');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // Check file type
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                        if (!allowedTypes.includes(file.type)) {
+                            alert('Only JPEG, PNG, and JPG images are allowed');
+                            this.value = '';
+                            return;
+                        }
+                        
+                        // Show cropper modal
+                        showCropper(file);
+                    }
+                });
+            }
+
+            // Phone number input formatting
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 10) {
+                        value = value.slice(0, 10);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Name input validation (letters only)
+            const nameInputs = document.querySelectorAll('#firstName, #lastName');
+            nameInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                    e.target.value = value;
+                });
+            });
+
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        const res = await fetch('/logout', { method: 'POST' });
+                        if (res.ok) {
+                            window.location.href = '/';
+                        } else {
+                            console.error('Logout failed');
+                            alert('Logout failed. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error during logout:', error);
+                        alert('An error occurred during logout. Please try again.');
+                    }
+                });
+            }
+        });
+
+        // Show cropper modal with selected image
+        function showCropper(file) {
+            currentFile = file;
+            const cropperModal = document.getElementById('cropperModal');
+            const cropperImage = document.getElementById('cropperImage');
+            const cropperPreview = document.querySelector('.edit-profile-cropper-preview');
+            
+            // Reset cropper if already exists
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            
+            // Create URL for the file
+            const imageURL = URL.createObjectURL(file);
+            cropperImage.src = imageURL;
+            
+            // Show modal
+            cropperModal.style.display = 'flex';
+            
+            // Initialize cropper after image loads
+            cropperImage.onload = function() {
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    guides: true,
+                    background: false,
+                    autoCropArea: 0.8,
+                    responsive: true,
+                    restore: false,
+                    checkCrossOrigin: false,
+                    preview: cropperPreview
+                });
+            };
+        }
+
+        // Close cropper modal
+        function closeCropper() {
+            const cropperModal = document.getElementById('cropperModal');
+            const fileInput = document.getElementById('fileInput');
+            
+            // Hide modal
+            cropperModal.style.display = 'none';
+            
+            // Reset file input
+            fileInput.value = '';
+            
+            // Clean up cropper
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            
+            currentFile = null;
+        }
+
+        // Apply crop and update avatar preview
+        function applyCrop() {
+            if (!cropper) {
+                alert('No image to crop');
+                return;
+            }
+            
+            // Get cropped canvas
+            const canvas = cropper.getCroppedCanvas({
+                width: 300,
+                height: 300,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
+            
+            if (!canvas) {
+                alert('Could not crop image');
+                return;
+            }
+            
+            // Convert canvas to blob with proper JPEG format
+            canvas.toBlob(function(blob) {
+                if (!blob) {
+                    alert('Failed to create image blob');
+                    return;
+                }
+                
+                // Create a new file from the blob - EXACTLY like your product page
+                croppedFile = new File([blob], currentFile.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+                
+                console.log('Cropped file created:', croppedFile);
+                
+                // Create URL for the cropped image
+                const croppedImageURL = URL.createObjectURL(blob);
+                
+                // Update avatar preview
+                updateAvatarPreview(croppedImageURL);
+                
+                // Close cropper modal
+                closeCropper();
+                
+                // Show delete button if not already present
+                let deleteButton = document.querySelector('.edit-profile-btn-delete');
+                if (!deleteButton) {
+                    deleteButton = document.createElement('button');
+                    deleteButton.type = 'button';
+                    deleteButton.className = 'edit-profile-btn edit-profile-btn-delete';
+                    deleteButton.textContent = 'Delete Image';
+                    deleteButton.onclick = deleteProfileImage;
+                    document.querySelector('.edit-profile-avatar-actions').appendChild(deleteButton);
+                }
+                
+            }, 'image/jpeg', 0.9); // Ensure it's JPEG format with 90% quality
+        }
+
+        // Enable email editing
+        function enableEmailEdit() {
+            const emailInput = document.getElementById('email');
+            const emailEditBtn = document.getElementById('emailEditBtn');
+            const emailHint = document.getElementById('emailHint');
+            
+            if (!isEmailEditing) {
+                // Enable editing
+                emailInput.readOnly = false;
+                emailInput.style.backgroundColor = '#ffffff';
+                emailInput.style.cursor = 'text';
+                emailEditBtn.textContent = 'Cancel';
+                emailEditBtn.classList.add('cancel');
+                emailHint.textContent = 'Enter your new email address';
+                isEmailEditing = true;
+                
+                // Focus on email input
+                emailInput.focus();
+            } else {
+                // Cancel editing
+                emailInput.readOnly = true;
+                emailInput.style.backgroundColor = '#f8f9fa';
+                emailInput.style.cursor = 'not-allowed';
+                emailInput.value = originalEmail;
+                emailEditBtn.textContent = 'Edit';
+                emailEditBtn.classList.remove('cancel');
+                emailHint.textContent = 'Click edit to change your email address';
+                isEmailEditing = false;
+            }
+        }
+
+        // Update avatar preview
+        function updateAvatarPreview(imageSrc) {
+            const avatarDisplay = document.getElementById('avatarDisplay');
+            const currentAvatar = document.getElementById('currentAvatar');
+            const defaultAvatar = document.getElementById('defaultAvatar');
+            
+            if (currentAvatar) {
+                currentAvatar.src = imageSrc;
+            } else {
+                if (defaultAvatar) {
+                    defaultAvatar.style.display = 'none';
+                }
+                const img = document.createElement('img');
+                img.src = imageSrc;
+                img.alt = 'Profile Picture';
+                img.id = 'currentAvatar';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '50%';
+                avatarDisplay.appendChild(img);
+            }
+        }
+
+        // Clear form function
+        function clearForm() {
+            if (confirm('Are you sure you want to clear all changes?')) {
+                // Reset form fields to original values from server-side rendering
+                document.getElementById('firstName').value = '<%= user.firstName || "" %>';
+                document.getElementById('lastName').value = '<%= user.lastName || "" %>';
+                document.getElementById('phone').value = '<%= user.phone || "" %>';
+                document.getElementById('dob').value = '<%= dobValue %>';
+                
+                // Reset email field
+                const emailInput = document.getElementById('email');
+                emailInput.value = originalEmail;
+                if (isEmailEditing) {
+                    enableEmailEdit(); // This will cancel editing mode
+                }
+                
+                // Reset avatar using data attributes
+                const avatarDisplay = document.getElementById('avatarDisplay');
+                const originalImage = avatarDisplay.getAttribute('data-original-image');
+                const hasImage = avatarDisplay.getAttribute('data-has-image') === 'true';
+                
+                const currentAvatar = document.getElementById('currentAvatar');
+                const defaultAvatar = document.getElementById('defaultAvatar');
+                
+                if (hasImage && originalImage) {
+                    // Restore original image
+                    if (currentAvatar) {
+                        currentAvatar.src = originalImage;
+                    } else {
+                        if (defaultAvatar) {
+                            defaultAvatar.style.display = 'none';
+                        }
+                        const img = document.createElement('img');
+                        img.src = originalImage;
+                        img.alt = 'Profile Picture';
+                        img.id = 'currentAvatar';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '50%';
+                        avatarDisplay.appendChild(img);
+                    }
+                    
+                    // Ensure delete button exists
+                    let deleteButton = document.querySelector('.edit-profile-btn-delete');
+                    if (!deleteButton) {
+                        deleteButton = document.createElement('button');
+                        deleteButton.type = 'button';
+                        deleteButton.className = 'edit-profile-btn edit-profile-btn-delete';
+                        deleteButton.textContent = 'Delete Image';
+                        deleteButton.onclick = deleteProfileImage;
+                        document.querySelector('.edit-profile-avatar-actions').appendChild(deleteButton);
+                    }
+                } else {
+                    // Show default avatar
+                    if (currentAvatar) {
+                        currentAvatar.remove();
+                    }
+                    if (defaultAvatar) {
+                        defaultAvatar.style.display = 'block';
+                    }
+                    
+                    // Remove delete button
+                    const deleteButton = document.querySelector('.edit-profile-btn-delete');
+                    if (deleteButton) {
+                        deleteButton.remove();
+                    }
+                }
+                
+                // Clear file input
+                document.getElementById('fileInput').value = '';
+                
+                // Clear cropped file
+                croppedFile = null;
+                
+                // Clear error styles
+                document.querySelectorAll('.edit-profile-form-input').forEach(input => {
+                    input.classList.remove('edit-profile-error');
+                });
+                
+                alert('Changes cleared successfully!');
+            }
+        }
+
+        // Save profile function
+        async function saveProfile() {
+            const form = document.getElementById('editProfileForm');
+            const formData = new FormData(form);
+            
+            // Add cropped profile image to form data if available - EXACTLY like your product page
+            if (croppedFile) {
+                formData.append('profileImage', croppedFile);
+                console.log('Appending cropped file to form data:', croppedFile);
+            }
+
+            // Clear previous error styles
+            document.querySelectorAll('.edit-profile-form-input').forEach(input => {
+                input.classList.remove('edit-profile-error');
+            });
+
+            // Validation
+            const firstName = formData.get('firstName').trim();
+            const lastName = formData.get('lastName').trim();
+            const email = formData.get('email').trim();
+            const phone = formData.get('phone').trim();
+            const dob = formData.get('dob');
+
+            let hasErrors = false;
+
+            // First Name validation
+            if (!firstName) {
+                document.getElementById('firstName').classList.add('edit-profile-error');
+                alert('First name is required!');
+                hasErrors = true;
+            } else if (!/^[a-zA-Z]+$/.test(firstName)) {
+                document.getElementById('firstName').classList.add('edit-profile-error');
+                alert('First name should contain only letters!');
+                hasErrors = true;
+            }
+
+            // Last Name validation
+            if (!lastName) {
+                document.getElementById('lastName').classList.add('edit-profile-error');
+                alert('Last name is required!');
+                hasErrors = true;
+            } else if (!/^[a-zA-Z]+$/.test(lastName)) {
+                document.getElementById('lastName').classList.add('edit-profile-error');
+                alert('Last name should contain only letters!');
+                hasErrors = true;
+            }
+
+            // Email validation
+            if (!email) {
+                document.getElementById('email').classList.add('edit-profile-error');
+                alert('Email is required!');
+                hasErrors = true;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('email').classList.add('edit-profile-error');
+                alert('Please enter a valid email address!');
+                hasErrors = true;
+            }
+
+            // Phone validation
+            if (phone && !/^[6-9]\d{9}$/.test(phone)) {
+                document.getElementById('phone').classList.add('edit-profile-error');
+                alert('Phone number should be 10 digits starting with 6, 7, 8, or 9!');
+                hasErrors = true;
+            }
+
+            // DOB validation
+            if (dob) {
+                const dobDate = new Date(dob);
+                const currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0);
+                if (dobDate >= currentDate) {
+                    document.getElementById('dob').classList.add('edit-profile-error');
+                    alert('Date of birth must be in the past!');
+                    hasErrors = true;
+                }
+            }
+
+            if (!hasErrors) {
+                try {
+                    console.log('Sending form data to server...');
+                    const response = await fetch('/editProfile', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        if (data.requiresOtp) {
+                            // Show OTP modal if email was changed
+                            document.getElementById('otpMessage').textContent = `We've sent a verification code to ${email}. Please enter it below:`;
+                            document.getElementById('otpModal').style.display = 'flex';
+                        } else {
+                            alert('Profile updated successfully!');
+                            setTimeout(() => {
+                                window.location.href = '/profile';
+                            }, 1500);
+                        }
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to update profile'));
+                    }
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                    alert('Failed to update profile. Please try again.');
+                }
+            }
+        }
+
+        // Delete profile image
+        async function deleteProfileImage() {
+            if (confirm('Are you sure you want to delete your profile image?')) {
+                try {
+                    const response = await fetch('/updateImage', {
+                        method: 'DELETE'
+                    });
+                    
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Reset avatar to default
+                        const avatarDisplay = document.getElementById('avatarDisplay');
+                        const currentAvatar = document.getElementById('currentAvatar');
+                        const defaultAvatar = document.getElementById('defaultAvatar');
+                        
+                        if (currentAvatar) {
+                            currentAvatar.remove();
+                        }
+                        if (defaultAvatar) {
+                            defaultAvatar.style.display = 'block';
+                        } else {
+                            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                            svg.setAttribute('width', '40');
+                            svg.setAttribute('height', '40');
+                            svg.setAttribute('viewBox', '0 0 24 24');
+                            svg.setAttribute('fill', 'currentColor');
+                            svg.setAttribute('id', 'defaultAvatar');
+                            svg.innerHTML = '<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>';
+                            avatarDisplay.appendChild(svg);
+                        }
+                        
+                        // Remove delete button
+                        const deleteButton = document.querySelector('.edit-profile-btn-delete');
+                        if (deleteButton) {
+                            deleteButton.remove();
+                        }
+                        
+                        // Clear cropped file
+                        croppedFile = null;
+                        
+                        alert('Profile image deleted successfully!');
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to delete profile image'));
+                    }
+                } catch (error) {
+                    console.error('Error deleting profile image:', error);
+                    alert('Failed to delete profile image');
+                }
+            }
+        }
+
+        // OTP Functions
+        async function verifyOtp() {
+            const otp = document.getElementById('otpInput').value;
+            
+            if (!otp || otp.length !== 6) {
+                alert('Please enter a valid 6-digit OTP');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/verifyProfileOtp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ otp })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Email verified and profile updated successfully!');
+                    closeOtpModal();
+                    setTimeout(() => {
+                        window.location.href = '/profile';
+                    }, 1500);
+                } else {
+                    alert('Error: ' + (data.error || 'Invalid OTP'));
+                }
+            } catch (error) {
+                console.error('Error verifying OTP:', error);
+                alert('Failed to verify OTP. Please try again.');
+            }
+        }
+
+        async function resendOtp() {
+            try {
+                const response = await fetch('/resendProfileOtp', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('New OTP sent to your email!');
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to resend OTP'));
+                }
+            } catch (error) {
+                console.error('Error resending OTP:', error);
+                alert('Failed to resend OTP. Please try again.');
+            }
+        }
+
+        function closeOtpModal() {
+            document.getElementById('otpModal').style.display = 'none';
+            document.getElementById('otpInput').value = '';
+        }
+    </script>
+</body>
+</html>
+<%- include('../partials/user/footer') %>

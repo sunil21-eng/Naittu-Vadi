@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <style>
+        /* General body and font styles */
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #f7fafc;
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content styles */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-top: 2px;
+            padding: 5px;
+        }
+
+        .add-product-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #1a202c;
+            border-radius: 8px;
+            transition: background-color 200ms;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .add-product-button:hover {
+            background-color: #2d3748;
+        }
+
+        /* Search container styles */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-box {
+            position: relative;
+            width: 350px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: #1a202c;
+            box-shadow: 0 0 0 2px rgba(26, 32, 44, 0.2);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 35px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #718096;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .clear-search-btn:hover {
+            background-color: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #718096;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Table styles */
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .product-table th,
+        .product-table td {
+            padding: 16px 24px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .product-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .product-table tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .product-image {
+            height: 40px;
+            width: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .product-name {
+            font-size: 14px;
+            color: #1a202c;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price,
+        .product-stock,
+        .product-category {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .attribute-tag {
+            display: inline-flex;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            background-color: #e2e8f0;
+            color: #2d3748;
+            margin-right: 4px;
+        }
+
+        .is-listed-section {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 16px;
+            margin-left: 8px;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 200ms ease-in-out;
+        }
+
+        .toggle-switch.listed {
+            background-color: #1a202c;
+        }
+
+        .toggle-switch.unlisted {
+            background-color: #a0aec0;
+        }
+
+        /* Spinner styles */
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1a202c;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            animation: spin 1s linear infinite;
+            margin: 2px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toggle-handle {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background-color: #ffffff;
+            border-radius: 9999px;
+            transition: transform 200ms ease-in-out;
+        }
+
+        .toggle-switch.listed .toggle-handle {
+            transform: translateX(16px);
+        }
+
+        /* Actions links */
+        .action-link {
+            text-decoration: none;
+            font-weight: 500;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 200ms ease-in-out;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .action-edit {
+            color: #4299e1;
+        }
+
+        .action-edit:hover {
+            color: #2b6cb0;
+            background-color: #edf2f7;
+        }
+
+        .action-delete {
+            color: #e53e3e;
+            margin-left: 8px;
+        }
+
+        .action-delete:hover {
+            color: #c53030;
+            background-color: #feebf0;
+        }
+
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 24px;
+            padding: 16px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .pagination-button {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border-radius: 8px;
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: background-color 200ms ease-in-out;
+            text-decoration: none;
+        }
+
+        .pagination-button:hover {
+            background-color: #edf2f7;
+        }
+
+        .pagination-button.active-page {
+            background-color: #1a202c;
+            color: #ffffff;
+            border-color: #1a202c;
+            pointer-events: none;
+        }
+
+        .pagination-button.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Custom message container styles */
+        .message-container {
+            padding: 12px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: opacity 0.5s ease-out;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .message-container.success {
+            background-color: #d4edda;
+            color: #155724;
+            opacity: 1;
+            height: auto;
+        }
+
+        .message-container.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            opacity: 1;
+            height: auto;
+        }
+
+        /* Modal styles for confirmation dialog */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal-message {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 24px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .modal-button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 200ms ease-in-out;
+        }
+
+        .modal-button.confirm {
+            background-color: #e53e3e;
+            color: #ffffff;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #c53030;
+        }
+
+        .modal-button.cancel {
+            background-color: #edf2f7;
+            color: #4a5568;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #e2e8f0;
+        }
+    </style>
+    <!-- Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation would be included here -->
+    <%-include("../partials/admin/navigation.ejs")%>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Message container for success/error alerts -->
+        <div id="message-container" class="message-container"></div>
+
+        <div class="header-section">
+            <h1 class="main-title">Products</h1>
+            <a href="/admin/addProduct" class="add-product-button">Add New Product</a>
+        </div>
+        
+        <!-- Search Box - Left Aligned -->
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search products by name or description..." 
+                    value="<%= searchQuery || '' %>"
+                >
+                <button id="clear-search" class="clear-search-btn" <%= searchQuery ? '' : 'style="display: none;"' %>>
+                    &times;
+                </button>
+                <button id="search-btn" class="search-btn">🔍</button>
+            </div>
+        </div>
+
+        <!-- Product Table Container -->
+        <div class="table-container">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>S.I. No.</th>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Category Attributes</th>
+                        <th>IsListed</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Products will be dynamically added here by EJS -->
+                    <% product.forEach((p, index)=> { %>
+                        <tr id="product-<%= p._id %>">
+                            <td>
+                                <%= (currentPage - 1) * 6 + index + 1 %>
+                            </td>
+                            <td>
+                                <!-- Assuming each product has an image URL, otherwise use a placeholder -->
+                                <img class="product-image" src="/uploads/productsImages/<%= p.images[0] %>"
+                                    alt="Product Image"
+                                    onerror="this.src='https://placehold.co/40x40/f0f0f0/808080?text=No+Img'">
+                            </td>
+                            <td class="product-name" title="<%= p.productName %>">
+                                <%= p.productName %>
+                            </td>
+                            <td class="product-price"> ₹<%= p.salePrice %>
+                            </td> 
+                            <td class="product-stock">
+                                <%= p.quantity %>
+                            </td>
+                            <td>
+                                <span class="attribute-tag">
+                                    <%= p.categoryAttribute %>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="is-listed-section">
+                                    <span class="status-text">
+                                        <%= p.isBlocked ? 'Unlisted' : 'Listed' %>
+                                    </span>
+                                    <div class="toggle-switch <%= p.isBlocked ? 'unlisted' : 'listed' %>"
+                                        data-product-id="<%= p._id %>" data-is-blocked="<%= p.isBlocked %>">
+                                        <span class="toggle-handle"></span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="product-category">
+                                <!-- Check if p.category exists before trying to access its properties -->
+                                <%= p.category ? p.category.name : 'N/A' %>
+                            </td>
+                            <td>
+                                <a href="/admin/productLists/edit/<%= p._id %>"
+                                    class="action-link action-edit">Edit</a>
+                                <button class="action-link action-delete"
+                                    onclick="showDeleteConfirmation('<%= p._id %>')">Delete</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-container">
+            <!-- Previous button -->
+            <a href="/admin/productLists?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+                class="pagination-button <%= currentPage === 1 ? 'disabled' : '' %>">Previous</a>
+
+            <!-- Page number buttons -->
+            <% for (let i=1; i <=totalPages; i++) { %>
+                <a href="/admin/productLists?page=<%= i %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+                    class="pagination-button <%= currentPage === i ? 'active-page' : '' %>">
+                    <%= i %>
+                </a>
+            <% } %>
+
+            <!-- Next button -->
+            <a href="/admin/productLists?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+                class="pagination-button <%= currentPage === totalPages ? 'disabled' : '' %>">Next</a>
+        </div>
+
+        <!-- Custom Modal for Deletion Confirmation -->
+        <div id="delete-modal" class="modal">
+            <div class="modal-content">
+                <p class="modal-message">Are you sure you want to delete this product? This action cannot be undone.
+                </p>
+                <div class="modal-buttons">
+                    <button id="confirm-delete-btn" class="modal-button confirm">Yes, Delete</button>
+                    <button id="cancel-delete-btn" class="modal-button cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Store productId to be deleted
+        let productIdToDelete = null;
+
+        // Function to show messages from the backend or script
+        function showMessage(message, type) {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.textContent = message;
+                messageContainer.className = `message-container ${type}`;
+                setTimeout(() => {
+                    messageContainer.className = 'message-container';
+                    messageContainer.textContent = '';
+                }, 4000);
+            }
+        }
+
+        // Function to show the delete confirmation modal
+        function showDeleteConfirmation(productId) {
+            productIdToDelete = productId;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        // Function to hide the modal
+        function hideDeleteConfirmation() {
+            document.getElementById('delete-modal').style.display = 'none';
+            productIdToDelete = null; // Clear the ID after use
+        }
+
+        // Function to handle product deletion
+        async function deleteProduct(productId) {
+            try {
+                // Construct the URL for the DELETE request.
+                // It's important that your backend has a route configured to handle this.
+                const response = await fetch(`/admin/productLists/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    // Find and remove the product row from the table
+                    const productRow = document.getElementById(`product-${productId}`);
+                    if (productRow) {
+                        productRow.remove();
+                    }
+                    showMessage(result.message, 'success');
+                } else {
+                    showMessage(result.message || 'Failed to delete product. Please check your network.', 'error');
+                    console.error('Error deleting product:', result.message);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showMessage('An error occurred while deleting the product. Please try again.', 'error');
+            }
+        }
+
+        // This function now handles the dynamic toggling.
+        // It's important to keep your toggle logic separate from the delete logic.
+        async function toggleProductListing(element) {
+            const productId = element.dataset.productId;
+            const isBlocked = element.dataset.isBlocked === 'true';
+
+            // Visually indicate loading state
+            element.innerHTML = '<div class="spinner"></div>';
+            element.style.pointerEvents = 'none'; // Disable clicks during fetch
+
+            try {
+                const response = await fetch('/admin/productLists/toggleList', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        isListed: isBlocked // Invert the value for the API call
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    const newIsBlocked = !isBlocked; // New `isBlocked` state
+
+                    // Update the DOM based on the new state
+                    element.dataset.isBlocked = newIsBlocked;
+                    element.classList.toggle('listed', !newIsBlocked);
+                    element.classList.toggle('unlisted', newIsBlocked);
+
+                    // Update the text next to the toggle switch
+                    const statusText = element.closest('.is-listed-section').querySelector('.status-text');
+                    statusText.textContent = newIsBlocked ? 'Unlisted' : 'Listed';
+
+                    showMessage(result.message, 'success');
+                } else {
+                    showMessage('Failed to toggle product status. Please try again.', 'error');
+                    console.error('Error toggling product:', result.error);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showMessage('An error occurred. Please check your network connection.', 'error');
+            } finally {
+                // Revert the visual state and re-enable clicks
+                element.innerHTML = '<span class="toggle-handle"></span>';
+                element.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search');
+            const searchBtn = document.getElementById('search-btn');
+            let searchTimeout;
+            
+            // Function to perform search
+            function performSearch() {
+                const searchValue = searchInput.value.trim();
+                const url = new URL(window.location.href);
+                
+                if (searchValue) {
+                    url.searchParams.set('search', searchValue);
+                    // Reset to first page when searching
+                    url.searchParams.set('page', 1);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                
+                window.location.href = url.toString();
+            }
+            
+            // Event listener for search input with debouncing
+            searchInput.addEventListener('input', () => {
+                // Show/hide clear button based on input
+                clearSearchBtn.style.display = searchInput.value ? 'block' : 'none';
+                
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                // Set new timeout for search execution (500ms delay)
+                searchTimeout = setTimeout(performSearch, 500);
+            });
+            
+            // Event listener for clear button
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                clearSearchBtn.style.display = 'none';
+                performSearch();
+            });
+            
+            // Event listener for search button
+            searchBtn.addEventListener('click', () => {
+                clearTimeout(searchTimeout);
+                performSearch();
+            });
+            
+            // Allow pressing Enter to search immediately
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimeout);
+                    performSearch();
+                }
+            });
+
+            // Check for success/error messages in the URL query parameters on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const successMessage = urlParams.get('success');
+            const errorMessage = urlParams.get('error');
+            if (successMessage) {
+                showMessage(successMessage, 'success');
+            }
+            if (errorMessage) {
+                showMessage(errorMessage, 'error');
+            }
+
+            // Handle the delete confirmation button click
+            document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+                if (productIdToDelete) {
+                    deleteProduct(productIdToDelete);
+                }
+                hideDeleteConfirmation();
+            });
+
+            // Handle the cancel button click
+            document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+                hideDeleteConfirmation();
+            });
+
+            // Attach event listeners dynamically to all toggle switches
+            const toggleSwitches = document.querySelectorAll('.toggle-switch');
+            toggleSwitches.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    toggleProductListing(toggle);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

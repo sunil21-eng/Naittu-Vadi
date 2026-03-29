@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - AllScouts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --danger-color: #e63946;
+            --success-color: #2a9d8f;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+            --sidebar-bg: #2c3e50;
+            --sidebar-active: #3498db;
+            --wallet-success: #1cc88a;
+            --wallet-danger: #e74a3b;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .profile-header {
+            background-color: var(--light-gray);
+            padding: 40px 0 25px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .breadcrumb {
+            justify-content: center;
+            background: transparent;
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .profile-container {
+            display: flex;
+            max-width: 98%;
+            margin: 0 auto 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        /* Sidebar Styles */
+        .profile-sidebar {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+        }
+
+        .profile-sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-sidebar-menu li {
+            margin: 0;
+        }
+
+        .profile-sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .profile-sidebar-menu a:hover {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .profile-sidebar-menu a.profile-active {
+            background-color: var(--sidebar-active);
+            border-left-color: #2980b9;
+            color: white;
+        }
+
+        .profile-sidebar-menu i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .profile-logout {
+            padding: 15px 20px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-logout-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .profile-logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .profile-logout-btn i {
+            margin-right: 6px;
+        }
+
+        /* Main Content Styles */
+        .profile-main-content {
+            flex: 1;
+            padding: 25px;
+        }
+
+        .profile-page-title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .profile-page-subtitle {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Transaction Styles */
+        .transaction-card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            background: white;
+        }
+
+        .transaction-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .credit {
+            color: var(--wallet-success);
+            font-weight: 600;
+        }
+
+        .debit {
+            color: var(--wallet-danger);
+            font-weight: 600;
+        }
+
+        .transaction-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .credit-icon {
+            background-color: rgba(28, 200, 138, 0.1);
+            color: var(--wallet-success);
+            border: 2px solid rgba(28, 200, 138, 0.2);
+        }
+
+        .debit-icon {
+            background-color: rgba(231, 74, 59, 0.1);
+            color: var(--wallet-danger);
+            border: 2px solid rgba(231, 74, 59, 0.2);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .transaction-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #d1d3e2;
+        }
+
+        .pagination-container {
+            margin-top: 30px;
+        }
+
+        .page-info {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .profile-container {
+                flex-direction: column;
+                max-width: 95%;
+            }
+            
+            .profile-sidebar {
+                width: 100%;
+            }
+            
+            .profile-sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .profile-sidebar-menu li {
+                flex-shrink: 0;
+            }
+            
+            .profile-sidebar-menu a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                white-space: nowrap;
+            }
+            
+            .profile-sidebar-menu a.profile-active {
+                border-left: none;
+                border-bottom-color: #2980b9;
+            }
+            
+            .transaction-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-main-content {
+                padding: 20px;
+            }
+            
+            .profile-header {
+                padding: 30px 0 20px;
+            }
+            
+            .profile-title {
+                font-size: 1.5rem;
+            }
+            
+            .transaction-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-main-content {
+                padding: 15px 12px;
+            }
+            
+            .profile-header {
+                padding: 25px 0 15px;
+            }
+            
+            .profile-title {
+                font-size: 1.3rem;
+            }
+            
+            .transaction-header {
+                padding: 15px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/user/header') %>
+
+    <!-- Profile Header -->
+    <section class="profile-header">
+        <div class="container">
+            <h1 class="profile-title">Transaction History</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
+                    <li class="breadcrumb-item"><a href="/wallet">Wallet</a></li>
+                    <li class="breadcrumb-item active">Transactions</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Profile Content -->
+    <div class="profile-container">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+            <ul class="profile-sidebar-menu">
+                <li><a href="/profile"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="/my-orders"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                <li><a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                <li><a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a></li>
+                <li><a href="/changePassword"><i class="fas fa-key"></i> Change Password</a></li>
+            </ul>
+            <div class="profile-logout">
+                <button class="profile-logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="profile-main-content">
+            <div class="transaction-header">
+                <div>
+                    <h1 class="profile-page-title">Transaction History</h1>
+                    <p class="profile-page-subtitle">View all your wallet transactions</p>
+                </div>
+                <div>
+                    <a href="/wallet" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Wallet
+                    </a>
+                </div>
+            </div>
+
+            <!-- Transaction Stats -->
+            <div class="transaction-stats">
+                <div class="stat-card">
+                    <div class="stat-number">₹<%= wallet.balance || 0 %></div>
+                    <div class="stat-label">Current Balance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number"><%= totalTransactions || 0 %></div>
+                    <div class="stat-label">Total Transactions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number"><%= totalPages || 1 %></div>
+                    <div class="stat-label">Total Pages</div>
+                </div>
+            </div>
+
+            <!-- Transactions List -->
+            <% if (wallet.transaction && wallet.transaction.length > 0) { %>
+                <div class="transactions-list">
+                    <% wallet.transaction.forEach(transaction => { %>
+                        <div class="transaction-card p-4">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <div class="transaction-icon <%= transaction.transactionsMethod === 'Credit' || transaction.transactionsMethod === 'Refund' || transaction.transactionsMethod === 'Referral' || transaction.transactionsMethod === 'Razorpay' ? 'credit-icon' : 'debit-icon' %>">
+                                        <% if (transaction.transactionsMethod === 'Credit' || transaction.transactionsMethod === 'Razorpay') { %>
+                                            <i class="fas fa-arrow-down"></i>
+                                        <% } else if (transaction.transactionsMethod === 'Debit' || transaction.transactionsMethod === 'Payment') { %>
+                                            <i class="fas fa-arrow-up"></i>
+                                        <% } else if (transaction.transactionsMethod === 'Refund') { %>
+                                            <i class="fas fa-undo"></i>
+                                        <% } else if (transaction.transactionsMethod === 'Referral') { %>
+                                            <i class="fas fa-gift"></i>
+                                        <% } else { %>
+                                            <i class="fas fa-exchange-alt"></i>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 class="mb-1 fw-bold"><%= transaction.transactionsMethod %></h6>
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                <%= new Date(transaction.date).toLocaleDateString('en-US', { 
+                                                    year: 'numeric', 
+                                                    month: 'long', 
+                                                    day: 'numeric' 
+                                                }) %>
+                                            </p>
+                                            <p class="text-muted mb-0">
+                                                <i class="fas fa-clock me-1"></i>
+                                                <%= new Date(transaction.date).toLocaleTimeString('en-US', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) %>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <% if (transaction.orderId && transaction.orderId.orderNumber) { %>
+                                                <p class="mb-1">
+                                                    <strong>Order:</strong> #<%= transaction.orderId.orderNumber %>
+                                                </p>
+                                            <% } %>
+                                            <p class="mb-0">
+                                                <strong>Transaction ID:</strong> 
+                                                <small class="text-muted"><%= transaction._id.toString().substring(18, 24).toUpperCase() %></small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-auto text-end">
+                                    <h4 class="mb-0 <%= transaction.transactionsMethod === 'Credit' || transaction.transactionsMethod === 'Refund' || transaction.transactionsMethod === 'Referral' || transaction.transactionsMethod === 'Razorpay' ? 'credit' : 'debit' %>">
+                                        <%= transaction.transactionsMethod === 'Credit' || transaction.transactionsMethod === 'Refund' || transaction.transactionsMethod === 'Referral' || transaction.transactionsMethod === 'Razorpay' ? '+' : '-' %>₹<%= transaction.amount %>
+                                    </h4>
+                                    <small class="text-muted">
+                                        <%= transaction.transactionsMethod === 'Credit' || transaction.transactionsMethod === 'Refund' || transaction.transactionsMethod === 'Referral' || transaction.transactionsMethod === 'Razorpay' ? 'Credited' : 'Debited' %>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                    <div class="pagination-container">
+                        <div class="page-info">
+                            Showing page <%= currentPage %> of <%= totalPages %> 
+                            (<%= totalTransactions %> total transactions)
+                        </div>
+                        <nav aria-label="Transaction pagination">
+                            <ul class="pagination justify-content-center">
+                                <% if (currentPage > 1) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="/wallet/transactions?page=<%= currentPage - 1 %>">
+                                            <i class="fas fa-chevron-left me-1"></i>Previous
+                                        </a>
+                                    </li>
+                                <% } %>
+                                
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="/wallet/transactions?page=<%= i %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                
+                                <% if (currentPage < totalPages) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="/wallet/transactions?page=<%= currentPage + 1 %>">
+                                            Next<i class="fas fa-chevron-right ms-1"></i>
+                                        </a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
+                <% } %>
+
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>No Transactions Found</h3>
+                    <p class="text-muted">You haven't made any transactions yet.</p>
+                    <a href="/wallet" class="btn btn-primary mt-3">
+                        <i class="fas fa-wallet me-2"></i>Go to Wallet
+                    </a>
+                </div>
+            <% } %>
+        </main>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-light py-3 mt-3">
+        <div class="container text-center">
+            <p class="mb-0" style="font-size: 0.85rem;">&copy; 2023 Your Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/logout', { method: 'POST' });
+                if (res.ok) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Logout failed');
+                alert('Logout failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during logout:', error);
+                alert('Error during logout. Please try again.');
+            }
+        });
+
+        // Auto-refresh page every 30 seconds to update balance
+        setInterval(() => {
+            window.location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>

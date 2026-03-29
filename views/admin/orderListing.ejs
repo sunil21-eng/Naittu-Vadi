@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <style>
+        /* General body and font styles */
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #f7fafc;
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content styles */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            font-size: 30px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-top: 2px;
+            padding: 5px;
+        }
+
+        /* Search container styles */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-box {
+            position: relative;
+            width: 350px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        #search-input:focus {
+            outline: none;
+            border-color: #1a202c;
+            box-shadow: 0 0 0 2px rgba(26, 32, 44, 0.2);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 35px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #718096;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .clear-search-btn:hover {
+            background-color: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #718096;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Filter dropdown styles */
+        .filter-container {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .filter-dropdown {
+            padding: 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #4a5568;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .filter-dropdown:focus {
+            outline: none;
+            border-color: #1a202c;
+            box-shadow: 0 0 0 2px rgba(26, 32, 44, 0.2);
+        }
+
+        /* Table styles */
+        .table-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 16px 24px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .order-table th {
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .order-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .order-table tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .customer-name {
+            font-size: 14px;
+            color: #1a202c;
+            font-weight: 500;
+        }
+
+        .customer-email {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .order-date {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .amount {
+            font-size: 14px;
+            color: #1a202c;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+            padding: 6px 10px;
+            border-radius: 9999px;
+        }
+
+        .status-pending {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .status-confirmed {
+            background-color: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .status-shipped {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+
+        .status-delivered {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+
+        .status-cancelled {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .status-returned {
+            background-color: #e9d8fd;
+            color: #6b46c1;
+        }
+
+        .payment-paid {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+
+        .payment-pending {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .payment-failed {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .return-requested {
+            background-color: #fefcbf;
+            color: #744210;
+        }
+
+        .return-approved {
+            background-color: #c6f6d5;
+            color: #276749;
+        }
+
+        .return-rejected {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .return-none {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+
+        /* Actions links */
+        .action-link {
+            text-decoration: none;
+            font-weight: 500;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 200ms ease-in-out;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .action-ship {
+            color: #38a169;
+        }
+
+        .action-ship:hover {
+            color: #2f855a;
+            background-color: #f0fff4;
+        }
+
+        /* Pagination styles */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 24px;
+            padding: 16px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .pagination-button {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border-radius: 8px;
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            transition: background-color 200ms ease-in-out;
+            text-decoration: none;
+        }
+
+        .pagination-button:hover {
+            background-color: #edf2f7;
+        }
+
+        .pagination-button.active-page {
+            background-color: #1a202c;
+            color: #ffffff;
+            border-color: #1a202c;
+            pointer-events: none;
+        }
+
+        .pagination-button.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stats-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 20px;
+            border-left: 4px solid #1a202c;
+        }
+
+        .stats-card h5 {
+            font-size: 14px;
+            color: #718096;
+            margin: 0 0 8px 0;
+            font-weight: 500;
+        }
+
+        .stats-card h2 {
+            font-size: 24px;
+            color: #1a202c;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        /* Custom message container styles */
+        .message-container {
+            padding: 12px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            transition: opacity 0.5s ease-out;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .message-container.success {
+            background-color: #d4edda;
+            color: #155724;
+            opacity: 1;
+            height: auto;
+        }
+
+        .message-container.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            opacity: 1;
+            height: auto;
+        }
+
+        /* Avatar styles */
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #1a202c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 10px;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .customer-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modal styles for confirmation dialog */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal-message {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 24px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .modal-button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 200ms ease-in-out;
+        }
+
+        .modal-button.confirm {
+            background-color: #e53e3e;
+            color: #ffffff;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #c53030;
+        }
+
+        .modal-button.cancel {
+            background-color: #edf2f7;
+            color: #4a5568;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Prevent action buttons from triggering row click */
+        .action-cell {
+            cursor: default;
+        }
+
+        .action-cell * {
+            cursor: pointer;
+        }
+
+        /* No actions message */
+        .no-actions {
+            color: #718096;
+            font-style: italic;
+            font-size: 14px;
+        }
+    </style>
+    <!-- Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation would be included here -->
+    <%-include("../partials/admin/navigation.ejs")%>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Message container for success/error alerts -->
+        <div id="message-container" class="message-container"></div>
+
+        <div class="header-section">
+            <h1 class="main-title">Orders</h1>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-container">
+            <div class="stats-card">
+                <h5>TOTAL ORDERS</h5>
+                <h2><%= totalOrders %></h2>
+            </div>
+            <div class="stats-card" style="border-left-color: #4299e1;">
+                <h5>CONFIRMED</h5>
+                <h2><%= orders.filter(order => order.orderStatus === 'Confirmed').length %></h2>
+            </div>
+            <div class="stats-card" style="border-left-color: #ed8936;">
+                <h5>PENDING</h5>
+                <h2><%= orders.filter(order => order.orderStatus === 'Pending').length %></h2>
+            </div>
+            <div class="stats-card" style="border-left-color: #38a169;">
+                <h5>DELIVERED</h5>
+                <h2><%= orders.filter(order => order.orderStatus === 'Delivered').length %></h2>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search by customer name..." 
+                    value="<%= search || '' %>"
+                >
+                <button id="clear-search" class="clear-search-btn" <%= search ? '' : 'style="display: none;"' %>>
+                    &times;
+                </button>
+                <button id="search-btn" class="search-btn">🔍</button>
+            </div>
+            
+            <div class="filter-container">
+                <select class="filter-dropdown" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="Pending" <%= statusFilter === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="Confirmed" <%= statusFilter === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+                    <option value="Shipped" <%= statusFilter === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                    <option value="Delivered" <%= statusFilter === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                    <option value="Cancelled" <%= statusFilter === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    <option value="Returned" <%= statusFilter === 'Returned' ? 'selected' : '' %>>Returned</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Orders Table Container -->
+        <div class="table-container">
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>SL NO.</th>
+                        <th>ORDER ID</th>
+                        <th>CUSTOMER</th>
+                        <th>DATE</th>
+                        <th>AMOUNT</th>
+                        <th>ORDER STATUS</th>
+                        <th>PAYMENT STATUS</th>
+                        <th>RETURN STATUS</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(function(order, index) { %>
+                            <tr class="order-row" data-order-id="<%= order._id %>">
+                                <td>
+                                    <%= (currentPage - 1) * limit + index + 1 %>
+                                </td>
+                                <td class="order-id">#<%= order.displayOrderId %></td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="avatar">
+                                            <%= order.customerName ? order.customerName.charAt(0).toUpperCase() : 'U' %>
+                                        </div>
+                                        <div class="customer-details">
+                                            <div class="customer-name"><%= order.customerName || 'Unknown Customer' %></div>
+                                            <% if (order.userId && order.userId.email) { %>
+                                                <div class="customer-email"><%= order.userId.email %></div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="order-date"><%= order.formattedDate %></td>
+                                <td class="amount">₹<%= order.finalAmount.toFixed(2) %></td>
+                                <td>
+                                    <span class="status-badge status-<%= order.orderStatus.toLowerCase() %>">
+                                        <%= order.orderStatus %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge payment-<%= order.paymentStatus === 'Paid' ? 'paid' : order.paymentStatus === 'Failed' ? 'failed' : 'pending' %>">
+                                        <%= order.paymentStatus || 'Pending' %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-badge 
+                                        <%= order.returnStatus === 'Return Requested' ? 'return-requested' : 
+                                            order.returnStatus === 'Return Approved' ? 'return-approved' :
+                                            order.returnStatus === 'Return Rejected' ? 'return-rejected' : 'return-none' %>">
+                                        <%= order.returnStatus %>
+                                    </span>
+                                </td>
+                                <td class="action-cell">
+                                    <% if (order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed') { %>
+                                        <button class="action-link action-ship" onclick="updateOrderStatus('<%= order._id %>', 'Shipped')">Ship</button>
+                                    <% } else if (order.orderStatus === 'Shipped') { %>
+                                        <button class="action-link action-deliver" onclick="updateOrderStatus('<%= order._id %>', 'Delivered')">Deliver</button>
+                                    <% } else { %>
+                                        <span class="no-actions">No actions</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <i class="fas fa-shopping-cart fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted">No orders found</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <% if (totalPages > 1) { %>
+            <div class="pagination-container">
+                <!-- Previous button -->
+                <a href="/admin/orders?page=<%= prevPage %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= statusFilter ? '&status=' + encodeURIComponent(statusFilter) : '' %>"
+                    class="pagination-button <%= !hasPrevPage ? 'disabled' : '' %>">Previous</a>
+
+                <!-- Page number buttons -->
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <a href="/admin/orders?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= statusFilter ? '&status=' + encodeURIComponent(statusFilter) : '' %>"
+                        class="pagination-button <%= currentPage === i ? 'active-page' : '' %>">
+                        <%= i %>
+                    </a>
+                <% } %>
+
+                <!-- Next button -->
+                <a href="/admin/orders?page=<%= nextPage %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= statusFilter ? '&status=' + encodeURIComponent(statusFilter) : '' %>"
+                    class="pagination-button <%= !hasNextPage ? 'disabled' : '' %>">Next</a>
+            </div>
+        <% } %>
+
+        <!-- Custom Modal for Status Update Confirmation -->
+        <div id="status-modal" class="modal">
+            <div class="modal-content">
+                <p class="modal-message" id="status-modal-message">Are you sure you want to update this order status?</p>
+                <div class="modal-buttons">
+                    <button id="confirm-status-btn" class="modal-button confirm">Yes, Update</button>
+                    <button id="cancel-status-btn" class="modal-button cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Store orderId and status for update
+        let orderIdToUpdate = null;
+        let newStatusToUpdate = null;
+
+        // Function to show messages
+        function showMessage(message, type) {
+            const messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.textContent = message;
+                messageContainer.className = `message-container ${type}`;
+                setTimeout(() => {
+                    messageContainer.className = 'message-container';
+                    messageContainer.textContent = '';
+                }, 4000);
+            }
+        }
+
+        // Function to show status update confirmation modal
+        function showStatusConfirmation(orderId, status) {
+            orderIdToUpdate = orderId;
+            newStatusToUpdate = status;
+            
+            const statusMessage = `Are you sure you want to update order status to "${status}"?`;
+            document.getElementById('status-modal-message').textContent = statusMessage;
+            document.getElementById('status-modal').style.display = 'flex';
+        }
+
+        // Function to hide status modal
+        function hideStatusConfirmation() {
+            document.getElementById('status-modal').style.display = 'none';
+            orderIdToUpdate = null;
+            newStatusToUpdate = null;
+        }
+
+        // Function to update order status
+        async function updateOrderStatus(orderId, status) {
+            showStatusConfirmation(orderId, status);
+        }
+
+        // Function to perform the actual status update
+        async function performStatusUpdate() {
+            if (!orderIdToUpdate || !newStatusToUpdate) return;
+
+            try {
+                const response = await fetch(`/admin/orders/${orderIdToUpdate}/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderStatus: newStatusToUpdate })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('Order status updated successfully', 'success');
+                    // Reload the page after a short delay to show the updated status
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showMessage('Error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('An error occurred while updating the order', 'error');
+            } finally {
+                hideStatusConfirmation();
+            }
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search');
+            const searchBtn = document.getElementById('search-btn');
+            const statusFilter = document.getElementById('statusFilter');
+            let searchTimeout;
+            
+            // Function to perform search
+            function performSearch() {
+                const searchValue = searchInput.value.trim();
+                const statusValue = statusFilter.value;
+                
+                let url = '/admin/orders?';
+                if (searchValue) url += `search=${encodeURIComponent(searchValue)}&`;
+                if (statusValue) url += `status=${encodeURIComponent(statusValue)}`;
+                
+                // Remove trailing & if present
+                if (url.endsWith('&')) {
+                    url = url.slice(0, -1);
+                }
+                
+                window.location.href = url;
+            }
+            
+            // Event listener for search input with debouncing
+            searchInput.addEventListener('input', () => {
+                // Show/hide clear button based on input
+                clearSearchBtn.style.display = searchInput.value ? 'block' : 'none';
+                
+                // Clear previous timeout
+                clearTimeout(searchTimeout);
+                
+                // Set new timeout for search execution (500ms delay)
+                searchTimeout = setTimeout(performSearch, 500);
+            });
+            
+            // Event listener for clear button
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                clearSearchBtn.style.display = 'none';
+                performSearch();
+            });
+            
+            // Event listener for search button
+            searchBtn.addEventListener('click', () => {
+                clearTimeout(searchTimeout);
+                performSearch();
+            });
+            
+            // Event listener for status filter
+            statusFilter.addEventListener('change', () => {
+                performSearch();
+            });
+            
+            // Allow pressing Enter to search immediately
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(searchTimeout);
+                    performSearch();
+                }
+            });
+
+            // Check for success/error messages in the URL query parameters on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const successMessage = urlParams.get('success');
+            const errorMessage = urlParams.get('error');
+            if (successMessage) {
+                showMessage(successMessage, 'success');
+            }
+            if (errorMessage) {
+                showMessage(errorMessage, 'error');
+            }
+
+            // Handle row click to redirect to order details
+            const orderRows = document.querySelectorAll('.order-row');
+            orderRows.forEach(row => {
+                row.addEventListener('click', (e) => {
+                    // Don't redirect if the click was on an action button
+                    if (e.target.closest('.action-cell') || e.target.closest('.action-link')) {
+                        return;
+                    }
+                    
+                    const orderId = row.getAttribute('data-order-id');
+                    if (orderId) {
+                        window.location.href = `/admin/orders/${orderId}`;
+                    }
+                });
+            });
+
+            // Handle the status confirmation button click
+            document.getElementById('confirm-status-btn').addEventListener('click', () => {
+                performStatusUpdate();
+            });
+
+            // Handle the cancel button click
+            document.getElementById('cancel-status-btn').addEventListener('click', () => {
+                hideStatusConfirmation();
+            });
+        });
+    </script>
+</body>
+</html>

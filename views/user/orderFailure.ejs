@@ -1,0 +1,693 @@
+<%- include('../partials/user/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed - ARTIMES</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+            --success-color: #27ae60;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 80px;
+        }
+
+        .failure-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .failure-card {
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border: none;
+            overflow: hidden;
+            background: white;
+        }
+
+        .failure-header {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .failure-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(0); }
+            40% { transform: translateX(-10px); }
+            60% { transform: translateX(10px); }
+        }
+
+        .error-details {
+            padding: 2.5rem;
+        }
+
+        .detail-card {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .info-value {
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Price Styles */
+        .current-price {
+            font-weight: 700;
+            color: var(--success-color);
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        
+        .discount-badge {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .free-badge {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .offer-tag {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 5px;
+        }
+
+        /* Button Styles */
+        .btn-retry-payment {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-retry-payment:hover {
+            background: linear-gradient(135deg, #c0392b, var(--danger-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+
+        .btn-alternate-payment {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-alternate-payment:hover {
+            background: linear-gradient(135deg, #2980b9, var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .btn-back-to-orders {
+            background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+            border: none;
+            padding: 0.875rem 1.75rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back-to-orders:hover {
+            background: linear-gradient(135deg, #2c3e50, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(44, 62, 80, 0.4);
+            color: white;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .troubleshooting {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .support-section {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .payment-method {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-method:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .payment-method.active {
+            border-color: var(--secondary-color);
+            background: #e3f2fd;
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 70px; }
+            .failure-header { padding: 2rem 1rem; }
+            .error-details { padding: 1.5rem; }
+            .btn-retry-payment,
+            .btn-alternate-payment,
+            .btn-back-to-orders {
+                padding: 0.875rem 1.5rem;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            .payment-methods { grid-template-columns: 1fr; }
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-failed {
+            background: #ffebee;
+            color: var(--danger-color);
+            border: 1px solid #ffcdd2;
+        }
+
+        /* Retry Animation */
+        .retry-loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--danger-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Order Summary Styles */
+        .order-summary-small {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .order-summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .order-summary-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Failure Content -->
+    <div class="container failure-container my-5">
+        <div class="failure-card">
+            <!-- Failure Header -->
+            <div class="failure-header">
+                <div class="failure-icon">
+                    <i class="fas fa-times"></i>
+                </div>
+                <h1 class="display-5 fw-bold mb-3">Payment Failed!</h1>
+                <p class="lead mb-0">We encountered an issue processing your payment. Don't worry, your order is safe.</p>
+            </div>
+
+            <!-- Error Details -->
+            <div class="error-details">
+                <!-- Order Information -->
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-receipt me-2"></i>Order Information</h4>
+                    <div class="info-item">
+                        <span class="info-label">Order Number</span>
+                        <span class="info-value fw-bold">#<%= orderId || '' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Order Amount</span>
+                        <span class="info-value fw-bold">₹<%= orderAmount ? Number(orderAmount).toFixed(2) : '0.00' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Payment Method</span>
+                        <span class="info-value"><%= paymentMethod || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Payment Status</span>
+                        <span class="status-badge status-failed"><%= paymentStatus || 'Failed' %></span>
+                    </div>
+                    <% if (userName) { %>
+                    <div class="info-item">
+                        <span class="info-label">Customer Name</span>
+                        <span class="info-value"><%= userName %></span>
+                    </div>
+                    <% } %>
+                    <% if (userPhone) { %>
+                    <div class="info-item">
+                        <span class="info-label">Contact Number</span>
+                        <span class="info-value"><%= userPhone %></span>
+                    </div>
+                    <% } %>
+                    <% if (email) { %>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value"><%= email %></span>
+                    </div>
+                    <% } %>
+                </div>
+
+                <!-- Error Message -->
+                <% if (errorMessage) { %>
+                <div class="error-message">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger me-3 mt-1"></i>
+                        <div>
+                            <h5 class="mb-2">What Went Wrong?</h5>
+                            <p class="mb-0"><%= errorMessage %></p>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Common Error Reasons -->
+                <div class="troubleshooting">
+                    <h5 class="mb-3"><i class="fas fa-wrench me-2"></i>Common Payment Issues</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-credit-card me-2 text-danger"></i> Insufficient funds in your account</li>
+                        <li class="mb-2"><i class="fas fa-shield-alt me-2 text-danger"></i> Bank transaction declined for security reasons</li>
+                        <li class="mb-2"><i class="fas fa-wifi me-2 text-danger"></i> Network connectivity issues</li>
+                        <li class="mb-2"><i class="fas fa-clock me-2 text-danger"></i> Payment session timeout</li>
+                        <li class="mb-2"><i class="fas fa-ban me-2 text-danger"></i> Technical error with payment gateway</li>
+                    </ul>
+                </div>
+
+                <!-- Retry Payment Section -->
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-redo me-2"></i>Retry Payment</h4>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method" data-method="razorpay" onclick="selectPaymentMethod('razorpay')">
+                            <div class="payment-icon">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="payment-name">Online Payment</div>
+                            <small class="text-muted">Razorpay</small>
+                        </div>
+                        
+                        <div class="payment-method" data-method="wallet" onclick="selectPaymentMethod('wallet')">
+                            <div class="payment-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="payment-name">Wallet</div>
+                            <small class="text-muted">Use Wallet Balance</small>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons mt-4">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <button id="retryPaymentBtn" class="btn btn-retry-payment w-100" onclick="retryPayment()">
+                                    <i class="fas fa-redo me-2"></i>
+                                    <span>Retry Payment</span>
+                                    <div class="retry-loader ms-2"></div>
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="/my-orders" class="btn btn-back-to-orders w-100">
+                                    <i class="fas fa-arrow-left me-2"></i>View My Orders
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alternative Options -->
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-exchange-alt me-2"></i>Alternative Options</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <a href="/checkout" class="btn btn-alternate-payment w-100">
+                                <i class="fas fa-shopping-cart me-2"></i>Try Different Payment
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <a href="/#products" class="btn btn-alternate-payment w-100">
+                                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Information -->
+                <div class="support-section">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-headset fa-2x text-warning me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Need Immediate Help?</h6>
+                            <p class="mb-2">Our support team is here to assist you with payment issues.</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong><i class="fas fa-envelope me-2"></i>Email:</strong>
+                                    <br>opensurfaces21@gmail.com
+                                </div>
+                                <div class="col-md-6">
+                                    <strong><i class="fas fa-phone me-2"></i>Phone:</strong>
+                                    <br>+91-7868829460
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Notice -->
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <strong>Security Notice:</strong> Your payment information is secure. We do not store your card details. 
+                    All transactions are processed through secure payment gateways.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var selectedPaymentMethod = 'razorpay';
+        var orderId = '<%= orderId || "" %>';
+        var orderAmount = '<%= orderAmount ? Number(orderAmount) : 0 %>';
+        var razorpayKeyId = '<%= razorpayKeyId || "" %>';
+        var userEmail = '<%= email || "" %>';
+        var userName = '<%= userName || "Customer" %>';
+        var userPhone = '<%= userPhone || "" %>';
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            
+            // Update UI
+            var paymentMethods = document.querySelectorAll('.payment-method');
+            for (var i = 0; i < paymentMethods.length; i++) {
+                paymentMethods[i].classList.remove('active');
+            }
+            var selectedElement = document.querySelector('[data-method="' + method + '"]');
+            if (selectedElement) {
+                selectedElement.classList.add('active');
+            }
+        }
+
+        function retryPayment() {
+            var retryBtn = document.getElementById('retryPaymentBtn');
+            var retryText = retryBtn.querySelector('span');
+            var loader = retryBtn.querySelector('.retry-loader');
+            
+            // Show loading state
+            retryText.textContent = 'Processing...';
+            loader.style.display = 'inline-block';
+            retryBtn.disabled = true;
+
+            try {
+                if (selectedPaymentMethod === 'razorpay') {
+                    initiateRazorpayPayment();
+                } else if (selectedPaymentMethod === 'wallet') {
+                    initiateWalletPayment();
+                } else {
+                    initiateRazorpayPayment();
+                }
+            } catch (error) {
+                console.error('Payment initiation error:', error);
+                showError('Failed to initiate payment. Please try again.');
+                resetRetryButton();
+            }
+        }
+
+        function initiateRazorpayPayment() {
+            var options = {
+                key: razorpayKeyId,
+                amount: Math.round(orderAmount * 100), // amount in paise
+                currency: "INR",
+                name: "ARTIMES",
+                description: "Order Payment",
+                handler: function (response) {
+                    verifyPayment(response);
+                },
+                prefill: {
+                    name: userName,
+                    email: userEmail,
+                    contact: userPhone
+                },
+                notes: {
+                    order_id: orderId
+                },
+                theme: {
+                    color: "#e74c3c"
+                },
+                modal: {
+                    ondismiss: function() {
+                        resetRetryButton();
+                    }
+                }
+            };
+
+            // Create order and get order_id from backend
+            fetch('/create-razorpay-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: orderAmount,
+                    orderId: orderId
+                })
+            })
+            .then(function(response) { 
+                return response.json(); 
+            })
+            .then(function(data) {
+                if (data.success) {
+                    options.order_id = data.order.id;
+                    var rzp = new Razorpay(options);
+                    rzp.open();
+                } else {
+                    throw new Error(data.error || 'Failed to create payment order');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error creating Razorpay order:', error);
+                showError('Payment service temporarily unavailable. Please try again later.');
+                resetRetryButton();
+            });
+        }
+
+        function initiateWalletPayment() {
+            // Redirect to checkout page for wallet payment
+            window.location.href = '/checkout';
+        }
+
+        function verifyPayment(paymentResponse) {
+            fetch('/verify-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    razorpay_order_id: paymentResponse.razorpay_order_id,
+                    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                    razorpay_signature: paymentResponse.razorpay_signature,
+                    orderId: orderId
+                })
+            })
+            .then(function(response) { 
+                return response.json(); 
+            })
+            .then(function(data) {
+                if (data.success) {
+                    // Redirect to success page
+                    window.location.href = '/orderSuccess/' + orderId;
+                } else {
+                    showError('Payment verification failed. Please contact support.');
+                    resetRetryButton();
+                }
+            })
+            .catch(function(error) {
+                console.error('Payment verification error:', error);
+                showError('Payment verification failed. Please contact support.');
+                resetRetryButton();
+            });
+        }
+
+        function resetRetryButton() {
+            var retryBtn = document.getElementById('retryPaymentBtn');
+            var retryText = retryBtn.querySelector('span');
+            var loader = retryBtn.querySelector('.retry-loader');
+            
+            retryText.textContent = 'Retry Payment';
+            loader.style.display = 'none';
+            retryBtn.disabled = false;
+        }
+
+        function showError(message) {
+            // Create toast notification
+            var toast = document.createElement('div');
+            toast.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = '<strong>Error!</strong> ' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+            document.body.appendChild(toast);
+
+            // Auto remove after 5 seconds
+            setTimeout(function() {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 5000);
+        }
+
+        // Initialize default selected payment method
+        document.addEventListener('DOMContentLoaded', function() {
+            selectPaymentMethod('razorpay');
+            
+            // Auto-retry prompt after 30 seconds
+            setTimeout(function() {
+                if (confirm('Would you like to retry the payment?')) {
+                    retryPayment();
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
+<%- include('../partials/user/footer') %>

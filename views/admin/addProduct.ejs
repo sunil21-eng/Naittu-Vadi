@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add product</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7f9;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 24px;
+        }
+
+        .notification {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .product-form {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit {
+            background-color: #2ecc71;
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .btn-submit:hover {
+            background-color: #27ae60;
+        }
+
+        .image-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .image-upload {
+            border: 2px dashed #ccc;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload:hover {
+            border-color: #3498db;
+            background-color: #f8fcff;
+        }
+
+        .image-upload p {
+            margin: 10px 0;
+            color: #7f8c8d;
+        }
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .crop-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .crop-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .crop-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background-color: #e74c3c;
+        }
+
+        .btn-cancel:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-confirm {
+            background-color: #2ecc71;
+        }
+
+        .btn-confirm:hover {
+            background-color: #27ae60;
+        }
+
+        #crop-image {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #2ecc71;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(30px);
+        }
+
+        .toggle-status {
+            font-weight: 600;
+            margin-left: 15px;
+            min-width: 70px;
+        }
+
+        .status-listed {
+            color: #2ecc71;
+        }
+
+        .status-unlisted {
+            color: #e74c3c;
+        }
+
+        .loading {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* Validation error styles */
+        label.error {
+            color: #e74c3c;
+            font-size: 13px;
+            font-weight: normal;
+            margin-top: 5px;
+            display: block;
+        }
+
+        input.error,
+        select.error,
+        textarea.error {
+            border-color: #e74c3c;
+        }
+
+        .image-error {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: 600;
+            display: block;
+        }
+
+        input[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+</head>
+
+<body>
+    <%-include("../partials/admin/navigation.ejs")%>
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1 class="page-header">Add New Product</h1>
+
+            <div id="notification"></div>
+
+            <!-- Hidden element to store categories from server -->
+            <div id="categories-data" style="display: none;">
+                <%= JSON.stringify(category || []) %>
+            </div>
+
+            <div class="form-container">
+                <div class="product-form">
+                    <form id="add-product-form" enctype="multipart/form-data">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="productName">Product Name</label>
+                                <input type="text" id="productName" name="productName" placeholder="Enter product name"
+                                    required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="description">Description</label>
+                                <textarea id="description" name="description" rows="4"
+                                    placeholder="Enter product description"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="color">Colors</label>
+                                <input type="text" id="color" name="color"
+                                    placeholder="Enter available colors (e.g., Red, Blue, Green)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="size">Sizes</label>
+                                <input type="text" id="size" name="size"
+                                    placeholder="Enter available size (e.g., 2 Inch, 3-Inch , 4 Inch)">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category">Category</label>
+                                <select id="category" name="category" required>
+                                    <option value="">Select category</option>
+                                    <!-- Categories will be populated by JavaScript -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="categoryAttribute">Category Attribute</label>
+                                <select id="categoryAttribute" name="categoryAttribute" required>
+                                    <option value="">Select category first</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="regularPrice">Regular Price (₹)</label>
+                                <input type="number" id="regularPrice" name="regularPrice" min="0" step="0.01"
+                                    placeholder="Enter price" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="salePrice">Sale Price (₹)</label>
+                                <input type="number" id="salePrice" name="salePrice" min="0" step="0.01"
+                                    placeholder="Enter sale price" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="discount">Discount (%)</label>
+                                <input type="number" id="discount" name="discount" min="0" max="100"
+                                    placeholder="Discount will be calculated automatically" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="quantity">Stock Quantity</label>
+                                <input type="number" id="quantity" name="quantity" min="0"
+                                    placeholder="Enter stock quantity" required>
+                            </div>
+                        </div>
+
+                        <!-- Is Listed Toggle -->
+                        <div class="toggle-container">
+                            <span class="toggle-label">Is Listed</span>
+                            <div style="display: flex; align-items: center;">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="isListed" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-status status-listed" id="isListedStatus">Listed</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-submit">Add Product</button>
+                    </form>
+                </div>
+
+                <!-- Image section moved to bottom -->
+                <div class="image-section">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">Upload Product Images</h3>
+                    <div class="image-upload" id="drop-area">
+                        <p>Drag & drop images here or click to browse</p>
+                        <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+                        <button class="btn" id="browse-btn">Browse</button>
+                    </div>
+
+                    <div class="image-preview" id="image-preview"></div>
+                </div>
+            </div>
+
+            <div class="crop-modal" id="crop-modal">
+                <div class="crop-container">
+                    <img id="crop-image">
+                    <div class="crop-actions">
+                        <button class="btn btn-cancel" id="cancel-crop">Cancel</button>
+                        <button class="btn btn-confirm" id="confirm-crop">Crop Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+        <script>
+
+            // Initialize jQuery validation
+            $(document).ready(function () {
+                $('#add-product-form').validate({
+                    rules: {
+                        productName: {
+                            required: true,
+                            minlength: 3
+                        },
+                        description: {
+                            required: true,
+                            minlength: 10
+                        },
+                        category: {
+                            required: true
+                        },
+                        categoryAttribute: {
+                            required: true
+                        },
+                        regularPrice: {
+                            required: true,
+                            number: true,
+                            min: 0.01
+                        },
+                        salePrice: {
+                            required: true,
+                            number: true,
+                            min: 0,
+                            lessThanRegularPrice: true
+                        },
+                        discount: {
+                            number: true,
+                            min: 0,
+                            max: 100
+                        },
+                        quantity: {
+                            required: true,
+                            digits: true,
+                            min: 0
+                        }, images: {
+                            atLeastOneImage: true
+                        }
+                    },
+                    messages: {
+                        productName: {
+                            required: "Please enter a product name",
+                            minlength: "Product name must be at least 3 characters long"
+                        },
+                        description: {
+                            required: "Please enter a product description",
+                            minlength: "Description must be at least 10 characters long"
+                        },
+                        category: {
+                            required: "Please select a category"
+                        },
+                        categoryAttribute: {
+                            required: "Please select a category attribute"
+                        },
+                        regularPrice: {
+                            required: "Please enter a regular price",
+                            number: "Please enter a valid price",
+                            min: "Price must be greater than 0"
+                        },
+                        salePrice: {
+                            required: "Please enter a sale price",
+                            number: "Please enter a valid price",
+                            min: "Sale price cannot be negative",
+                            lessThanRegularPrice: "Sale price must be less than regular price"
+                        },
+                        discount: {
+                            number: "Please enter a valid discount percentage",
+                            min: "Discount cannot be negative",
+                            max: "Discount cannot exceed 100%"
+                        },
+                        quantity: {
+                            required: "Please enter a stock quantity",
+                            digits: "Quantity must be a whole number",
+                            min: "Quantity cannot be negative"
+                        },
+
+                    }
+
+                })
+            });
+
+
+
+
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Elements
+                const form = document.getElementById('add-product-form');
+                const fileInput = document.getElementById('file-input');
+                const browseBtn = document.getElementById('browse-btn');
+                const dropArea = document.getElementById('drop-area');
+                const imagePreview = document.getElementById('image-preview');
+                const cropModal = document.getElementById('crop-modal');
+                const cropImageElem = document.getElementById('crop-image');
+                const cancelCropBtn = document.getElementById('cancel-crop');
+                const confirmCropBtn = document.getElementById('confirm-crop');
+                const categorySelect = document.getElementById('category');
+                const categoryAttributeSelect = document.getElementById('categoryAttribute');
+                const notificationElem = document.getElementById('notification');
+                const isListedCheckbox = document.getElementById('isListed');
+                const isListedStatus = document.getElementById('isListedStatus');
+                const categoriesDataElement = document.getElementById('categories-data');
+
+
+                // Variables
+                let cropper;
+                let currentFile;
+                const uploadedImages = [];
+                let categories = [];
+
+                // Get categories from server-rendered data
+                try {
+                    const categoriesText = categoriesDataElement.textContent;
+                    categories = JSON.parse(categoriesText);
+                    console.log("Categories loaded from server:", categories);
+                    populateCategories(categories);
+                } catch (error) {
+                    console.error("Error parsing categories:", error);
+                    showNotification('Error loading categories', 'error');
+                    // Fallback to sample data
+                    populateCategories(getSampleCategories());
+                }
+
+                // Event Listeners
+                browseBtn.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', handleFileSelect);
+                dropArea.addEventListener('dragover', handleDragOver);
+                dropArea.addEventListener('drop', handleDrop);
+                cancelCropBtn.addEventListener('click', closeCropModal);
+                confirmCropBtn.addEventListener('click', cropImage);
+                form.addEventListener('submit', handleFormSubmit);
+                categorySelect.addEventListener('change', updateCategoryAttributes);
+                isListedCheckbox.addEventListener('change', updateListedStatus);
+                document.getElementById('regularPrice').addEventListener('input', calculateDiscount);
+                document.getElementById('salePrice').addEventListener('input', calculateDiscount);
+
+
+                // Function to calculate discount percentage
+                function calculateDiscount() {
+                    const regularPrice = parseFloat(document.getElementById('regularPrice').value) || 0;
+                    const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+
+                    let discount = 0;
+
+                    if (regularPrice > 0 && salePrice < regularPrice) {
+                        discount = ((regularPrice - salePrice) / regularPrice) * 100;
+                        discount = Math.round(discount * 100) / 100; // Round to 2 decimal places
+                    }
+
+                    document.getElementById('discount').value = discount;
+                }
+
+                // Update listed status text
+                function updateListedStatus() {
+                    if (isListedCheckbox.checked) {
+                        isListedStatus.textContent = 'Listed';
+                        isListedStatus.className = 'toggle-status status-listed';
+                    } else {
+                        isListedStatus.textContent = 'Unlisted';
+                        isListedStatus.className = 'toggle-status status-unlisted';
+                    }
+                }
+
+                // Sample categories for fallback
+                function getSampleCategories() {
+                    return [
+                        { _id: '1', name: 'Clothing', attributes: ['Men', 'Women', 'Kids'], isListed: true },
+                        { _id: '2', name: 'Electronics', attributes: ['Mobile', 'Laptop', 'Tablet'], isListed: true },
+                        { _id: '3', name: 'Home & Kitchen', attributes: ['Furniture', 'Appliances', 'Decor'], isListed: true }
+                    ];
+                }
+
+                // Populate categories dropdown
+                function populateCategories(categories) {
+                    // Clear loading message
+                    categorySelect.innerHTML = '<option value="">Select category</option>';
+
+                    // Add categories from server
+                    categories.forEach(category => {
+                        if (category.isListed) {
+                            const option = document.createElement('option');
+                            option.value = category.name;
+                            option.textContent = category.name;
+                            option.dataset.attributes = JSON.stringify(category.attributes);
+                            categorySelect.appendChild(option);
+                        }
+                    });
+
+                    // If no categories found, show message
+                    if (categorySelect.options.length === 1) {
+                        const option = document.createElement('option');
+                        option.value = "";
+                        option.textContent = "No categories available";
+                        option.disabled = true;
+                        categorySelect.appendChild(option);
+                    }
+                }
+
+                // Update category attributes based on selected category
+                function updateCategoryAttributes() {
+                    const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+
+                    // Check if a valid category is selected
+                    if (!selectedOption.value) {
+                        categoryAttributeSelect.innerHTML = '<option value="">Select category first</option>';
+                        return;
+                    }
+
+                    const attributes = selectedOption.dataset.attributes ?
+                        JSON.parse(selectedOption.dataset.attributes) : [];
+
+                    categoryAttributeSelect.innerHTML = '<option value="">Select attribute</option>';
+
+                    if (attributes.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = "";
+                        option.textContent = "No attributes available";
+                        option.disabled = true;
+                        categoryAttributeSelect.appendChild(option);
+                        return;
+                    }
+
+                    attributes.forEach(attr => {
+                        const option = document.createElement('option');
+                        option.value = attr;
+                        option.textContent = attr;
+                        categoryAttributeSelect.appendChild(option);
+                    });
+                }
+
+                // Handle file selection
+                function handleFileSelect(e) {
+                    const files = e.target.files;
+                    if (files.length > 0) {
+                        processFiles(files);
+                    }
+                }
+
+                // Handle drag over
+                function handleDragOver(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropArea.style.borderColor = '#3498db';
+                    dropArea.style.backgroundColor = '#f8fcff';
+                }
+
+                // Handle drop
+                function handleDrop(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropArea.style.borderColor = '#ccc';
+                    dropArea.style.backgroundColor = 'transparent';
+
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        processFiles(files);
+                    }
+                }
+
+                // Process selected files
+                function processFiles(files) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        if (file.type.match('image.*')) {
+                            openCropModal(file);
+                        }
+                    }
+                }
+
+                // Open crop modal
+                function openCropModal(file) {
+                    currentFile = file;
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        cropImageElem.src = e.target.result;
+                        cropModal.style.display = 'flex';
+
+                        // Initialize cropper
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+
+                        cropper = new Cropper(cropImageElem, {
+                            aspectRatio: 1,
+                            viewMode: 1,
+                            autoCropArea: 0.8
+                        });
+                    };
+
+                    reader.readAsDataURL(file);
+                }
+
+                // Close crop modal
+                function closeCropModal() {
+                    cropModal.style.display = 'none';
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                }
+
+                // Crop image and add to preview
+                function cropImage() {
+                    if (cropper) {
+                        // Get cropped canvas
+                        const canvas = cropper.getCroppedCanvas({
+                            width: 440,
+                            height: 440
+                        });
+
+                        // Convert canvas to blob
+                        canvas.toBlob(function (blob) {
+                            // Create a new file from the blob
+                            const croppedFile = new File([blob], currentFile.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+
+                            // Add to uploaded images array
+                            uploadedImages.push(croppedFile);
+
+                            // Create preview
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                const previewItem = document.createElement('div');
+                                previewItem.className = 'preview-item';
+
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+
+                                const removeBtn = document.createElement('button');
+                                removeBtn.className = 'remove-image';
+                                removeBtn.innerHTML = '&times;';
+                                removeBtn.addEventListener('click', function () {
+                                    const index = uploadedImages.indexOf(croppedFile);
+                                    if (index > -1) {
+                                        uploadedImages.splice(index, 1);
+                                    }
+                                    previewItem.remove();
+                                });
+
+                                previewItem.appendChild(img);
+                                previewItem.appendChild(removeBtn);
+                                imagePreview.appendChild(previewItem);
+                            };
+
+                            reader.readAsDataURL(blob);
+
+                            // Close modal
+                            closeCropModal();
+                        }, 'image/jpeg', 0.9);
+                    }
+                }
+
+                // Handle form submission
+                async function handleFormSubmit(e) {
+                    e.preventDefault();
+
+                    // Validate form
+                    if (!validateForm()) {
+                        return;
+                    }
+
+                    // Create FormData object
+                    const formData = new FormData(form);
+
+                    // Append isListed status
+                    formData.append('isListed', isListedCheckbox.checked);
+
+                    // Append images
+                    uploadedImages.forEach((file, index) => {
+                        formData.append('images', file);
+                    });
+
+                    try {
+                        // Submit form
+                        const response = await fetch('/admin/addProduct', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            const result = await response.json();
+                            if (result.success) {
+                                showNotification('Product added successfully!', 'success');
+                                setTimeout(() => {
+                                    window.location.href = result.redirectUrl || '/admin/productLists';
+                                }, 1500);
+                            } else {
+                                showNotification(result.message || 'Error adding product', 'error');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error submitting form:', error);
+                        showNotification('Error adding product', 'error');
+                    }
+                }
+
+                // Validate form
+                function validateForm() {
+                    // Check required fields
+                    const requiredFields = form.querySelectorAll('[required]');
+                    for (let field of requiredFields) {
+                        if (!field.value.trim()) {
+                            showNotification(`Please fill in the ${field.labels[0].textContent} field`, 'error');
+                            field.focus();
+                            return false;
+                        }
+                    }
+
+                    // Check if images are uploaded
+                    if (uploadedImages.length === 0) {
+                        showNotification('Please upload at least one image', 'error');
+                        return false;
+                    }
+
+                    // Check if sale price is less than regular price
+                    const regularPrice = parseFloat(document.getElementById('regularPrice').value);
+                    const salePrice = parseFloat(document.getElementById('salePrice').value);
+
+                    if (salePrice > regularPrice) {
+                        showNotification('Sale price cannot be greater than regular price', 'error');
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                // Show notification
+                function showNotification(message, type) {
+                    notificationElem.textContent = message;
+                    notificationElem.className = `notification ${type}`;
+
+                    // Auto hide after 5 seconds
+                    setTimeout(() => {
+                        notificationElem.textContent = '';
+                        notificationElem.className = 'notification';
+                    }, 5000);
+                }
+            });
+
+
+
+
+        </script>
+</body>
+
+</html>

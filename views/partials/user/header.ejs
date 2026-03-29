@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artemis - Premium Crakers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --secondary-color: #ff006e;
+            --dark-color: #2b2d42;
+            --light-color: #f8f9fa;
+        }
+
+        /* Header-specific styles only */
+        .artemis-top-bar {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 8px 0;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .artemis-top-bar .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+
+        .artemis-top-bar .top-contact span {
+            margin-right: 20px;
+        }
+
+        .artemis-top-bar .top-contact i {
+            margin-right: 5px;
+            color: var(--primary-color);
+        }
+
+        .artemis-navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            width: 100%;
+        }
+
+        .artemis-navbar .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+
+        .artemis-navbar .navbar-brand {
+            font-weight: 800;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .artemis-navbar .tshirt-icon {
+            color: var(--primary-color);
+        }
+
+        .artemis-navbar .nav-link {
+            font-weight: 600;
+            color: var(--dark-color);
+            padding: 0.5rem 1rem !important;
+        }
+
+        .artemis-navbar .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .artemis-navbar .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .artemis-navbar .btn-primary:hover {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .artemis-navbar .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .artemis-navbar .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .artemis-navbar .user-dropdown {
+            position: relative;
+        }
+
+        .artemis-navbar .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            left: auto;
+            min-width: 150px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 10px 0;
+            display: none;
+            z-index: 1000;
+        }
+
+        .artemis-navbar .user-dropdown:hover .user-dropdown-menu {
+            display: block;
+        }
+
+        .artemis-navbar .user-dropdown-item {
+            display: block;
+            padding: 8px 20px;
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .artemis-navbar .user-dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        /* Badge animation */
+        .badge-pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Toast notification for header events */
+        .header-toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .header-toast i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .artemis-top-bar .top-contact span {
+                margin-right: 10px;
+                font-size: 0.75rem;
+            }
+
+            .artemis-navbar .navbar-nav {
+                margin-top: 15px;
+            }
+
+            .artemis-navbar .user-dropdown-menu {
+                position: static;
+                box-shadow: none;
+                padding-left: 20px;
+            }
+            
+            .artemis-top-bar .container,
+            .artemis-navbar .container {
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .artemis-top-bar .d-flex {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .artemis-top-bar .top-contact span {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .artemis-top-bar .delivery-info {
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Toast Notification -->
+    <div id="headerToast" class="header-toast">
+        <i class="fas fa-info-circle"></i>
+        <span></span>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="artemis-top-bar">
+        <div class="container">
+            <div class="d-flex justify-content-between">
+                <div class="top-contact">
+                    <span><i class="fas fa-phone"></i> +91 7868829460</span>
+                    <span><i class="fas fa-envelope"></i> opensurfaces21@gmail.com</span>
+                </div>
+                <div class="delivery-info">
+                    <span>5-7 Business days delivery </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="artemis-navbar navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-tshirt me-2 tshirt-icon"></i>Artemis Crakers
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/#products">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <a href="/wishlist" class="btn btn-outline-dark me-2 position-relative">
+                        <i class="fas fa-heart"></i>
+                        <span id="wishlist-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary wishlist-count">
+                            <%= typeof wishlistCount !== 'undefined' ? wishlistCount : 0 %>
+                        </span>
+                    </a>
+                    <a href="/cart" class="btn btn-outline-dark me-2 position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary cart-count">
+                            <%= typeof cartCount !== 'undefined' ? cartCount : 0 %>
+                        </span>
+                    </a>
+
+                    <div class="user-section ms-2">
+                        <% if (user) { %>
+                            <div class="user-dropdown">
+                                <a href="#" class="btn btn-outline-primary">
+                                    <i class="fas fa-user me-1"></i>
+                                    <%= user.name ? user.name : (user.firstName + " " + user.lastName) %>
+                                </a>
+                                <div class="user-dropdown-menu">
+                                    <a href="/profile" class="user-dropdown-item">Profile</a>
+                                    <a href="/logout" class="user-dropdown-item">Logout</a>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <a href="/login" class="btn btn-primary me-2">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                            <a href="/signup" class="btn btn-outline-primary">
+                                <i class="fas fa-user-plus me-1"></i>Signup
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Fixed script with proper wishlist count synchronization -->
+    <script>
+        // Header Sync Manager - Fixed version
+        class HeaderSyncManager {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                // Listen for storage events from other tabs
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'cartSync') {
+                        this.handleCartSync(e);
+                    }
+                    if (e.key === 'wishlistSync') {
+                        this.handleWishlistSync(e);
+                    }
+                });
+
+                // Listen for custom events from the same page
+                document.addEventListener('cartUpdated', (event) => {
+                    console.log('Cart updated event received:', event.detail);
+                    if (event.detail && event.detail.cartCount !== undefined) {
+                        this.updateCartCount(event.detail.cartCount);
+                    }
+                    if (event.detail && event.detail.message) {
+                        this.showToast(event.detail.message);
+                    }
+                });
+
+                document.addEventListener('wishlistUpdated', (event) => {
+                    console.log('Wishlist updated event received:', event.detail);
+                    if (event.detail && event.detail.wishlistCount !== undefined) {
+                        this.updateWishlistCount(event.detail.wishlistCount);
+                        
+                        // Update localStorage with the new count
+                        this.updateWishlistStorage(event.detail.wishlistCount);
+                    }
+                    if (event.detail && event.detail.message) {
+                        this.showToast(event.detail.message);
+                    }
+                });
+
+                // Listen for cart removal events specifically
+                document.addEventListener('cartItemRemoved', (event) => {
+                    console.log('Cart item removed event received:', event.detail);
+                    if (event.detail && event.detail.cartCount !== undefined) {
+                        this.updateCartCount(event.detail.cartCount);
+                        this.showToast(event.detail.message || 'Item removed from cart');
+                    }
+                });
+
+                // Initial fetch from server - this is the source of truth
+                this.fetchCountsFromServer();
+
+                // Set up periodic sync with server
+                this.setupPeriodicSync();
+            }
+
+            // Handle cart sync from storage event
+            handleCartSync(e) {
+                console.log('Cart sync from another tab:', e.newValue);
+                if (e.newValue) {
+                    try {
+                        const cartData = JSON.parse(e.newValue).data;
+                        if (cartData && cartData.cartCount !== undefined) {
+                            this.updateCartCount(cartData.cartCount);
+                            this.showToast('Cart updated in another tab');
+                        }
+                    } catch (error) {
+                        console.error('Error parsing cart sync data:', error);
+                    }
+                }
+            }
+
+            // Handle wishlist sync from storage event
+            handleWishlistSync(e) {
+                console.log('Wishlist sync from another tab:', e.newValue);
+                if (e.newValue) {
+                    try {
+                        const wishlistData = JSON.parse(e.newValue).data;
+                        if (wishlistData && wishlistData.length !== undefined) {
+                            this.updateWishlistCount(wishlistData.length);
+                            this.showToast('Wishlist updated in another tab');
+                        }
+                    } catch (error) {
+                        console.error('Error parsing wishlist sync data:', error);
+                    }
+                }
+            }
+
+            // Update cart count with animation
+            updateCartCount(count) {
+                const cartCountElement = document.querySelector('.cart-count');
+                if (cartCountElement) {
+                    const oldCount = parseInt(cartCountElement.textContent) || 0;
+                    const newCount = parseInt(count) || 0;
+                    
+                    cartCountElement.textContent = newCount;
+                    
+                    // Add animation if count changed
+                    if (oldCount !== newCount) {
+                        cartCountElement.classList.add('badge-pulse');
+                        setTimeout(() => {
+                            cartCountElement.classList.remove('badge-pulse');
+                        }, 500);
+                        
+                        console.log(`Cart count updated: ${oldCount} → ${newCount}`);
+                    }
+                }
+            }
+
+            // Update wishlist count with animation
+            updateWishlistCount(count) {
+                const wishlistCountElement = document.querySelector('.wishlist-count');
+                if (wishlistCountElement) {
+                    const oldCount = parseInt(wishlistCountElement.textContent) || 0;
+                    const newCount = parseInt(count) || 0;
+                    
+                    wishlistCountElement.textContent = newCount;
+                    
+                    // Add animation if count changed
+                    if (oldCount !== newCount) {
+                        wishlistCountElement.classList.add('badge-pulse');
+                        setTimeout(() => {
+                            wishlistCountElement.classList.remove('badge-pulse');
+                        }, 500);
+                        
+                        console.log(`Wishlist count updated: ${oldCount} → ${newCount}`);
+                    }
+                }
+            }
+
+            // Update wishlist storage with just the count
+            updateWishlistStorage(count) {
+                try {
+                    localStorage.setItem('wishlistSync', JSON.stringify({
+                        data: { length: count },
+                        timestamp: Date.now()
+                    }));
+                } catch (error) {
+                    console.error('Error updating wishlist storage:', error);
+                }
+            }
+
+            // Clear wishlist storage (call this when logging out)
+            clearWishlistStorage() {
+                try {
+                    localStorage.removeItem('wishlistSync');
+                } catch (error) {
+                    console.error('Error clearing wishlist storage:', error);
+                }
+            }
+
+            // Show toast notification
+            showToast(message) {
+                const toast = document.getElementById('headerToast');
+                const span = toast.querySelector('span');
+                
+                span.textContent = message;
+                toast.style.display = 'flex';
+                
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
+
+            // Fetch latest counts from server - THIS IS THE SOURCE OF TRUTH
+            fetchCountsFromServer() {
+                fetch('/api/header-counts')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Always update with server data first
+                            this.updateCartCount(data.cartCount);
+                            this.updateWishlistCount(data.wishlistCount);
+                            
+                            // Update localStorage with server data for cross-tab sync
+                            this.updateLocalStorageFromServer(data);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching counts:', error));
+            }
+
+            // Update localStorage with server data (but don't read from it on init)
+            updateLocalStorageFromServer(data) {
+                // Update cart in localStorage
+                try {
+                    localStorage.setItem('cartSync', JSON.stringify({
+                        data: { cartCount: data.cartCount },
+                        timestamp: Date.now()
+                    }));
+                } catch (e) {
+                    console.error('Error updating cart storage:', e);
+                }
+
+                // Update wishlist in localStorage
+                try {
+                    localStorage.setItem('wishlistSync', JSON.stringify({
+                        data: { length: data.wishlistCount },
+                        timestamp: Date.now()
+                    }));
+                } catch (e) {
+                    console.error('Error updating wishlist storage:', e);
+                }
+            }
+
+            // Set up periodic sync with server
+            setupPeriodicSync() {
+                // Sync every 30 seconds
+                setInterval(() => {
+                    this.fetchCountsFromServer();
+                }, 30000);
+            }
+        }
+
+        // Initialize the header sync manager
+        document.addEventListener('DOMContentLoaded', function() {
+            window.headerSync = new HeaderSyncManager();
+            
+            // Clear any stale localStorage data that might be causing issues
+            try {
+                // Check if we have any old wishlist data that might be stale
+                const wishlistStorage = localStorage.getItem('wishlistSync');
+                if (wishlistStorage) {
+                    const timestamp = JSON.parse(wishlistStorage).timestamp;
+                    const fiveMinutes = 5 * 60 * 1000;
+                    
+                    // If data is older than 5 minutes, remove it and rely on server
+                    if (Date.now() - timestamp > fiveMinutes) {
+                        localStorage.removeItem('wishlistSync');
+                        console.log('Cleared stale wishlist data from localStorage');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking localStorage:', error);
+            }
+        });
+
+        // Function to manually update cart count (can be called from other pages)
+        function updateCartCount(count) {
+            if (window.headerSync) {
+                window.headerSync.updateCartCount(count);
+            }
+        }
+
+        // Function to manually update wishlist count (can be called from other pages)
+        function updateWishlistCount(count) {
+            if (window.headerSync) {
+                window.headerSync.updateWishlistCount(count);
+            }
+        }
+
+        // Function to clear wishlist storage (call this on logout)
+        function clearWishlistStorage() {
+            if (window.headerSync) {
+                window.headerSync.clearWishlistStorage();
+            }
+        }
+
+        // Function to trigger cart removal event
+        function triggerCartRemoval(cartCount, message) {
+            const event = new CustomEvent('cartItemRemoved', { 
+                detail: { 
+                    cartCount: cartCount,
+                    message: message || 'Item removed from cart'
+                } 
+            });
+            document.dispatchEvent(event);
+        }
+
+        // Function to trigger cart update event
+        function triggerCartUpdate(cartCount, message) {
+            const event = new CustomEvent('cartUpdated', { 
+                detail: { 
+                    cartCount: cartCount,
+                    message: message || 'Cart updated'
+                } 
+            });
+            document.dispatchEvent(event);
+        }
+
+        // Function to trigger wishlist update event
+        function triggerWishlistUpdate(wishlistCount, message) {
+            const event = new CustomEvent('wishlistUpdated', { 
+                detail: { 
+                    wishlistCount: wishlistCount,
+                    message: message || 'Wishlist updated'
+                } 
+            });
+            document.dispatchEvent(event);
+        }
+
+        // Function to trigger a sync from server
+        function syncCountsWithServer() {
+            if (window.headerSync) {
+                window.headerSync.fetchCountsFromServer();
+            }
+        }
+
+        // Listen for visibility change to sync when tab becomes active
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && window.headerSync) {
+                console.log('Tab became active, syncing counts...');
+                window.headerSync.fetchCountsFromServer();
+            }
+        });
+
+        // Listen for logout events (you'll need to dispatch this from your logout function)
+        document.addEventListener('userLoggedOut', function() {
+            clearWishlistStorage();
+            if (window.headerSync) {
+                window.headerSync.updateWishlistCount(0);
+                window.headerSync.updateCartCount(0);
+            }
+        });
+
+        // Expose functions globally for use in other pages
+        window.cartWishlistSync = {
+            updateCartCount,
+            updateWishlistCount,
+            clearWishlistStorage,
+            triggerCartRemoval,
+            triggerCartUpdate,
+            triggerWishlistUpdate,
+            syncCountsWithServer
+        };
+    </script>
+</body>
+</html>

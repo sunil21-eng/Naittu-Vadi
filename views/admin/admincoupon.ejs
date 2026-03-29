@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Management - Admin</title>
+    <style>
+        /* General body and layout styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            display: flex;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Header and buttons */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .header h1 i {
+            margin-right: 10px;
+            color: #4c51bf;
+        }
+        .add-coupon-btn {
+            background-color: #4c51bf;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .add-coupon-btn:hover {
+            background-color: #3b3f8f;
+        }
+
+        /* Search box styling */
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+            max-width: 400px;
+            position: relative;
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: #4c51bf;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+        }
+        .search-clear {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+        }
+        .search-clear:hover {
+            color: #4a5568;
+        }
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #4c51bf;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Table styling */
+        .coupon-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .coupon-table th, .coupon-table td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .coupon-table th {
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .coupon-table tr:hover {
+            background-color: #edf2f7;
+        }
+
+        /* Coupon code styling */
+        .coupon-code {
+            font-weight: bold;
+            color: #4c51bf;
+            background-color: #ebf4ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Discount badge */
+        .discount-badge {
+            background-color: #2f855a;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        .discount-badge.percentage {
+            background-color: #dd6b20;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .status-active {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+        .status-inactive {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        /* Actions links */
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .actions a, .actions button {
+            color: #4c51bf;
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .actions a:hover {
+            background-color: #ebf4ff;
+        }
+        .actions .edit-btn {
+            background-color: #ebf4ff;
+            color: #4c51bf;
+        }
+        .actions .status-btn {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+        .actions .status-btn.active {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+        .actions .status-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Message area styling */
+        .message-area {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .error-message {
+            background-color: #fed7d7;
+            color: #c53030;
+            display: block;
+        }
+        .success-message {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            display: block;
+        }
+        .info-message {
+            background-color: #bee3f8;
+            color: #2c5282;
+            display: block;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 8px;
+        }
+
+        .pagination-btn, .pagination-page {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn {
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background-color: #4c51bf;
+            color: white;
+            border-color: #4c51bf;
+        }
+
+        .pagination-page {
+            border: 1px solid #e2e8f0;
+            color: #4a5568;
+            background-color: white;
+        }
+
+        .pagination-page.active {
+            background-color: #4c51bf;
+            color: white;
+            border-color: #4c51bf;
+        }
+
+        .pagination-page:hover:not(.active) {
+            background-color: #edf2f7;
+        }
+
+        .pagination-btn.disabled, .pagination-page.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-ellipsis {
+            padding: 8px 4px;
+            color: #a0aec0;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #4c51bf;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4c51bf;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .confirmation-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .confirmation-content h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        .confirmation-content p {
+            margin-bottom: 25px;
+            color: #4a5568;
+        }
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .confirmation-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .confirmation-btn.confirm {
+            background-color: #4c51bf;
+            color: white;
+        }
+        .confirmation-btn.confirm:hover {
+            background-color: #3b3f8f;
+        }
+        .confirmation-btn.cancel {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .confirmation-btn.cancel:hover {
+            background-color: #cbd5e0;
+        }
+
+        /* No data styling */
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #718096;
+        }
+        .no-data i {
+            font-size: 60px;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+        .no-data h4 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            .coupon-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include("../partials/admin/navigation.ejs") %>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-ticket-alt"></i>
+                Coupon Management
+            </h1>
+            <a href="/admin/addcoupon" class="add-coupon-btn">
+                <i class="fas fa-plus"></i>
+                Add New Coupon
+            </a>
+        </div>
+
+        <!-- Message Area -->
+        <div class="message-area" id="message-area"></div>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search coupons by code..." value="<%= searchQuery || '' %>">
+            <button id="search-clear" class="search-clear">&times;</button>
+            <button id="search-btn" class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading-indicator">
+            <div class="loading-spinner"></div>
+            <p>Searching coupons...</p>
+        </div>
+
+        <!-- Coupon Table -->
+        <% if (coupons && coupons.length > 0) { %>
+        <table class="coupon-table">
+            <thead>
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Discount</th>
+                    <th>Min Purchase</th>
+                    <th>Max Redemption</th>
+                    <th>Expiry Date</th>
+                    <th>Used</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="coupon-table-body">
+                <% coupons.forEach(coupon => { 
+                    const isPercentage = coupon.type === 'percentageDiscount';
+                    const expiryDate = new Date(coupon.expiry).toLocaleDateString('en-IN');
+                    const status = coupon.status ? 'active' : 'inactive';
+                %>
+                <tr>
+                    <td>
+                        <span class="coupon-code">
+                            <i class="fas fa-tag" style="margin-right: 5px;"></i>
+                            <%= coupon.couponCode %>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="discount-badge <%= isPercentage ? 'percentage' : '' %>">
+                            <%= isPercentage ? coupon.discount + '%' : '₹' + coupon.discount %>
+                        </span>
+                    </td>
+                    <td>₹<%= coupon.minPurchase || 0 %></td>
+                    <td><%= coupon.maxRedeem || 'Unlimited' %></td>
+                    <td><%= expiryDate %></td>
+                    <td><%= coupon.usedCount || 0 %></td>
+                    <td>
+                        <span class="status-badge <%= status === 'active' ? 'status-active' : 'status-inactive' %>">
+                            <%= status === 'active' ? 'Active' : 'Inactive' %>
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <a href="/admin/editcoupon/<%= coupon._id %>" class="edit-btn">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </a>
+                        <button class="status-btn <%= status %>" data-id="<%= coupon._id %>" data-status="<%= coupon.status %>">
+                            <i class="fas <%= status === 'active' ? 'fa-ban' : 'fa-check-circle' %>"></i>
+                            <%= status === 'active' ? 'Block' : 'Activate' %>
+                        </button>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <% if (pagination && pagination.totalPages > 1) { %>
+        <div class="pagination" id="pagination-container">
+            <!-- Previous Button -->
+            <% if (pagination.currentPage > 1) { %>
+                <a href="?page=<%= pagination.currentPage - 1 %><%= searchQuery ? '&query=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-btn">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            <% } else { %>
+                <span class="pagination-btn disabled">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </span>
+            <% } %>
+            
+            <!-- Page Numbers -->
+            <% 
+            let startPage = Math.max(1, pagination.currentPage - 2);
+            let endPage = Math.min(pagination.totalPages, startPage + 4);
+            
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            %>
+            
+            <% if (startPage > 1) { %>
+                <a href="?page=1<%= searchQuery ? '&query=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-page">1</a>
+                <% if (startPage > 2) { %>
+                    <span class="pagination-ellipsis">...</span>
+                <% } %>
+            <% } %>
+            
+            <% for(let i = startPage; i <= endPage; i++) { %>
+                <% if (i === pagination.currentPage) { %>
+                    <span class="pagination-page active"><%= i %></span>
+                <% } else { %>
+                    <a href="?page=<%= i %><%= searchQuery ? '&query=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-page"><%= i %></a>
+                <% } %>
+            <% } %>
+            
+            <% if (endPage < pagination.totalPages) { %>
+                <% if (endPage < pagination.totalPages - 1) { %>
+                    <span class="pagination-ellipsis">...</span>
+                <% } %>
+                <a href="?page=<%= pagination.totalPages %><%= searchQuery ? '&query=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-page"><%= pagination.totalPages %></a>
+            <% } %>
+            
+            <!-- Next Button -->
+            <% if (pagination.currentPage < pagination.totalPages) { %>
+                <a href="?page=<%= pagination.currentPage + 1 %><%= searchQuery ? '&query=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-btn">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            <% } else { %>
+                <span class="pagination-btn disabled">
+                    Next <i class="fas fa-chevron-right"></i>
+                </span>
+            <% } %>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; color: #718096;">
+            <i class="fas fa-ticket-alt" style="margin-right: 5px;"></i>
+            Showing <%= coupons.length %> of <%= pagination.totalPages * 5 %> coupons
+        </div>
+        <% } %>
+        <% } else { %>
+        <!-- No Data Display -->
+        <div class="coupon-table">
+            <div class="no-data">
+                <i class="fas fa-ticket-alt"></i>
+                <h4>No coupons found</h4>
+                <p><%= searchQuery ? 'No coupons match your search criteria.' : 'Start by adding your first coupon!' %></p>
+                <% if (searchQuery) { %>
+                <button onclick="clearSearch()" class="add-coupon-btn" style="margin-top: 15px; display: inline-block;">
+                    <i class="fas fa-times"></i>
+                    Clear Search
+                </button>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <h3 id="confirmation-title">Confirm Action</h3>
+            <p id="confirmation-message">Are you sure you want to proceed?</p>
+            <div class="confirmation-buttons">
+                <button class="confirmation-btn cancel" onclick="closeConfirmationModal()">Cancel</button>
+                <button class="confirmation-btn confirm" id="confirmation-confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchClear = document.getElementById('search-clear');
+            const searchBtn = document.getElementById('search-btn');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const messageArea = document.getElementById('message-area');
+            const couponTableBody = document.getElementById('coupon-table-body');
+            const paginationContainer = document.getElementById('pagination-container');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmationTitle = document.getElementById('confirmation-title');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
+            
+            let currentCouponId = null;
+            let currentAction = null;
+
+            // Check for URL parameters to show messages
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            const success = urlParams.get('success');
+            
+            if (error) {
+                showMessage(decodeURIComponent(error), 'error');
+            } else if (success) {
+                showMessage(decodeURIComponent(success), 'success');
+            }
+
+            // Show/hide clear button based on input value
+            if (searchInput.value) {
+                searchClear.style.display = 'block';
+            }
+            
+            searchInput.addEventListener('input', function() {
+                searchClear.style.display = this.value ? 'block' : 'none';
+            });
+            
+            // Clear search input
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                performSearch(''); // Perform search with empty query
+            });
+            
+            // Search on button click
+            searchBtn.addEventListener('click', function() {
+                performSearch(searchInput.value);
+            });
+            
+            // Search on enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch(this.value);
+                }
+            });
+            
+            // Search while typing with debounce
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(this.value);
+                }, 500);
+            });
+            
+            // Function to perform search
+            function performSearch(query) {
+                loadingIndicator.style.display = 'block';
+                
+                // Create URL with search parameter
+                const url = new URL(window.location.href);
+                url.pathname = '/admin/couponsearch'; // Use search route
+                url.searchParams.set('query', query);
+                url.searchParams.set('page', '1');
+                
+                // Use fetch API to get search results
+                fetch(url.toString(), {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newTableBody = doc.getElementById('coupon-table-body');
+                    const newPagination = doc.getElementById('pagination-container');
+                    
+                    if (newTableBody) {
+                        couponTableBody.innerHTML = newTableBody.innerHTML;
+                    }
+                    
+                    if (newPagination) {
+                        paginationContainer.innerHTML = newPagination.innerHTML;
+                    }
+                    
+                    // Reattach event listeners to status buttons
+                    attachStatusButtonListeners();
+                    
+                    loadingIndicator.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    loadingIndicator.style.display = 'none';
+                    showMessage('An error occurred during search', 'error');
+                });
+            }
+            
+            // Function to clear search
+            window.clearSearch = function() {
+                searchInput.value = '';
+                searchClear.style.display = 'none';
+                performSearch('');
+            };
+            
+            // Function to show messages
+            function showMessage(message, type) {
+                messageArea.textContent = message;
+                messageArea.className = 'message-area ' + (type === 'success' ? 'success-message' : 'error-message');
+                messageArea.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageArea.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Function to open confirmation modal
+            function openConfirmationModal(title, message, confirmCallback) {
+                confirmationTitle.textContent = title;
+                confirmationMessage.textContent = message;
+                currentAction = confirmCallback;
+                confirmationModal.style.display = 'flex';
+            }
+            
+            // Function to close confirmation modal
+            window.closeConfirmationModal = function() {
+                confirmationModal.style.display = 'none';
+                currentAction = null;
+                currentCouponId = null;
+            };
+            
+            // Confirmation button handler
+            confirmationConfirmBtn.addEventListener('click', function() {
+                if (currentAction) {
+                    currentAction();
+                }
+                closeConfirmationModal();
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) {
+                    closeConfirmationModal();
+                }
+            });
+            
+            // Function to attach status button listeners
+            function attachStatusButtonListeners() {
+                document.querySelectorAll('.status-btn').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const couponId = this.dataset.id;
+                        const currentStatus = this.dataset.status === 'true';
+                        const action = currentStatus ? 'block' : 'activate';
+                        
+                        openConfirmationModal(
+                            `${action === 'block' ? 'Block' : 'Activate'} Coupon`,
+                            `Are you sure you want to ${action} this coupon?`,
+                            function() {
+                                updateCouponStatus(couponId, !currentStatus);
+                            }
+                        );
+                    });
+                });
+            }
+            
+            // Function to update coupon status
+            function updateCouponStatus(couponId, newStatus) {
+                fetch(`/admin/blockcoupon/${couponId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        // Reload the page after a short delay
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showMessage(result.message || 'Error updating coupon status', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating coupon status:', error);
+                    showMessage('An error occurred while updating coupon status', 'error');
+                });
+            }
+            
+            // Initial attachment of status button listeners
+            attachStatusButtonListeners();
+        });
+    </script>
+</body>
+</html>

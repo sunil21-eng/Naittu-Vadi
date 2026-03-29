@@ -1,0 +1,894 @@
+<%- include('../partials/user/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Order Success - ARTIMES' %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --accent-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+            --discount-color: #dc3545;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 80px;
+        }
+
+        .success-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .success-card {
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border: none;
+            overflow: hidden;
+            background: white;
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, var(--success-color), #219a52);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
+        }
+
+        .order-details {
+            padding: 2.5rem;
+        }
+
+        .detail-card {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .info-value {
+            color: #666;
+            font-weight: 500;
+        }
+
+        /* Price Styles */
+        .current-price {
+            font-weight: 700;
+            color: var(--success-color);
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-left: 5px;
+        }
+        
+        .discount-badge {
+            background-color: var(--discount-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .free-badge {
+            background-color: var(--discount-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .offer-tag {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 4px;
+        }
+        
+        .savings-amount {
+            color: var(--success-color);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Enhanced Order Summary Styles */
+        .order-summary-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .summary-body {
+            padding: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .summary-value {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .summary-highlight {
+            background: rgba(39, 174, 96, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        .summary-total-row {
+            background: var(--light-gray);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .text-success {
+            color: var(--success-color) !important;
+        }
+
+        .text-danger {
+            color: var(--discount-color) !important;
+        }
+
+        .badge-savings {
+            background: var(--success-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-color), #219a52);
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-success-custom:hover {
+            background: linear-gradient(135deg, #219a52, var(--success-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+            color: white;
+        }
+
+        .btn-continue-shopping {
+            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-continue-shopping:hover {
+            background: linear-gradient(135deg, #2980b9, var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .btn-print-confirmation {
+            background: linear-gradient(135deg, var(--primary-color), #2c3e50);
+            border: none;
+            padding: 0.875rem 1.75rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-print-confirmation:hover {
+            background: linear-gradient(135deg, #2c3e50, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(44, 62, 80, 0.4);
+            color: white;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--success-color);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .timeline-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            margin-right: 1.5rem;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex: 1;
+            padding-top: 0.5rem;
+        }
+
+        .email-notification {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 70px; }
+            .success-header { padding: 2rem 1rem; }
+            .order-details { padding: 1.5rem; }
+            .btn-success-custom,
+            .btn-continue-shopping,
+            .btn-print-confirmation {
+                padding: 0.875rem 1.5rem;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            .timeline::before { left: 25px; }
+            .timeline-icon { width: 50px; height: 50px; margin-right: 1rem; }
+        }
+
+        .print-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .share-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .share-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .share-whatsapp { background: #25D366; }
+        .share-email { background: var(--secondary-color); }
+        .share-copy { background: var(--primary-color); }
+
+        .support-section {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .action-buttons { margin: 2rem 0; }
+
+        .order-items-summary { margin-top: 1rem; }
+
+        .order-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-item:last-child { border-bottom: none; }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .item-meta {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .payment-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <!-- Success Content -->
+    <div class="container success-container my-5">
+        <div class="success-card">
+            <!-- Success Header -->
+            <div class="success-header">
+                <!-- Confetti Animation -->
+                <div class="confetti" style="left: 10%; animation-delay: 0s;"></div>
+                <div class="confetti" style="left: 20%; animation-delay: 0.5s;"></div>
+                <div class="confetti" style="left: 30%; animation-delay: 1s;"></div>
+                <div class="confetti" style="left: 40%; animation-delay: 1.5s;"></div>
+                <div class="confetti" style="left: 50%; animation-delay: 2s;"></div>
+                <div class="confetti" style="left: 60%; animation-delay: 2.5s;"></div>
+                <div class="confetti" style="left: 70%; animation-delay: 0.2s;"></div>
+                <div class="confetti" style="left: 80%; animation-delay: 0.7s;"></div>
+                <div class="confetti" style="left: 90%; animation-delay: 1.2s;"></div>
+                
+                <div class="success-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h1 class="display-5 fw-bold mb-3">Order Confirmed!</h1>
+                <p class="lead mb-0">Thank you for your purchase. Your order has been successfully placed.</p>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details">
+                <!-- Order Information -->
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-receipt me-2"></i>Order Information</h4>
+                    <div class="info-item">
+                        <span class="info-label">Order Number</span>
+                        <span class="info-value fw-bold text-success">#<%= order.displayOrderId || orderNumber || '' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Order Date & Time</span>
+                        <span class="info-value"><%= order.formattedDate || new Date().toLocaleString('en-IN', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }) %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Payment Method</span>
+                        <span class="info-value text-capitalize"><%= order.paymentMethod || paymentMethod || 'N/A' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Payment Status</span>
+                        <span class="info-value">
+                            <span class="payment-status status-<%= (order.paymentStatus || paymentStatus || 'paid').toLowerCase() %>">
+                                <%= order.paymentStatus || paymentStatus || 'Paid' %>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Confirmation Email</span>
+                        <span class="info-value"><%= user && user.email ? user.email : (email || '') %></span>
+                    </div>
+                </div>
+
+                <!-- Enhanced Order Summary -->
+                <% if (orderSummary) { 
+                    var subtotal = Number(orderSummary.subtotal || 0);
+                    var offerSavings = Number(orderSummary.offerSavings || 0);
+                    var couponDiscount = Number(orderSummary.discount || 0);
+                    var shipping = Number(orderSummary.shipping || 0);
+                    var total = Number(orderSummary.total || orderAmount || 0);
+                    var totalSavings = offerSavings + couponDiscount;
+                %>
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-calculator me-2"></i>Order Summary</h4>
+                    
+                    <div class="order-summary-container">
+                        <div class="summary-header">
+                            <i class="fas fa-receipt me-2"></i>Price Breakdown
+                        </div>
+                        <div class="summary-body">
+                            <!-- Original Subtotal (before any discounts) -->
+                            <div class="summary-row">
+                                <span class="summary-label">Original Subtotal:</span>
+                                <span class="summary-value">₹<%= subtotal.toFixed(2) %></span>
+                            </div>
+                            
+                            <!-- Offer Savings (from product offers) -->
+                            <% if (offerSavings > 0) { %>
+                            <div class="summary-row">
+                                <span class="summary-label">
+                                    <i class="fas fa-tag text-success me-1"></i>Offer Savings:
+                                </span>
+                                <span class="summary-value text-success">-₹<%= offerSavings.toFixed(2) %></span>
+                            </div>
+                            <% } %>
+                            
+                            <!-- Coupon Discount -->
+                            <% if (couponDiscount > 0) { %>
+                            <div class="summary-row">
+                                <span class="summary-label">
+                                    <i class="fas fa-ticket-alt text-success me-1"></i>Coupon Discount:
+                                </span>
+                                <span class="summary-value text-success">-₹<%= couponDiscount.toFixed(2) %></span>
+                            </div>
+                            <% } %>
+                            
+                            <!-- Subtotal after offers -->
+                            <div class="summary-row">
+                                <span class="summary-label fw-bold">Subtotal after Offers:</span>
+                                <span class="summary-value fw-bold">₹<%= (subtotal - offerSavings - couponDiscount).toFixed(2) %></span>
+                            </div>
+                            
+                            <!-- Shipping -->
+                            <div class="summary-row">
+                                <span class="summary-label">Shipping:</span>
+                                <span class="summary-value">
+                                    <% if (shipping === 0) { %>
+                                        <span class="text-success">FREE</span>
+                                    <% } else { %>
+                                        ₹<%= shipping.toFixed(2) %>
+                                    <% } %>
+                                </span>
+                            </div>
+                            
+                            <!-- Total Savings Highlight -->
+                            <% if (totalSavings > 0) { %>
+                            <div class="summary-highlight">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">
+                                        <i class="fas fa-piggy-bank me-2 text-success"></i>Total You Saved:
+                                    </span>
+                                    <span class="badge-savings">₹<%= totalSavings.toFixed(2) %></span>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    You saved <%= totalSavings > 0 ? Math.round((totalSavings / (subtotal + totalSavings)) * 100) : 0 %>% on your purchase!
+                                </small>
+                            </div>
+                            <% } %>
+                            
+                            <!-- Grand Total -->
+                            <div class="summary-total-row d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Grand Total:</span>
+                                <span class="fw-bold text-success">₹<%= total.toFixed(2) %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Order Items Summary with Offer Display -->
+                <% if (order.orderedItem && order.orderedItem.length > 0) { 
+                    var totalItemsSavings = 0;
+                %>
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-boxes me-2"></i>Order Items</h4>
+                    <div class="order-items-summary">
+                        <% for (var i = 0; i < order.orderedItem.length; i++) { 
+                            var item = order.orderedItem[i];
+                            var product = item.productId || {};
+                            var isFree = item.productPrice === 0;
+                            var originalPrice = Number(product.regularPrice || product.salePrice || item.productPrice || 0);
+                            var paidPrice = Number(item.productPrice || 0);
+                            var itemSavings = (originalPrice - paidPrice) * item.quantity;
+                            if (itemSavings > 0) totalItemsSavings += itemSavings;
+                            
+                            var imagePath = '';
+                            if (product.images && product.images.length > 0) {
+                                imagePath = product.images[0];
+                                if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+                                    imagePath = '/uploads/productsImages/' + imagePath;
+                                }
+                            }
+                        %>
+                        <div class="order-item">
+                            <% if (imagePath) { %>
+                                <img src="<%= imagePath %>" class="item-image" alt="<%= product.productName || '' %>"
+                                     onerror="this.src='https://placehold.co/60x60/f0f0f0/808080?text=No+Image'">
+                            <% } else { %>
+                                <div class="item-image bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                            <% } %>
+                            <div class="item-details">
+                                <div class="item-name">
+                                    <%= product.productName || 'Product not available' %>
+                                    <% if (isFree) { %>
+                                        <span class="free-badge">FREE</span>
+                                    <% } else if (originalPrice > paidPrice) { %>
+                                        <span class="offer-tag">Offer</span>
+                                    <% } %>
+                                </div>
+                                <div class="item-meta mb-1">
+                                    Quantity: <%= item.quantity %> 
+                                    <% if (item.size) { %> | Size: <%= item.size %><% } %>
+                                </div>
+                                <div class="item-meta">
+                                    <% if (isFree) { %>
+                                        <span class="text-danger fw-bold">FREE</span>
+                                        <% if (originalPrice > 0) { %>
+                                            <span class="original-price ms-2">₹<%= originalPrice.toFixed(2) %></span>
+                                        <% } %>
+                                    <% } else if (originalPrice > paidPrice) { %>
+                                        <span class="fw-bold text-success">₹<%= paidPrice.toFixed(2) %></span>
+                                        <span class="original-price ms-2">₹<%= originalPrice.toFixed(2) %></span>
+                                        <span class="discount-badge ms-2">-<%= Math.round((originalPrice - paidPrice) / originalPrice * 100) %>%</span>
+                                    <% } else { %>
+                                        <span class="fw-bold">₹<%= paidPrice.toFixed(2) %></span>
+                                    <% } %>
+                                    <span class="ms-2">| Total: ₹<%= (paidPrice * item.quantity).toFixed(2) %></span>
+                                </div>
+                                <% if (!isFree && originalPrice > paidPrice) { %>
+                                    <div class="savings-amount mt-1">
+                                        <i class="fas fa-tag me-1"></i>Saved: ₹<%= (originalPrice - paidPrice).toFixed(2) %> on this item
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <% } %>
+                        
+                        <% if (totalItemsSavings > 0) { %>
+                        <div class="alert alert-success mt-3 mb-0 py-2">
+                            <i class="fas fa-tag me-2"></i>
+                            <strong>Total Savings on Items: ₹<%= totalItemsSavings.toFixed(2) %></strong>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Delivery Information -->
+                <% 
+                var address = order.shippingAddress || deliveryAddress || null;
+                if (address) { 
+                %>
+                <div class="detail-card">
+                    <h4 class="mb-4"><i class="fas fa-truck me-2"></i>Delivery Information</h4>
+                    <div class="info-item">
+                        <span class="info-label">Delivery Address</span>
+                        <span class="info-value text-end">
+                            <%= address.name || (user && user.name) || '' %><br>
+                            <% if (address.houseName) { %><%= address.houseName %>, <% } %>
+                            <% if (address.street) { %><%= address.street %><br><% } %>
+                            <%= address.city || '' %>, 
+                            <%= address.state || '' %> - 
+                            <%= address.pincode || '' %><br>
+                            <%= address.country || 'India' %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Contact</span>
+                        <span class="info-value">
+                            <%= address.email || (user && user.email) || '' %><br>
+                            <%= address.number || address.phone || (user && user.phone) || 'Not provided' %>
+                        </span>
+                    </div>
+                    <% if (estimatedDelivery) { %>
+                    <div class="info-item">
+                        <span class="info-label">Estimated Delivery</span>
+                        <span class="info-value fw-bold text-success"><%= estimatedDelivery %></span>
+                    </div>
+                    <% } %>
+                </div>
+                <% } %>
+
+                <!-- Email Notification -->
+                <div class="email-notification">
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-envelope fa-2x text-primary me-3 mt-1"></i>
+                        <div>
+                            <h5 class="mb-2">Confirmation Sent</h5>
+                            <p class="mb-0">A confirmation email has been sent to <strong><%= user && user.email ? user.email : (email || '') %></strong> with your order details.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps Timeline -->
+                <div class="timeline">
+                    <h4 class="mb-4"><i class="fas fa-list-alt me-2"></i>What's Next?</h4>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h5>Order Processing</h5>
+                            <p class="text-muted mb-0">We're preparing your items for shipment. This usually takes 1-2 business days.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h5>Shipping</h5>
+                            <p class="text-muted mb-0">Your order will be shipped within 3-5 business days. You'll receive a tracking number via email.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h5>Delivery</h5>
+                            <p class="text-muted mb-0">Expected delivery within 5-7 business days. Our delivery partner will contact you before arrival.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row action-buttons">
+                    <div class="col-md-6 mb-3">
+                        <a href="/my-orders" class="btn btn-success-custom w-100">
+                            <i class="fas fa-clipboard-list me-2"></i>View My Orders
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <a href="/#products" class="btn btn-continue-shopping w-100">
+                            <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Share & Print Section -->
+                <div class="print-section">
+                    <h5 class="mb-3">Share Your Purchase</h5>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn share-whatsapp" title="Share via WhatsApp" onclick="shareOnWhatsApp()">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="share-btn share-email" title="Email Order Details" onclick="shareViaEmail()">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="#" class="share-btn share-copy" onclick="copyOrderDetails()" title="Copy Order Details">
+                            <i class="fas fa-copy"></i>
+                        </a>
+                    </div>
+                    <button class="btn btn-print-confirmation" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Print Confirmation
+                    </button>
+                </div>
+
+                <!-- Support Information -->
+                <div class="support-section">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-headset fa-2x text-warning me-3"></i>
+                        <div>
+                            <h6 class="mb-1">Need Help?</h6>
+                            <p class="mb-0">Contact our customer support team at <strong>opensurfaces21@gmail.com</strong> or call <strong>+91-7868829460</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Copy order details to clipboard
+        function copyOrderDetails() {
+            var orderDetails = 'Order Number: #<%= order.displayOrderId || orderNumber || "" %>\n' +
+                              'Order Date: <%= order.formattedDate || new Date().toLocaleDateString() %>\n' +
+                              'Order Amount: ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>\n' +
+                              'Email: <%= user && user.email ? user.email : (email || "") %>';
+            
+            navigator.clipboard.writeText(orderDetails).then(function() {
+                var copyBtn = document.querySelector('.share-copy');
+                var originalHTML = copyBtn.innerHTML;
+                
+                copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                copyBtn.style.background = '#27ae60';
+                
+                setTimeout(function() {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = '';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy order details. Please try again.');
+            });
+        }
+
+        // WhatsApp share function
+        function shareOnWhatsApp() {
+            var text = 'I just placed an order on ARTIMES! Order Number: #<%= order.displayOrderId || orderNumber || "" %> - Amount: ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>';
+            var url = 'https://wa.me/?text=' + encodeURIComponent(text);
+            window.open(url, '_blank');
+        }
+
+        // Email share function
+        function shareViaEmail() {
+            var subject = 'My ARTIMES Order Confirmation - #<%= order.displayOrderId || orderNumber || "" %>';
+            var body = 'Hello! I wanted to share my recent purchase from ARTIMES.\n\n' +
+                      'Order Details:\n' +
+                      '- Order Number: #<%= order.displayOrderId || orderNumber || "" %>\n' +
+                      '- Order Date: <%= order.formattedDate || new Date().toLocaleDateString() %>\n' +
+                      '- Order Amount: ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>\n\n' +
+                      'Thank you!';
+            var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+            window.location.href = url;
+        }
+
+        // Print styles
+        var style = document.createElement('style');
+        style.innerHTML = `
+            @media print {
+                body { padding-top: 0 !important; background: white !important; }
+                .btn, .share-buttons, .timeline::before, .support-section { display: none !important; }
+                .success-header { background: #27ae60 !important; -webkit-print-color-adjust: exact; }
+                .action-buttons { display: none !important; }
+                .print-section { display: none !important; }
+                .order-summary-container { border: 1px solid #dee2e6 !important; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+<%- include('../partials/user/footer') %>

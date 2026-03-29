@@ -1,0 +1,262 @@
+<head> 
+    <title>Artemis Admin - Dashboard</title>
+    <!-- The CSS is embedded here to create a self-contained document -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f7f7f7;
+            color: #111;
+            display: flex;
+        }
+        /* Main Content Area */
+        main {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .stats-card-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .stats-card-change {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .stats-card-change.positive {
+            color: #28a745;
+        }
+
+        .stats-card-change.negative {
+            color: #dc3545;
+        }
+
+        /* Recent Orders */
+        .recent-orders,
+        .top-selling-products {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            color: #888;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .status-shipped {
+            background-color: #d1e7dd;
+            color: #198754;
+        }
+
+        .status-processing {
+            background-color: #cff4fc;
+            color: #0d6efd;
+        }
+
+        .status-delivered {
+            background-color: #d3f9d8;
+            color: #0b932c;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #dc3545;
+        }
+
+        /* Top Selling Products */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            text-align: center;
+        }
+
+        .product-card-image {
+            width: 100%;
+            height: 200px;
+            background-color: #eee;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            object-fit: cover;
+        }
+
+        .product-card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-card-subtitle {
+            font-size: 0.8rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    
+  <%-include("../partials/admin/navigation.ejs")%>
+    <!-- The main content area -->
+    <main>
+        <h1 class="page-header">Dashboard</h1>
+        <p class="page-subtitle">Welcome back, Admin User</p>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stats-card">
+                <div class="stats-card-title">Total Orders</div>
+                <div class="stats-card-value">8,765</div>
+                <div class="stats-card-change positive">+8%</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-card-title">Total Revenue</div>
+                <div class="stats-card-value">$345,678</div>
+                <div class="stats-card-change positive">+12%</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-card-title">Active Customers</div>
+                <div class="stats-card-value">2,123</div>
+                <div class="stats-card-change positive">+4%</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-card-title">Pending Orders</div>
+                <div class="stats-card-value">45</div>
+                <div class="stats-card-change negative">-3%</div>
+            </div>
+        </div>
+
+        <!-- Recent Orders Section -->
+        <div class="recent-orders">
+            <h2 class="section-title">Recent Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#54321</td>
+                        <td>Sophia Bennett</td>
+                        <td>2024-07-26</td>
+                        <td><span class="status-badge status-shipped">Shipped</span></td>
+                    </tr>
+                    <tr>
+                        <td>#54322</td>
+                        <td>Ethan Carter</td>
+                        <td>2024-07-25</td>
+                        <td><span class="status-badge status-processing">Processing</span></td>
+                    </tr>
+                    <tr>
+                        <td>#54323</td>
+                        <td>Olivia Hayes</td>
+                        <td>2024-07-24</td>
+                        <td><span class="status-badge status-delivered">Delivered</span></td>
+                    </tr>
+                    <tr>
+                        <td>#54324</td>
+                        <td>Liam Foster</td>
+                        <td>2024-07-23</td>
+                        <td><span class="status-badge status-shipped">Shipped</span></td>
+                    </tr>
+                    <tr>
+                        <td>#54325</td>
+                        <td>Ava Coleman</td>
+                        <td>2024-07-22</td>
+                        <td><span class="status-badge status-cancelled">Cancelled</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Top Selling Products Section -->
+        <div class="top-selling-products">
+            <h2 class="section-title">Top Selling Products</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <img src="https://placehold.co/200x200/e0e0e0/ffffff?text=Product+1" class="product-card-image" alt="Product Image">
+                    <div class="product-card-title">Retro Graphic Tee</div>
+                    <div class="product-card-subtitle">Best Seller</div>
+                </div>
+                <div class="product-card">
+                    <img src="https://placehold.co/200x200/e0e0e0/ffffff?text=Product+2" class="product-card-image" alt="Product Image">
+                    <div class="product-card-title">Classic Crew Neck</div>
+                    <div class="product-card-subtitle">Top Rated</div>
+                </div>
+                <div class="product-card">
+                    <img src="https://placehold.co/200x200/e0e0e0/ffffff?text=Product+3" class="product-card-image" alt="Product Image">
+                    <div class="product-card-title">Vintage Logo Tee</div>
+                    <div class="product-card-subtitle">Customer Favorite</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>

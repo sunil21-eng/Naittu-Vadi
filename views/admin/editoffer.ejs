@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Offer - Admin</title>
+    <style>
+        /* General body and layout styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            display: flex;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .header h1 i {
+            margin-right: 10px;
+            color: #4c51bf;
+        }
+        .back-btn {
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: #4c51bf;
+            color: white;
+            border-color: #4c51bf;
+        }
+
+        /* Form Container */
+        .form-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .section-title {
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title i {
+            color: #4c51bf;
+            font-size: 1.3rem;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .form-label i {
+            color: #4c51bf;
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #4c51bf;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+        }
+        .form-control[readonly] {
+            background-color: #f7fafc;
+            cursor: not-allowed;
+        }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        /* Offer Information Display */
+        .offer-info {
+            background-color: #ebf4ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            color: #4a5568;
+            font-weight: 600;
+            min-width: 100px;
+        }
+        .info-value {
+            color: #2d3748;
+            font-weight: 500;
+        }
+        .info-value i {
+            color: #4c51bf;
+            margin-right: 5px;
+        }
+
+        /* Offer Type Toggle */
+        .offer-type {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .type-option {
+            flex: 1;
+            position: relative;
+        }
+        .type-option input[type="radio"] {
+            display: none;
+        }
+        .type-option label {
+            display: block;
+            padding: 12px;
+            text-align: center;
+            background-color: #edf2f7;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .type-option input[type="radio"]:checked + label {
+            background-color: #4c51bf;
+            border-color: #4c51bf;
+            color: white;
+        }
+        .type-option label i {
+            margin-right: 8px;
+        }
+
+        /* Target Selection */
+        .target-selection {
+            display: none;
+        }
+        .target-selection.show {
+            display: block;
+        }
+
+        /* Input with icon */
+        .input-with-icon {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+        .input-with-icon .form-control {
+            padding-left: 35px;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: .3s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4c51bf;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .toggle-label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .toggle-label i {
+            color: #4c51bf;
+            margin-right: 5px;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background-color: #4c51bf;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #3b3f8f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 81, 191, 0.3);
+        }
+        .btn-secondary {
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background-color: #e53e3e;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        /* Message area styling */
+        .message-area {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .error-message {
+            background-color: #fed7d7;
+            color: #c53030;
+            display: block;
+        }
+        .success-message {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            display: block;
+        }
+        .info-message {
+            background-color: #bee3f8;
+            color: #2c5282;
+            display: block;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #4c51bf;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4c51bf;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Helper text */
+        .helper-text {
+            color: #718096;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        .helper-text i {
+            color: #4c51bf;
+            margin-right: 5px;
+            font-size: 0.8rem;
+        }
+
+        /* Warning box */
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .warning-box i {
+            font-size: 1.5rem;
+            color: #856404;
+        }
+        .warning-box p {
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .offer-type {
+                flex-direction: column;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <%- include("../partials/admin/navigation.ejs") %>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-edit"></i>
+                Edit Offer
+            </h1>
+            <a href="/admin/offer" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Offers
+            </a>
+        </div>
+
+        <!-- Message Area -->
+        <div class="message-area" id="message-area"></div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <% 
+                const today = new Date();
+                const end = new Date(offer.endDate);
+                const isExpired = end < today;
+            %>
+
+            <% if (!offer.status) { %>
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>This offer is currently inactive and won't be applied to products. You can activate it by toggling the status switch below.</p>
+            </div>
+            <% } %>
+
+            <% if (isExpired) { %>
+            <div class="warning-box">
+                <i class="fas fa-hourglass-end"></i>
+                <p>This offer has expired. You can extend the validity period by updating the end date.</p>
+            </div>
+            <% } %>
+
+            <form id="editOfferForm" method="POST" action="/admin/updateoffer/<%= offer._id %>">
+                <!-- Offer Information Display -->
+                <div class="offer-info">
+                    <div class="info-row">
+                        <span class="info-label">Offer ID:</span>
+                        <span class="info-value"><%= offer._id %></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Created:</span>
+                        <span class="info-value">
+                            <i class="fas fa-calendar"></i>
+                            <%= new Date(offer.createdAt).toLocaleDateString('en-IN') %>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Basic Information
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="form-label">
+                                <i class="fas fa-gift"></i>
+                                Offer Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="offerName" 
+                                   value="<%= offer.offerName %>"
+                                   placeholder="e.g., Summer Sale 2024" 
+                                   required>
+                            <div class="helper-text">
+                                <i class="fas fa-info-circle"></i>
+                                Choose a unique and descriptive name for the offer
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offer Type Section -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-tag"></i>
+                        Offer Type
+                    </div>
+
+                    <div class="offer-type">
+                        <div class="type-option">
+                            <input type="radio" name="offerType" id="product" value="product" <%= offer.offerType === 'product' ? 'checked' : '' %>>
+                            <label for="product">
+                                <i class="fas fa-box"></i>
+                                Product Offer
+                            </label>
+                        </div>
+                        <div class="type-option">
+                            <input type="radio" name="offerType" id="category" value="category" <%= offer.offerType === 'category' ? 'checked' : '' %>>
+                            <label for="category">
+                                <i class="fas fa-tags"></i>
+                                Category Offer
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Product Selection -->
+                    <div class="target-selection <%= offer.offerType === 'product' ? 'show' : '' %>" id="product-selection">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-box"></i>
+                                Select Product
+                            </label>
+                            <select class="form-control" name="productId" id="productSelect">
+                                <option value="">Choose a product...</option>
+                                <% products.forEach(product => { %>
+                                    <option value="<%= product._id %>" <%= offer.productId && offer.productId.toString() === product._id.toString() ? 'selected' : '' %>>
+                                        <%= product.productName %> (₹<%= product.salePrice %>)
+                                    </option>
+                                <% }) %>
+                            </select>
+                            <div class="helper-text">
+                                <i class="fas fa-info-circle"></i>
+                                Select the product this offer applies to
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="target-selection <%= offer.offerType === 'category' ? 'show' : '' %>" id="category-selection">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tags"></i>
+                                Select Category
+                            </label>
+                            <select class="form-control" name="categoryId" id="categorySelect">
+                                <option value="">Choose a category...</option>
+                                <% categories.forEach(category => { %>
+                                    <option value="<%= category._id %>" <%= offer.categoryId && offer.categoryId.toString() === category._id.toString() ? 'selected' : '' %>>
+                                        <%= category.name %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                            <div class="helper-text">
+                                <i class="fas fa-info-circle"></i>
+                                Select the category this offer applies to
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Discount Section -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-percent"></i>
+                        Discount Details
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-percent"></i>
+                                Discount Percentage
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-percent input-icon"></i>
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="discount" 
+                                       value="<%= offer.discount %>"
+                                       min="1" 
+                                       max="100" 
+                                       step="1"
+                                       placeholder="Enter discount percentage" 
+                                       required>
+                            </div>
+                            <div class="helper-text">
+                                <i class="fas fa-info-circle"></i>
+                                Enter value between 1 and 100
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validity Period Section -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Validity Period
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-play"></i>
+                                Start Date
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   name="startDate" 
+                                   id="startDate"
+                                   value="<%= new Date(offer.startDate).toISOString().split('T')[0] %>"
+                                   required
+                                   min="<%= new Date().toISOString().split('T')[0] %>">
+                            <div class="helper-text">
+                                <i class="fas fa-info-circle"></i>
+                                When the offer becomes active
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-stop"></i>
+                                End Date
+                            </label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   name="endDate" 
+                                   id="endDate"
+                                   value="<%= new Date(offer.endDate).toISOString().split('T')[0] %>"
+                                   required
+                                   min="<%= new Date().toISOString().split('T')[0] %>">
+                            <div class="helper-text">
+                                <i class="fas fa-info-circle"></i>
+                                When the offer expires
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Section -->
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-toggle-on"></i>
+                        Status
+                    </div>
+
+                    <div class="toggle-switch">
+                        <label class="switch">
+                            <input type="checkbox" name="status" value="true" <%= offer.status ? 'checked' : '' %>>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">
+                            <i class="fas fa-check-circle"></i>
+                            Active (Offer will be available immediately)
+                        </span>
+                    </div>
+                    <div class="helper-text" style="margin-top: 10px;">
+                        <i class="fas fa-info-circle"></i>
+                        Inactive offers won't be applied to products
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="/admin/offer" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                    <button type="button" class="btn btn-danger" id="resetBtn">
+                        <i class="fas fa-undo"></i>
+                        Reset Changes
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Update Offer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading-indicator">
+            <div class="loading-spinner"></div>
+            <p>Updating offer...</p>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center;">
+        <div class="confirmation-content" style="background-color: #fff; padding: 30px; border-radius: 10px; width: 90%; max-width: 450px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center;">
+            <h3 style="margin-top: 0; margin-bottom: 15px; color: #2d3748;" id="confirmation-title">Confirm Changes</h3>
+            <p style="margin-bottom: 25px; color: #4a5568;" id="confirmation-message">Are you sure you want to update this offer?</p>
+            <div class="confirmation-buttons" style="display: flex; justify-content: center; gap: 15px;">
+                <button class="confirmation-btn cancel" onclick="closeConfirmationModal()" style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; background-color: #e2e8f0; color: #4a5568;">Cancel</button>
+                <button class="confirmation-btn confirm" id="confirmation-confirm-btn" style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; background-color: #4c51bf; color: white;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('editOfferForm');
+            const messageArea = document.getElementById('message-area');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const resetBtn = document.getElementById('resetBtn');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmationTitle = document.getElementById('confirmation-title');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
+            
+            // Offer type elements
+            const productRadio = document.getElementById('product');
+            const categoryRadio = document.getElementById('category');
+            const productSelection = document.getElementById('product-selection');
+            const categorySelection = document.getElementById('category-selection');
+            const productSelect = document.getElementById('productSelect');
+            const categorySelect = document.getElementById('categorySelect');
+
+            // Date inputs
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            const statusCheckbox = document.querySelector('input[name="status"]');
+
+            // Original form data for reset
+            const originalData = {
+                offerName: '<%= offer.offerName %>',
+                offerType: '<%= offer.offerType %>',
+                discount: '<%= offer.discount %>',
+                startDate: '<%= new Date(offer.startDate).toISOString().split("T")[0] %>',
+                endDate: '<%= new Date(offer.endDate).toISOString().split("T")[0] %>',
+                productId: '<%= offer.productId || "" %>',
+                categoryId: '<%= offer.categoryId || "" %>',
+                status: '<%= offer.status ? "true" : "false" %>'
+            };
+
+            // Set minimum date for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            startDate.setAttribute('min', today);
+            endDate.setAttribute('min', today);
+
+            // Handle offer type change
+            function updateOfferType() {
+                if (productRadio.checked) {
+                    productSelection.classList.add('show');
+                    categorySelection.classList.remove('show');
+                    productSelect.required = true;
+                    categorySelect.required = false;
+                } else {
+                    productSelection.classList.remove('show');
+                    categorySelection.classList.add('show');
+                    productSelect.required = false;
+                    categorySelect.required = true;
+                }
+            }
+
+            productRadio.addEventListener('change', updateOfferType);
+            categoryRadio.addEventListener('change', updateOfferType);
+
+            // Update end date minimum based on start date
+            startDate.addEventListener('change', function() {
+                endDate.setAttribute('min', this.value);
+                if (endDate.value && endDate.value < this.value) {
+                    endDate.value = this.value;
+                }
+            });
+
+            // Check if any changes were made
+            function hasChanges() {
+                const currentOfferName = document.querySelector('input[name="offerName"]').value.trim();
+                const currentOfferType = productRadio.checked ? 'product' : 'category';
+                const currentDiscount = document.querySelector('input[name="discount"]').value;
+                const currentStartDate = startDate.value;
+                const currentEndDate = endDate.value;
+                const currentProductId = productSelect.value;
+                const currentCategoryId = categorySelect.value;
+                const currentStatus = statusCheckbox.checked;
+
+                return currentOfferName !== originalData.offerName ||
+                       currentOfferType !== originalData.offerType ||
+                       currentDiscount !== originalData.discount ||
+                       currentStartDate !== originalData.startDate ||
+                       currentEndDate !== originalData.endDate ||
+                       currentProductId !== originalData.productId ||
+                       currentCategoryId !== originalData.categoryId ||
+                       currentStatus !== originalData.status;
+            }
+
+            // Form validation and submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Check if any changes were made
+                if (!hasChanges()) {
+                    showMessage('No changes were made to the offer', 'info');
+                    return;
+                }
+
+                // Get form values
+                const offerName = document.querySelector('input[name="offerName"]').value.trim();
+                const discount = parseInt(document.querySelector('input[name="discount"]').value);
+                const start = startDate.value;
+                const end = endDate.value;
+
+                // Validate offer name
+                if (!offerName) {
+                    showMessage('Please enter an offer name', 'error');
+                    return;
+                }
+                if (offerName.length < 3) {
+                    showMessage('Offer name must be at least 3 characters long', 'error');
+                    return;
+                }
+
+                // Validate discount
+                if (!discount || discount < 1 || discount > 100) {
+                    showMessage('Please enter a valid discount percentage between 1 and 100', 'error');
+                    return;
+                }
+
+                // Validate dates
+                if (!start || !end) {
+                    showMessage('Please select both start and end dates', 'error');
+                    return;
+                }
+
+                if (new Date(start) > new Date(end)) {
+                    showMessage('End date cannot be before start date', 'error');
+                    return;
+                }
+
+                // Validate target selection
+                if (productRadio.checked && !productSelect.value) {
+                    showMessage('Please select a product for this offer', 'error');
+                    return;
+                }
+
+                if (categoryRadio.checked && !categorySelect.value) {
+                    showMessage('Please select a category for this offer', 'error');
+                    return;
+                }
+
+                // Show confirmation modal
+                openConfirmationModal(
+                    'Update Offer',
+                    'Are you sure you want to update this offer?',
+                    function() {
+                        showLoading();
+                        form.submit();
+                    }
+                );
+            });
+
+            // Reset button handler
+            resetBtn.addEventListener('click', function() {
+                openConfirmationModal(
+                    'Reset Changes',
+                    'Are you sure you want to reset all changes? This will revert to the original values.',
+                    function() {
+                        // Reset form to original values
+                        document.querySelector('input[name="offerName"]').value = originalData.offerName;
+                        
+                        if (originalData.offerType === 'product') {
+                            productRadio.checked = true;
+                        } else {
+                            categoryRadio.checked = true;
+                        }
+                        updateOfferType();
+                        
+                        document.querySelector('input[name="discount"]').value = originalData.discount;
+                        startDate.value = originalData.startDate;
+                        endDate.value = originalData.endDate;
+                        
+                        if (originalData.productId) {
+                            productSelect.value = originalData.productId;
+                        }
+                        if (originalData.categoryId) {
+                            categorySelect.value = originalData.categoryId;
+                        }
+                        
+                        statusCheckbox.checked = originalData.status;
+                        
+                        showMessage('Form has been reset to original values', 'success');
+                    }
+                );
+            });
+
+            // Modal functions
+            function openConfirmationModal(title, message, confirmCallback) {
+                confirmationTitle.textContent = title;
+                confirmationMessage.textContent = message;
+                confirmationConfirmBtn.onclick = function() {
+                    confirmCallback();
+                    closeConfirmationModal();
+                };
+                confirmationModal.style.display = 'flex';
+            }
+
+            window.closeConfirmationModal = function() {
+                confirmationModal.style.display = 'none';
+            };
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) {
+                    closeConfirmationModal();
+                }
+            });
+
+            // Function to show loading
+            function showLoading() {
+                loadingIndicator.style.display = 'block';
+            }
+
+            // Function to show messages
+            function showMessage(message, type) {
+                messageArea.textContent = message;
+                messageArea.className = 'message-area ' + (type === 'success' ? 'success-message' : type === 'info' ? 'info-message' : 'error-message');
+                messageArea.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageArea.style.display = 'none';
+                }, 5000);
+            }
+
+            // Check for URL parameters to show messages
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            const success = urlParams.get('success');
+            
+            if (error) {
+                showMessage(decodeURIComponent(error), 'error');
+            } else if (success) {
+                showMessage(decodeURIComponent(success), 'success');
+            }
+
+            // Prevent form resubmission on page refresh
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+        });
+    </script>
+</body>
+</html>

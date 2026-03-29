@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Management</title>
+    <style>
+        /* General body and layout styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            display: flex;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        /* Header and buttons */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2d3748;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .add-category-btn {
+            background-color: #4c51bf;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .add-category-btn:hover {
+            background-color: #3b3f8f;
+        }
+
+        /* Search box styling */
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+            max-width: 400px;
+            position: relative;
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: #4c51bf;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+        }
+        .search-clear {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+        }
+        .search-clear:hover {
+            color: #4a5568;
+        }
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #4c51bf;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Table styling */
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .category-table th, .category-table td {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .category-table th {
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .category-table tr:hover {
+            background-color: #edf2f7;
+        }
+
+        /* Actions links */
+        .actions a {
+            color: #4c51bf;
+            text-decoration: none;
+            margin-right: 15px;
+            transition: color 0.3s ease;
+        }
+        .actions a:hover {
+            color: #3b3f8f;
+        }
+        .actions a.delete-btn {
+            color: #e53e3e;
+        }
+        .actions a.delete-btn:hover {
+            color: #c53030;
+        }
+
+        /* Message area styling */
+        .message-area {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .error-message {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+        .success-message {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #a0aec0;
+        }
+        .close-btn:hover {
+            color: #2d3748;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .modal-content input[type="text"],
+        .modal-content textarea {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .modal-content input[type="text"]:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #4c51bf;
+            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
+        }
+        .modal-content button {
+            background-color: #4c51bf;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .modal-content button:hover {
+            background-color: #3b3f8f;
+        }
+        
+        /* Modal message styling */
+        .modal-message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .modal-error {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+        .modal-success {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .confirmation-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .confirmation-content h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        .confirmation-content p {
+            margin-bottom: 25px;
+            color: #4a5568;
+        }
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .confirmation-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        .confirmation-btn.confirm {
+            background-color: #4c51bf;
+            color: white;
+        }
+        .confirmation-btn.confirm:hover {
+            background-color: #3b3f8f;
+        }
+        .confirmation-btn.cancel {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .confirmation-btn.cancel:hover {
+            background-color: #cbd5e0;
+        }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 8px;
+        }
+
+        .pagination-btn, .pagination-page {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn {
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pagination-btn:hover:not(.disabled) {
+            background-color: #4c51bf;
+            color: white;
+            border-color: #4c51bf;
+        }
+
+        .pagination-page {
+            border: 1px solid #e2e8f0;
+            color: #4a5568;
+            background-color: white;
+        }
+
+        .pagination-page.active {
+            background-color: #4c51bf;
+            color: white;
+            border-color: #4c51bf;
+        }
+
+        .pagination-page:hover:not(.active) {
+            background-color: #edf2f7;
+        }
+
+        .pagination-btn.disabled, .pagination-page.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-ellipsis {
+            padding: 8px 4px;
+            color: #a0aec0;
+        }
+        .description{
+             max-width: 200px;      /* limit cell width */
+  white-space: nowrap;   /* keep text in one line */
+  overflow: hidden;      /* hide overflowed text */
+  text-overflow: ellipsis
+
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #4c51bf;
+        }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4c51bf;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+  <!-- Navigation  -->
+    <%-include("../partials/admin/navigation.ejs")%>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Categories</h1>
+            <button class="add-category-btn" onclick="openAddModal()">Add Category</button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Search categories..." value="<%= searchQuery || '' %>">
+            <button id="search-clear" class="search-clear">&times;</button>
+            <button id="search-btn" class="search-btn">🔍</button>
+        </div>
+
+        <!-- Message Area for success/error messages -->
+        <% if (errorMessage) { %>
+            <div class="message-area error-message">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+
+        <div class="message-area" id="message-area" style="display:none;"></div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading-indicator">
+            <div class="loading-spinner"></div>
+            <p>Searching...</p>
+        </div>
+
+        <!-- Category Table -->
+        <table class="category-table">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Description</th>
+                    <th>Attributes</th>
+                    <th>Is Listed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="category-table-body">
+                <% if (cat && cat.length > 0) { %>
+                    <% cat.forEach(category => { %>
+                        <tr>
+                            <td><%= category.name %></td>
+                            <td class="description"><%= category.description %></td>
+                            <td>
+                                <% if (category.attributes && category.attributes.length > 0) { %>
+                                    <%= category.attributes.join(', ') %>
+                                <% } else { %>
+                                    N/A
+                                <% } %>
+                            </td>
+                            <td><%= category.isListed ? 'Listed' : 'Unlisted' %></td>
+                            <td class="actions">
+                                <a href="#" class="edit-btn" data-id="<%= category._id %>" 
+                                    data-name="<%= category.name %>" 
+                                    data-description="<%= category.description %>" 
+                                    data-attributes="<%= category.attributes.join(', ') %>"
+                                    data-listed="<%= category.isListed %>">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No categories found.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination-container">
+            <!-- Previous Button -->
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-btn">
+                    &laquo; Previous
+                </a>
+            <% } else { %>
+                <span class="pagination-btn disabled">&laquo; Previous</span>
+            <% } %>
+            
+            <!-- Page Numbers -->
+            <% 
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPage, startPage + 4);
+            
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+            %>
+            
+            <% if (startPage > 1) { %>
+                <a href="?page=1<%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-page">1</a>
+                <% if (startPage > 2) { %>
+                    <span class="pagination-ellipsis">...</span>
+                <% } %>
+            <% } %>
+            
+            <% for(let i = startPage; i <= endPage; i++) { %>
+                <% if (i === currentPage) { %>
+                    <span class="pagination-page active"><%= i %></span>
+                <% } else { %>
+                    <a href="?page=<%= i %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-page"><%= i %></a>
+                <% } %>
+            <% } %>
+            
+            <% if (endPage < totalPage) { %>
+                <% if (endPage < totalPage - 1) { %>
+                    <span class="pagination-ellipsis">...</span>
+                <% } %>
+                <a href="?page=<%= totalPage %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-page"><%= totalPage %></a>
+            <% } %>
+            
+            <!-- Next Button -->
+            <% if (currentPage < totalPage) { %>
+                <a href="?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" class="pagination-btn">
+                    Next &raquo;
+                </a>
+            <% } else { %>
+                <span class="pagination-btn disabled">Next &raquo;</span>
+            <% } %>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; color: #718096;">
+            Showing <%= cat.length %> of <%= totalCategories %> categories
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAddModal()">&times;</span>
+            <h2>Add New Category</h2>
+            
+            <div id="add-modal-message" class="modal-message"></div>
+            
+            <form id="add-form">
+                <input type="text" name="name" placeholder="Category Name" required>
+                <textarea name="description" placeholder="Description" rows="3" required></textarea>
+                <input type="text" name="attributes" placeholder="Attributes (e.g., men, women)">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" name="isListed" checked>
+                    Is Listed
+                </label>
+                <button type="submit">Add Category</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Category</h2>
+            
+            <div id="edit-modal-message" class="modal-message"></div>
+            
+            <form id="edit-form">
+                <input type="hidden" name="id" id="edit-id">
+                <input type="text" name="name" id="edit-name" placeholder="Category Name" required>
+                <textarea name="description" id="edit-description" placeholder="Description" rows="3" required></textarea>
+                <input type="text" name="attributes" id="edit-attributes" placeholder="Attributes (e.g., men, women)">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" name="isListed" id="edit-isListed">
+                    Is Listed
+                </label>
+                <button type="submit" id="edit-submit-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <h3 id="confirmation-title">Confirm Action</h3>
+            <p id="confirmation-message">Are you sure you want to proceed?</p>
+            <div class="confirmation-buttons">
+                <button class="confirmation-btn cancel" onclick="closeConfirmationModal()">Cancel</button>
+                <button class="confirmation-btn confirm" id="confirmation-confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const addModal = document.getElementById('addModal');
+        const editModal = document.getElementById('editModal');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const messageArea = document.getElementById('message-area');
+        const addModalMessage = document.getElementById('add-modal-message');
+        const editModalMessage = document.getElementById('edit-modal-message');
+        const searchInput = document.getElementById('search-input');
+        const searchClear = document.getElementById('search-clear');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const categoryTableBody = document.getElementById('category-table-body');
+        const paginationContainer = document.getElementById('pagination-container');
+        const editIsListedCheckbox = document.getElementById('edit-isListed');
+        const editSubmitBtn = document.getElementById('edit-submit-btn');
+        const confirmationTitle = document.getElementById('confirmation-title');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
+        
+        let originalIsListedValue = false;
+        let confirmationAction = null;
+        
+        // Show/hide clear button based on input value
+        if (searchInput.value) {
+            searchClear.style.display = 'block';
+        }
+        
+        searchInput.addEventListener('input', function() {
+            searchClear.style.display = this.value ? 'block' : 'none';
+        });
+        
+        // Clear search input
+        searchClear.addEventListener('click', function() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            performSearch(''); // Perform search with empty query
+        });
+        
+        // Search on button click
+        document.getElementById('search-btn').addEventListener('click', function() {
+            performSearch(searchInput.value);
+        });
+        
+        // Search while typing with debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performSearch(this.value);
+            }, 500); // 500ms delay after typing stops
+        });
+        
+        // Function to perform search
+        function performSearch(query) {
+            loadingIndicator.style.display = 'block';
+            
+            // Create URL with search parameter
+            const url = new URL(window.location.href);
+            url.searchParams.set('search', query);
+            url.searchParams.set('page', '1'); // Reset to first page when searching
+            
+            // Use fetch API to get search results
+            fetch(url.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Identify as AJAX request
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Parse the HTML response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Extract the table body and pagination from the response
+                const newTableBody = doc.getElementById('category-table-body');
+                const newPagination = doc.getElementById('pagination-container');
+                
+                // Update the table and pagination
+                if (newTableBody) {
+                    categoryTableBody.innerHTML = newTableBody.innerHTML;
+                }
+                
+                if (newPagination) {
+                    paginationContainer.innerHTML = newPagination.innerHTML;
+                }
+                
+                // Reattach event listeners to edit buttons
+                attachEditButtonListeners();
+                
+                loadingIndicator.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                loadingIndicator.style.display = 'none';
+                showMessage('An error occurred during search', 'error');
+            });
+        }
+        
+        // Function to reattach event listeners to edit buttons
+        function attachEditButtonListeners() {
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = e.target.dataset.id;
+                    const name = e.target.dataset.name;
+                    const description = e.target.dataset.description;
+                    const attributes = e.target.dataset.attributes;
+                    const isListed = e.target.dataset.listed;
+                    openEditModal(id, name, description, attributes, isListed);
+                });
+            });
+        }
+
+        // Function to show messages in modals
+        function showModalMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'modal-message ' + (type === 'success' ? 'modal-success' : 'modal-error');
+            element.style.display = 'block';
+            
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Clear modal messages when opening modals
+        function clearModalMessages() {
+            addModalMessage.style.display = 'none';
+            editModalMessage.style.display = 'none';
+        }
+
+        // Open/Close Modals
+        function openAddModal() {
+            clearModalMessages();
+            document.getElementById('add-form').reset();
+            addModal.style.display = 'flex';
+        }
+
+        function closeAddModal() {
+            addModal.style.display = 'none';
+        }
+
+        function openEditModal(id, name, description, attributes, isListed) {
+            clearModalMessages();
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-description').value = description;
+            document.getElementById('edit-attributes').value = attributes;
+            document.getElementById('edit-isListed').checked = isListed === 'true';
+            originalIsListedValue = isListed === 'true';
+            editModal.style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        function openConfirmationModal(title, message, confirmCallback) {
+            confirmationTitle.textContent = title;
+            confirmationMessage.textContent = message;
+            confirmationAction = confirmCallback;
+            confirmationModal.style.display = 'flex';
+        }
+
+        function closeConfirmationModal() {
+            confirmationModal.style.display = 'none';
+            confirmationAction = null;
+        }
+
+        // Check if the listing status changed and show confirmation
+        editIsListedCheckbox.addEventListener('change', function() {
+            // Only show confirmation when unlisting (changing from true to false)
+            if (originalIsListedValue && !this.checked) {
+                openConfirmationModal(
+                    'Unlist Category', 
+                    'Are you sure you want to unlist this category? It will no longer be visible to customers.',
+                    function() {
+                        // Continue with form submission
+                        document.getElementById('edit-form').dispatchEvent(new Event('submit'));
+                    }
+                );
+            }
+        });
+
+        // Edit form submission
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            const categoryId = data.id;
+            data.isListed = document.getElementById('edit-isListed').checked;
+            
+            // Check if any changes were made
+            const nameChanged = data.name !== document.getElementById('edit-name').defaultValue;
+            const descChanged = data.description !== document.getElementById('edit-description').defaultValue;
+            const attrsChanged = data.attributes !== document.getElementById('edit-attributes').defaultValue;
+            const listedChanged = data.isListed !== originalIsListedValue;
+            
+            if (!nameChanged && !descChanged && !attrsChanged && !listedChanged) {
+                showModalMessage(editModalMessage, 'No changes were made.', 'error');
+                return;
+            }
+            
+            // If listing status changed from false to true, show confirmation
+            if (!originalIsListedValue && data.isListed) {
+                openConfirmationModal(
+                    'List Category', 
+                    'Are you sure you want to list this category? It will become visible to customers.',
+                    function() {
+                        submitEditForm(data, categoryId);
+                    }
+                );
+            } else {
+                // Submit directly if no special confirmation needed
+                submitEditForm(data, categoryId);
+            }
+        });
+
+        // Function to submit the edit form
+        function submitEditForm(data, categoryId) {
+            fetch(`/admin/editCategory/${categoryId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    showModalMessage(editModalMessage, result.message, 'success');
+                    // Close modal and reload after success
+                    setTimeout(() => {
+                        closeEditModal();
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showModalMessage(editModalMessage, result.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error("Error editing category:", error);
+                showModalMessage(editModalMessage, 'An error occurred. Please try again.', 'error');
+            });
+        }
+
+        // Confirmation button handler
+        confirmationConfirmBtn.addEventListener('click', function() {
+            if (confirmationAction) {
+                confirmationAction();
+            }
+            closeConfirmationModal();
+        });
+
+        // Add Category Submission
+        document.getElementById('add-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            data.isListed = data.isListed === 'on'; // Convert checkbox value to boolean
+
+            try {
+                const response = await fetch('/admin/addCategory', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showModalMessage(addModalMessage, 'Category added successfully!', 'success');
+                    // Clear form and close modal after success
+                    setTimeout(() => {
+                        closeAddModal();
+                        window.location.reload(); // Reload to show the new category
+                    }, 1500);
+                } else {
+                    showModalMessage(addModalMessage, result.error, 'error');
+                }
+            } catch (error) {
+                console.error("Error adding category:", error);
+                showModalMessage(addModalMessage, 'An error occurred. Please try again.', 'error');
+            }
+        });
+        
+        // Function to show messages in the main message area
+        function showMessage(message, type) {
+            messageArea.textContent = message;
+            messageArea.className = 'message-area ' + (type === 'success' ? 'success-message' : 'error-message');
+            messageArea.style.display = 'block';
+            setTimeout(() => {
+                messageArea.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Event listener to open the edit modal
+        attachEditButtonListeners();
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === addModal) {
+                closeAddModal();
+            }
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+            if (e.target === confirmationModal) {
+                closeConfirmationModal();
+            }
+        });
+    </script>
+</body>
+</html>
