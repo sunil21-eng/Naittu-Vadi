@@ -878,70 +878,73 @@
                 }, 5000);
             }
 
-            // Form submission
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
+            
+           // Form submission
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Validate form
+    if (!validateForm()) {
+        showMessage('Please fix the errors in the form', 'error');
+        return;
+    }
+
+    // Prepare data as JSON
+    let productId = [];
+    let categoryId = [];
+    
+    if (productRadio.checked) {
+        productId = [productSelect.value];
+    } else {
+        categoryId = [categorySelect.value];
+    }
+
+    const data = {
+        offerName: offerName.value.trim(),
+        discount: discount.value,
+        offerType: productRadio.checked ? 'product' : 'category',
+        startDate: startDate.value,
+        endDate: endDate.value,
+        productId: JSON.stringify(productId),
+        categoryId: JSON.stringify(categoryId),
+        status: document.querySelector('input[name="status"]').checked ? 'true' : 'false'
+    };
+
+    // Show loading
+    showLoading();
+
+    try {
+        // Submit using fetch with JSON
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            const result = await response.json();
+            hideLoading();
+            
+            if (!result.success) {
+                showMessage(result.message || 'Error creating offer', 'error');
                 
-                // Validate form
-                if (!validateForm()) {
-                    showMessage('Please fix the errors in the form', 'error');
-                    return;
+                if (result.message && result.message.includes('already exists')) {
+                    offerName.classList.add('error');
+                    showFieldError('offerNameError', result.message);
                 }
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        hideLoading();
+        showMessage('An error occurred while creating the offer', 'error');
+    }
+});
 
-                // Create FormData object
-                const formData = new FormData(form);
-                
-                // Clear existing ID fields
-                formData.delete('productId');
-                formData.delete('categoryId');
-
-                // Add the correct fields based on selection
-                if (productRadio.checked) {
-                    // Send product as array (JSON string)
-                    formData.append('productId', JSON.stringify([productSelect.value]));
-                    formData.append('categoryId', JSON.stringify([]));
-                } else {
-                    // Send category as array (JSON string)
-                    formData.append('categoryId', JSON.stringify([categorySelect.value]));
-                    formData.append('productId', JSON.stringify([]));
-                }
-
-                // Ensure status is properly set
-                const statusCheckbox = document.querySelector('input[name="status"]');
-                formData.set('status', statusCheckbox.checked ? 'true' : 'false');
-
-                // Show loading
-                showLoading();
-
-                try {
-                    // Submit using fetch
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else {
-                        const data = await response.json();
-                        hideLoading();
-                        
-                        if (!data.success) {
-                            showMessage(data.message || 'Error creating offer', 'error');
-                            
-                            // If it's a duplicate offer error, highlight the offer name field
-                            if (data.message && data.message.includes('already exists')) {
-                                offerName.classList.add('error');
-                                showFieldError('offerNameError', data.message);
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    hideLoading();
-                    showMessage('An error occurred while creating the offer', 'error');
-                }
-            });
 
             // Reset button handler
             document.getElementById('resetBtn').addEventListener('click', function(e) {

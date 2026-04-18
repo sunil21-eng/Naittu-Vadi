@@ -103,7 +103,7 @@ router.post("/blockcoupon/:couponId", adminAuth, couponController.blockCoupon);
 // Offer Routes
 router.get("/offer", adminAuth, offerController.loadOffer);
 router.get("/offersearch", adminAuth, offerController.loadOffer);
-router.get("/addOffer", adminAuth, offerController.loadAddOffer);
+router.get("/addoffer", adminAuth, offerController.loadAddOffer);
 router.post("/addoffer", adminAuth, offerController.addOffer);
 router.get("/editoffer/:offerId", adminAuth, offerController.loadEditOffer);
 router.post("/updateoffer/:offerId", adminAuth, offerController.editOffer);

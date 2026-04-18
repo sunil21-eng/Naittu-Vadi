@@ -29,10 +29,11 @@ router.get('/logout',userController.logout);
 
 
 router.get("/auth/google",passport.authenticate('google',{scope:["profile","email"]}));
+
 router.get("/auth/google/callback",passport.authenticate("google",{failureRedirect:'/login'}),(req,res) => {
     req.session.user = {_id:req.user._id, email: req.user.email};
     res.redirect('/');
-});
+}); 
 
 router.use(getHeaderCounts);
 router.use(checkUserStatus);

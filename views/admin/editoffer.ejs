@@ -342,33 +342,53 @@
             background-color: #fed7d7;
             color: #c53030;
             display: block;
+            border: 1px solid #fc8181;
         }
         .success-message {
             background-color: #c6f6d5;
             color: #2f855a;
             display: block;
+            border: 1px solid #9ae6b4;
         }
         .info-message {
             background-color: #bee3f8;
             color: #2c5282;
             display: block;
+            border: 1px solid #90cdf4;
         }
 
         /* Loading indicator */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
         .loading {
             display: none;
             text-align: center;
             padding: 20px;
-            color: #4c51bf;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
         }
         .loading-spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #4c51bf;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 10px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -406,6 +426,80 @@
         .warning-box p {
             margin: 0;
             font-size: 0.95rem;
+        }
+
+        /* Confirmation Modal */
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .confirmation-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .confirmation-content h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        .confirmation-content p {
+            margin-bottom: 25px;
+            color: #4a5568;
+        }
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .confirmation-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .confirmation-btn.cancel {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .confirmation-btn.cancel:hover {
+            background-color: #cbd5e0;
+        }
+        .confirmation-btn.confirm {
+            background-color: #4c51bf;
+            color: white;
+        }
+        .confirmation-btn.confirm:hover {
+            background-color: #3b3f8f;
+        }
+
+        /* Error text styling */
+        .error-text {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .error-text.show {
+            display: block;
+        }
+        .form-control.error {
+            border-color: #e53e3e;
+            background-color: #fff5f5;
         }
 
         /* Responsive design */
@@ -464,6 +558,15 @@
         <!-- Message Area -->
         <div class="message-area" id="message-area"></div>
 
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay"></div>
+        
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading-indicator">
+            <div class="loading-spinner"></div>
+            <p>Updating offer...</p>
+        </div>
+
         <!-- Form Container -->
         <div class="form-container">
             <% 
@@ -486,7 +589,7 @@
             </div>
             <% } %>
 
-            <form id="editOfferForm" method="POST" action="/admin/updateoffer/<%= offer._id %>">
+            <form id="editOfferForm">
                 <!-- Offer Information Display -->
                 <div class="offer-info">
                     <div class="info-row">
@@ -517,14 +620,17 @@
                             </label>
                             <input type="text" 
                                    class="form-control" 
+                                   id="offerName"
                                    name="offerName" 
                                    value="<%= offer.offerName %>"
                                    placeholder="e.g., Summer Sale 2024" 
-                                   required>
+                                   required
+                                   maxlength="100">
                             <div class="helper-text">
                                 <i class="fas fa-info-circle"></i>
                                 Choose a unique and descriptive name for the offer
                             </div>
+                            <div class="error-text" id="offerNameError"></div>
                         </div>
                     </div>
                 </div>
@@ -560,10 +666,10 @@
                                 <i class="fas fa-box"></i>
                                 Select Product
                             </label>
-                            <select class="form-control" name="productId" id="productSelect">
+                            <select class="form-control" id="productSelect" name="productSelect">
                                 <option value="">Choose a product...</option>
                                 <% products.forEach(product => { %>
-                                    <option value="<%= product._id %>" <%= offer.productId && offer.productId.toString() === product._id.toString() ? 'selected' : '' %>>
+                                    <option value="<%= product._id %>" <%= offer.productId && offer.productId[0] && offer.productId[0].toString() === product._id.toString() ? 'selected' : '' %>>
                                         <%= product.productName %> (₹<%= product.salePrice %>)
                                     </option>
                                 <% }) %>
@@ -572,6 +678,7 @@
                                 <i class="fas fa-info-circle"></i>
                                 Select the product this offer applies to
                             </div>
+                            <div class="error-text" id="productError"></div>
                         </div>
                     </div>
 
@@ -582,10 +689,10 @@
                                 <i class="fas fa-tags"></i>
                                 Select Category
                             </label>
-                            <select class="form-control" name="categoryId" id="categorySelect">
+                            <select class="form-control" id="categorySelect" name="categorySelect">
                                 <option value="">Choose a category...</option>
                                 <% categories.forEach(category => { %>
-                                    <option value="<%= category._id %>" <%= offer.categoryId && offer.categoryId.toString() === category._id.toString() ? 'selected' : '' %>>
+                                    <option value="<%= category._id %>" <%= offer.categoryId && offer.categoryId[0] && offer.categoryId[0].toString() === category._id.toString() ? 'selected' : '' %>>
                                         <%= category.name %>
                                     </option>
                                 <% }) %>
@@ -594,6 +701,7 @@
                                 <i class="fas fa-info-circle"></i>
                                 Select the category this offer applies to
                             </div>
+                            <div class="error-text" id="categoryError"></div>
                         </div>
                     </div>
                 </div>
@@ -615,6 +723,7 @@
                                 <i class="fas fa-percent input-icon"></i>
                                 <input type="number" 
                                        class="form-control" 
+                                       id="discount"
                                        name="discount" 
                                        value="<%= offer.discount %>"
                                        min="1" 
@@ -627,6 +736,7 @@
                                 <i class="fas fa-info-circle"></i>
                                 Enter value between 1 and 100
                             </div>
+                            <div class="error-text" id="discountError"></div>
                         </div>
                     </div>
                 </div>
@@ -649,12 +759,12 @@
                                    name="startDate" 
                                    id="startDate"
                                    value="<%= new Date(offer.startDate).toISOString().split('T')[0] %>"
-                                   required
-                                   min="<%= new Date().toISOString().split('T')[0] %>">
+                                   required>
                             <div class="helper-text">
                                 <i class="fas fa-info-circle"></i>
                                 When the offer becomes active
                             </div>
+                            <div class="error-text" id="startDateError"></div>
                         </div>
 
                         <div class="form-group">
@@ -667,12 +777,12 @@
                                    name="endDate" 
                                    id="endDate"
                                    value="<%= new Date(offer.endDate).toISOString().split('T')[0] %>"
-                                   required
-                                   min="<%= new Date().toISOString().split('T')[0] %>">
+                                   required>
                             <div class="helper-text">
                                 <i class="fas fa-info-circle"></i>
                                 When the offer expires
                             </div>
+                            <div class="error-text" id="endDateError"></div>
                         </div>
                     </div>
                 </div>
@@ -686,7 +796,7 @@
 
                     <div class="toggle-switch">
                         <label class="switch">
-                            <input type="checkbox" name="status" value="true" <%= offer.status ? 'checked' : '' %>>
+                            <input type="checkbox" name="status" id="statusCheckbox" value="true" <%= offer.status ? 'checked' : '' %>>
                             <span class="slider"></span>
                         </label>
                         <span class="toggle-label">
@@ -710,29 +820,23 @@
                         <i class="fas fa-undo"></i>
                         Reset Changes
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="fas fa-save"></i>
                         Update Offer
                     </button>
                 </div>
             </form>
         </div>
-
-        <!-- Loading Indicator -->
-        <div class="loading" id="loading-indicator">
-            <div class="loading-spinner"></div>
-            <p>Updating offer...</p>
-        </div>
     </div>
 
     <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="confirmation-modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center;">
-        <div class="confirmation-content" style="background-color: #fff; padding: 30px; border-radius: 10px; width: 90%; max-width: 450px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center;">
-            <h3 style="margin-top: 0; margin-bottom: 15px; color: #2d3748;" id="confirmation-title">Confirm Changes</h3>
-            <p style="margin-bottom: 25px; color: #4a5568;" id="confirmation-message">Are you sure you want to update this offer?</p>
-            <div class="confirmation-buttons" style="display: flex; justify-content: center; gap: 15px;">
-                <button class="confirmation-btn cancel" onclick="closeConfirmationModal()" style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; background-color: #e2e8f0; color: #4a5568;">Cancel</button>
-                <button class="confirmation-btn confirm" id="confirmation-confirm-btn" style="padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; background-color: #4c51bf; color: white;">Confirm</button>
+    <div id="confirmationModal" class="confirmation-modal">
+        <div class="confirmation-content">
+            <h3 id="confirmation-title">Confirm Changes</h3>
+            <p id="confirmation-message">Are you sure you want to update this offer?</p>
+            <div class="confirmation-buttons">
+                <button class="confirmation-btn cancel" onclick="closeConfirmationModal()">Cancel</button>
+                <button class="confirmation-btn confirm" id="confirmation-confirm-btn">Confirm</button>
             </div>
         </div>
     </div>
@@ -742,27 +846,30 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
             const form = document.getElementById('editOfferForm');
             const messageArea = document.getElementById('message-area');
             const loadingIndicator = document.getElementById('loading-indicator');
+            const loadingOverlay = document.getElementById('loading-overlay');
             const resetBtn = document.getElementById('resetBtn');
+            const submitBtn = document.getElementById('submitBtn');
             const confirmationModal = document.getElementById('confirmationModal');
             const confirmationTitle = document.getElementById('confirmation-title');
             const confirmationMessage = document.getElementById('confirmation-message');
             const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
             
-            // Offer type elements
+            // Form elements
+            const offerName = document.getElementById('offerName');
             const productRadio = document.getElementById('product');
             const categoryRadio = document.getElementById('category');
             const productSelection = document.getElementById('product-selection');
             const categorySelection = document.getElementById('category-selection');
             const productSelect = document.getElementById('productSelect');
             const categorySelect = document.getElementById('categorySelect');
-
-            // Date inputs
+            const discount = document.getElementById('discount');
             const startDate = document.getElementById('startDate');
             const endDate = document.getElementById('endDate');
-            const statusCheckbox = document.querySelector('input[name="status"]');
+            const statusCheckbox = document.getElementById('statusCheckbox');
 
             // Original form data for reset
             const originalData = {
@@ -771,8 +878,8 @@
                 discount: '<%= offer.discount %>',
                 startDate: '<%= new Date(offer.startDate).toISOString().split("T")[0] %>',
                 endDate: '<%= new Date(offer.endDate).toISOString().split("T")[0] %>',
-                productId: '<%= offer.productId || "" %>',
-                categoryId: '<%= offer.categoryId || "" %>',
+                productId: '<%= offer.productId && offer.productId[0] ? offer.productId[0] : "" %>',
+                categoryId: '<%= offer.categoryId && offer.categoryId[0] ? offer.categoryId[0] : "" %>',
                 status: '<%= offer.status ? "true" : "false" %>'
             };
 
@@ -781,19 +888,28 @@
             startDate.setAttribute('min', today);
             endDate.setAttribute('min', today);
 
+            // If start date is in the past, don't restrict it
+            if (startDate.value < today) {
+                startDate.removeAttribute('min');
+            }
+
             // Handle offer type change
             function updateOfferType() {
                 if (productRadio.checked) {
                     productSelection.classList.add('show');
                     categorySelection.classList.remove('show');
-                    productSelect.required = true;
-                    categorySelect.required = false;
                 } else {
                     productSelection.classList.remove('show');
                     categorySelection.classList.add('show');
-                    productSelect.required = false;
-                    categorySelect.required = true;
                 }
+                clearTargetErrors();
+            }
+
+            function clearTargetErrors() {
+                document.getElementById('productError').classList.remove('show');
+                document.getElementById('categoryError').classList.remove('show');
+                productSelect.classList.remove('error');
+                categorySelect.classList.remove('error');
             }
 
             productRadio.addEventListener('change', updateOfferType);
@@ -805,13 +921,87 @@
                 if (endDate.value && endDate.value < this.value) {
                     endDate.value = this.value;
                 }
+                validateDate('startDateError', startDate.value, 'Start date is required');
             });
+
+            endDate.addEventListener('change', function() {
+                validateDate('endDateError', endDate.value, 'End date is required');
+                if (startDate.value && endDate.value && new Date(startDate.value) > new Date(endDate.value)) {
+                    showFieldError('endDateError', 'End date cannot be before start date');
+                    endDate.classList.add('error');
+                } else {
+                    hideFieldError('endDateError');
+                    endDate.classList.remove('error');
+                }
+            });
+
+            // Real-time validation
+            offerName.addEventListener('input', function() {
+                if (!this.value.trim()) {
+                    showFieldError('offerNameError', 'Offer name is required');
+                    this.classList.add('error');
+                } else if (this.value.trim().length < 3) {
+                    showFieldError('offerNameError', 'Offer name must be at least 3 characters');
+                    this.classList.add('error');
+                } else {
+                    hideFieldError('offerNameError');
+                    this.classList.remove('error');
+                }
+            });
+
+            discount.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (!this.value) {
+                    showFieldError('discountError', 'Discount is required');
+                    this.classList.add('error');
+                } else if (value < 1 || value > 100) {
+                    showFieldError('discountError', 'Discount must be between 1 and 100');
+                    this.classList.add('error');
+                } else {
+                    hideFieldError('discountError');
+                    this.classList.remove('error');
+                }
+            });
+
+            // Helper functions for field validation
+            function showFieldError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+
+            function hideFieldError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.classList.remove('show');
+            }
+
+            function validateDate(elementId, value, message) {
+                if (!value) {
+                    showFieldError(elementId, message);
+                    return false;
+                } else {
+                    hideFieldError(elementId);
+                    return true;
+                }
+            }
+
+            function clearAllErrors() {
+                const errorElements = document.querySelectorAll('.error-text');
+                errorElements.forEach(element => {
+                    element.classList.remove('show');
+                });
+                
+                const formControls = document.querySelectorAll('.form-control');
+                formControls.forEach(control => {
+                    control.classList.remove('error');
+                });
+            }
 
             // Check if any changes were made
             function hasChanges() {
-                const currentOfferName = document.querySelector('input[name="offerName"]').value.trim();
+                const currentOfferName = offerName.value.trim();
                 const currentOfferType = productRadio.checked ? 'product' : 'category';
-                const currentDiscount = document.querySelector('input[name="discount"]').value;
+                const currentDiscount = discount.value;
                 const currentStartDate = startDate.value;
                 const currentEndDate = endDate.value;
                 const currentProductId = productSelect.value;
@@ -825,107 +1015,108 @@
                        currentEndDate !== originalData.endDate ||
                        currentProductId !== originalData.productId ||
                        currentCategoryId !== originalData.categoryId ||
-                       currentStatus !== originalData.status;
+                       currentStatus !== (originalData.status === 'true');
             }
 
-            // Form validation and submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Check if any changes were made
-                if (!hasChanges()) {
-                    showMessage('No changes were made to the offer', 'info');
-                    return;
-                }
-
-                // Get form values
-                const offerName = document.querySelector('input[name="offerName"]').value.trim();
-                const discount = parseInt(document.querySelector('input[name="discount"]').value);
-                const start = startDate.value;
-                const end = endDate.value;
+            // Form validation
+            function validateForm() {
+                let isValid = true;
+                clearAllErrors();
 
                 // Validate offer name
-                if (!offerName) {
-                    showMessage('Please enter an offer name', 'error');
-                    return;
-                }
-                if (offerName.length < 3) {
-                    showMessage('Offer name must be at least 3 characters long', 'error');
-                    return;
+                if (!offerName.value.trim()) {
+                    showFieldError('offerNameError', 'Please enter an offer name');
+                    offerName.classList.add('error');
+                    isValid = false;
+                } else if (offerName.value.trim().length < 3) {
+                    showFieldError('offerNameError', 'Offer name must be at least 3 characters long');
+                    offerName.classList.add('error');
+                    isValid = false;
                 }
 
                 // Validate discount
-                if (!discount || discount < 1 || discount > 100) {
-                    showMessage('Please enter a valid discount percentage between 1 and 100', 'error');
-                    return;
+                const discountValue = parseInt(discount.value);
+                if (!discount.value) {
+                    showFieldError('discountError', 'Please enter a discount percentage');
+                    discount.classList.add('error');
+                    isValid = false;
+                } else if (discountValue < 1 || discountValue > 100) {
+                    showFieldError('discountError', 'Discount must be between 1 and 100');
+                    discount.classList.add('error');
+                    isValid = false;
                 }
 
                 // Validate dates
-                if (!start || !end) {
-                    showMessage('Please select both start and end dates', 'error');
-                    return;
+                if (!startDate.value) {
+                    showFieldError('startDateError', 'Please select a start date');
+                    startDate.classList.add('error');
+                    isValid = false;
+                } else {
+                    startDate.classList.remove('error');
                 }
 
-                if (new Date(start) > new Date(end)) {
-                    showMessage('End date cannot be before start date', 'error');
-                    return;
+                if (!endDate.value) {
+                    showFieldError('endDateError', 'Please select an end date');
+                    endDate.classList.add('error');
+                    isValid = false;
+                } else {
+                    endDate.classList.remove('error');
                 }
 
-                // Validate target selection
-                if (productRadio.checked && !productSelect.value) {
-                    showMessage('Please select a product for this offer', 'error');
-                    return;
-                }
-
-                if (categoryRadio.checked && !categorySelect.value) {
-                    showMessage('Please select a category for this offer', 'error');
-                    return;
-                }
-
-                // Show confirmation modal
-                openConfirmationModal(
-                    'Update Offer',
-                    'Are you sure you want to update this offer?',
-                    function() {
-                        showLoading();
-                        form.submit();
+                if (startDate.value && endDate.value) {
+                    if (new Date(startDate.value) > new Date(endDate.value)) {
+                        showFieldError('endDateError', 'End date cannot be before start date');
+                        endDate.classList.add('error');
+                        isValid = false;
                     }
-                );
-            });
+                }
 
-            // Reset button handler
-            resetBtn.addEventListener('click', function() {
-                openConfirmationModal(
-                    'Reset Changes',
-                    'Are you sure you want to reset all changes? This will revert to the original values.',
-                    function() {
-                        // Reset form to original values
-                        document.querySelector('input[name="offerName"]').value = originalData.offerName;
-                        
-                        if (originalData.offerType === 'product') {
-                            productRadio.checked = true;
-                        } else {
-                            categoryRadio.checked = true;
-                        }
-                        updateOfferType();
-                        
-                        document.querySelector('input[name="discount"]').value = originalData.discount;
-                        startDate.value = originalData.startDate;
-                        endDate.value = originalData.endDate;
-                        
-                        if (originalData.productId) {
-                            productSelect.value = originalData.productId;
-                        }
-                        if (originalData.categoryId) {
-                            categorySelect.value = originalData.categoryId;
-                        }
-                        
-                        statusCheckbox.checked = originalData.status;
-                        
-                        showMessage('Form has been reset to original values', 'success');
+                // Validate based on offer type
+                if (productRadio.checked) {
+                    if (!productSelect.value) {
+                        showFieldError('productError', 'Please select a product');
+                        productSelect.classList.add('error');
+                        isValid = false;
+                    } else {
+                        productSelect.classList.remove('error');
                     }
-                );
-            });
+                } else {
+                    if (!categorySelect.value) {
+                        showFieldError('categoryError', 'Please select a category');
+                        categorySelect.classList.add('error');
+                        isValid = false;
+                    } else {
+                        categorySelect.classList.remove('error');
+                    }
+                }
+
+                return isValid;
+            }
+
+            // Show loading
+            function showLoading() {
+                loadingIndicator.style.display = 'block';
+                loadingOverlay.style.display = 'block';
+                submitBtn.disabled = true;
+            }
+
+            // Hide loading
+            function hideLoading() {
+                loadingIndicator.style.display = 'none';
+                loadingOverlay.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+
+            // Show message
+            function showMessage(message, type) {
+                messageArea.textContent = message;
+                messageArea.className = 'message-area ' + (type === 'success' ? 'success-message' : type === 'info' ? 'info-message' : 'error-message');
+                messageArea.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageArea.style.display = 'none';
+                }, 5000);
+            }
 
             // Modal functions
             function openConfirmationModal(title, message, confirmCallback) {
@@ -949,21 +1140,127 @@
                 }
             });
 
-            // Function to show loading
-            function showLoading() {
-                loadingIndicator.style.display = 'block';
-            }
-
-            // Function to show messages
-            function showMessage(message, type) {
-                messageArea.textContent = message;
-                messageArea.className = 'message-area ' + (type === 'success' ? 'success-message' : type === 'info' ? 'info-message' : 'error-message');
-                messageArea.style.display = 'block';
+            // Form submission
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
                 
-                setTimeout(() => {
-                    messageArea.style.display = 'none';
-                }, 5000);
-            }
+                // Check if any changes were made
+                if (!hasChanges()) {
+                    showMessage('No changes were made to the offer', 'info');
+                    return;
+                }
+                
+                // Validate form
+                if (!validateForm()) {
+                    showMessage('Please fix the errors in the form', 'error');
+                    return;
+                }
+
+                // Prepare data as JSON
+                let productId = [];
+                let categoryId = [];
+                
+                if (productRadio.checked) {
+                    productId = [productSelect.value];
+                } else {
+                    categoryId = [categorySelect.value];
+                }
+                
+                const data = {
+                    offerName: offerName.value.trim(),
+                    discount: discount.value,
+                    offerType: productRadio.checked ? 'product' : 'category',
+                    startDate: startDate.value,
+                    endDate: endDate.value,
+                    productId: JSON.stringify(productId),
+                    categoryId: JSON.stringify(categoryId),
+                    status: statusCheckbox.checked ? 'true' : 'false'
+                };
+                
+                // Show confirmation modal
+                openConfirmationModal(
+                    'Update Offer',
+                    'Are you sure you want to update this offer?',
+                    async function() {
+                        showLoading();
+                        
+                        try {
+                            const response = await fetch(`/admin/updateoffer/<%= offer._id %>`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(data)
+                            });
+                            
+                            if (response.redirected) {
+                                window.location.href = response.url;
+                            } else {
+                                const result = await response.json();
+                                hideLoading();
+                                
+                                if (!result.success) {
+                                    showMessage(result.message || 'Error updating offer', 'error');
+                                    
+                                    // If it's a duplicate offer error, highlight the offer name field
+                                    if (result.message && result.message.includes('already exists')) {
+                                        offerName.classList.add('error');
+                                        showFieldError('offerNameError', result.message);
+                                    }
+                                } else if (result.redirect) {
+                                    window.location.href = result.redirect;
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            hideLoading();
+                            showMessage('An error occurred while updating the offer', 'error');
+                        }
+                    }
+                );
+            });
+
+            // Reset button handler
+            resetBtn.addEventListener('click', function() {
+                openConfirmationModal(
+                    'Reset Changes',
+                    'Are you sure you want to reset all changes? This will revert to the original values.',
+                    function() {
+                        // Reset form to original values
+                        offerName.value = originalData.offerName;
+                        
+                        if (originalData.offerType === 'product') {
+                            productRadio.checked = true;
+                        } else {
+                            categoryRadio.checked = true;
+                        }
+                        updateOfferType();
+                        
+                        discount.value = originalData.discount;
+                        startDate.value = originalData.startDate;
+                        endDate.value = originalData.endDate;
+                        
+                        if (originalData.productId) {
+                            productSelect.value = originalData.productId;
+                        } else {
+                            productSelect.value = '';
+                        }
+                        
+                        if (originalData.categoryId) {
+                            categorySelect.value = originalData.categoryId;
+                        } else {
+                            categorySelect.value = '';
+                        }
+                        
+                        statusCheckbox.checked = originalData.status === 'true';
+                        
+                        // Clear all errors
+                        clearAllErrors();
+                        
+                        showMessage('Form has been reset to original values', 'success');
+                    }
+                );
+            });
 
             // Check for URL parameters to show messages
             const urlParams = new URLSearchParams(window.location.search);
@@ -979,6 +1276,20 @@
             // Prevent form resubmission on page refresh
             if (window.history.replaceState) {
                 window.history.replaceState(null, null, window.location.pathname);
+            }
+
+            // Initialize the form
+            updateOfferType();
+            
+            // Initial validation styling
+            if (offerName.value.trim() && offerName.value.trim().length >= 3) {
+                offerName.classList.remove('error');
+                hideFieldError('offerNameError');
+            }
+            
+            if (discount.value && parseInt(discount.value) >= 1 && parseInt(discount.value) <= 100) {
+                discount.classList.remove('error');
+                hideFieldError('discountError');
             }
         });
     </script>
