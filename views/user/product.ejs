@@ -515,10 +515,118 @@
             display: inline-block;
             margin-left: 10px;
         }
+
+        /* Toast Notification Styles */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        .toast-notification.success {
+            border-left: 4px solid #28a745;
+            background-color: #ffffff;
+        }
+
+        .toast-notification.error {
+            border-left: 4px solid #dc3545;
+            background-color: #ffffff;
+        }
+
+        .toast-notification i {
+            font-size: 1.2rem;
+        }
+
+        .toast-notification.success i {
+            color: #28a745;
+        }
+
+        .toast-notification.error i {
+            color: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal styles for login prompt */
+        .modal-backdrop {
+            z-index: 1040;
+        }
+        
+        .login-prompt-modal {
+            z-index: 1050;
+        }
+        
+        .login-prompt-modal .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .login-prompt-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .login-prompt-modal .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
     </style>
 </head>
 
 <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">
+        <i class="fas"></i>
+        <span></span>
+    </div>
+
+    <!-- Login Prompt Modal -->
+    <div class="modal fade login-prompt-modal" id="loginPromptModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login Required
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <i class="fas fa-heart-broken fa-3x text-danger mb-3"></i>
+                    <h5 class="mb-3">Please login to continue</h5>
+                    <p class="text-muted">You need to be logged in to add items to cart or wishlist.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <a href="/login" class="btn btn-primary px-4">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login Now
+                    </a>
+                    <a href="/signup" class="btn btn-outline-secondary px-4">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <div class="product-image-section">
             <div class="product-image-wrapper">
@@ -641,24 +749,20 @@
                 <% } %>
             </div>
 
-            <form id="add-to-cart-form" action="/cart/add" method="POST">
-                <input type="hidden" name="productId" value="<%= product._id %>">
-
-                <div class="action-buttons">
-                    <% if (product.quantity > 0) { %>
-                        <button type="submit" class="btn btn-primary btn-lg" id="add-to-cart-btn">
-                            <i class="fas fa-shopping-cart"></i> ADD TO CART
-                        </button>
-                        <a href="/cart" class="btn btn-success btn-lg">
-                            <i class="fas fa-shopping-cart"></i> GO TO CART
-                        </a>
-                    <% } else { %>
-                        <button class="btn btn-secondary btn-lg" disabled>
-                            <i class="fas fa-bell"></i> NOTIFY WHEN AVAILABLE
-                        </button>
-                    <% } %>
-                </div>
-            </form>
+            <div class="action-buttons">
+                <% if (product.quantity > 0) { %>
+                    <button class="btn btn-primary btn-lg" id="add-to-cart-btn">
+                        <i class="fas fa-shopping-cart"></i> ADD TO CART
+                    </button>
+                    <a href="/cart" class="btn btn-success btn-lg">
+                        <i class="fas fa-shopping-cart"></i> GO TO CART
+                    </a>
+                <% } else { %>
+                    <button class="btn btn-secondary btn-lg" disabled>
+                        <i class="fas fa-bell"></i> NOTIFY WHEN AVAILABLE
+                    </button>
+                <% } %>
+            </div>
 
             <div class="row mt-5">
                 <div class="col-12">
@@ -836,6 +940,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = toast.querySelector('i');
+            const text = toast.querySelector('span');
+            
+            toast.className = 'toast-notification ' + type;
+            icon.className = 'fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle');
+            text.textContent = message;
+            
+            toast.style.display = 'flex';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            const modal = new bootstrap.Modal(document.getElementById('loginPromptModal'));
+            modal.show();
+        }
+
         // Zoom functionality variables
         let currentZoom = 1;
         const zoomStep = 0.2;
@@ -991,15 +1118,94 @@
             };
         }
 
-        // Initialize wishlist buttons
+        // Initialize wishlist buttons with improved error handling
         function initializeWishlistButtons() {
+            // Check initial wishlist state from server (you can set this via data attribute)
             document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                // Check initial state (you may want to set this from server)
                 btn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     const productId = this.getAttribute('data-product-id');
                     toggleWishlist(productId, this);
                 });
+            });
+        }
+
+        // Toggle wishlist function with comprehensive error handling
+        function toggleWishlist(productId, button) {
+            const icon = button.querySelector('i');
+            
+            button.disabled = true;
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+            fetch('/wishlist/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId })
+            })
+            .then(async response => {
+                const contentType = response.headers.get('content-type');
+                
+                // Handle 401 Unauthorized
+                if (response.status === 401) {
+                    showToast('Please login to manage your wishlist', 'error');
+                    setTimeout(() => {
+                        showLoginModal();
+                    }, 1500);
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                    return;
+                }
+                
+                // Handle 400 Bad Request
+                if (response.status === 400) {
+                    const data = await response.json();
+                    showToast(data.message || 'Invalid request', 'error');
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                    return;
+                }
+                
+                // Check if response is JSON
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        button.classList.toggle('active');
+                        if (button.classList.contains('active')) {
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                        } else {
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                        }
+                        showToast(data.message, 'success');
+
+                        // Update wishlist count using the global function from header
+                        if (typeof window.updateWishlistCount === 'function') {
+                            window.updateWishlistCount(data.wishlistCount);
+                        }
+                    } else {
+                        showToast(data.message || 'Error updating wishlist', 'error');
+                    }
+                } else {
+                    // Not JSON response - possible HTML redirect
+                    showToast('Please login to manage your wishlist', 'error');
+                    setTimeout(() => {
+                        showLoginModal();
+                    }, 1500);
+                }
+                
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Network error. Please check your connection.', 'error');
+                button.innerHTML = originalHTML;
+                button.disabled = false;
             });
         }
 
@@ -1015,110 +1221,7 @@
             });
         }
 
-        // Initialize main add to cart functionality
-        function initializeMainAddToCart() {
-            const form = document.getElementById('add-to-cart-form');
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    const submitButton = form.querySelector('button[type="submit"]');
-                    const originalText = submitButton.innerHTML;
-                    
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Adding...';
-
-                    const formData = new FormData(form);
-                    const productId = formData.get('productId');
-
-                    fetch('/cart/add', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            productId: productId,
-                            quantity: 1
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            submitButton.innerHTML = '<i class="fas fa-check"></i> Added!';
-                            showMessage('Product added to cart successfully!', 'success');
-
-                            const cartBadge = document.querySelector('.cart-count');
-                            if (cartBadge && data.cartCount !== undefined) {
-                                cartBadge.textContent = data.cartCount;
-                            }
-
-                            setTimeout(() => {
-                                submitButton.innerHTML = originalText;
-                                submitButton.disabled = false;
-                            }, 2000);
-                        } else {
-                            showMessage(data.message || 'Error adding to cart', 'error');
-                            submitButton.innerHTML = originalText;
-                            submitButton.disabled = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showMessage('An error occurred. Please try again.', 'error');
-                        submitButton.innerHTML = originalText;
-                        submitButton.disabled = false;
-                    });
-                });
-            }
-        }
-
-        // Toggle wishlist function
-        function toggleWishlist(productId, button) {
-            const icon = button.querySelector('i');
-            
-            button.disabled = true;
-            const originalHTML = button.innerHTML;
-            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-
-            fetch('/wishlist/toggle', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ productId: productId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    button.classList.toggle('active');
-                    if (button.classList.contains('active')) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                    }
-                    showMessage(data.message || 'Wishlist updated!', 'success');
-
-                    const wishlistBadge = document.querySelector('.wishlist-count');
-                    if (wishlistBadge && data.wishlistCount !== undefined) {
-                        wishlistBadge.textContent = data.wishlistCount;
-                    }
-                } else {
-                    showMessage(data.message || 'Error updating wishlist', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showMessage('An error occurred. Please try again.', 'error');
-            })
-            .finally(() => {
-                button.disabled = false;
-                button.innerHTML = originalHTML;
-            });
-        }
-
-        // Add to cart function for related products
+        // Add to cart function for related products with improved error handling
         function addToCart(productId, button) {
             const originalText = button.innerHTML;
             button.disabled = true;
@@ -1131,51 +1234,155 @@
                 },
                 body: JSON.stringify({ productId: productId, quantity: 1 })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    button.innerHTML = '<i class="fas fa-check"></i>';
-                    showMessage('Added to cart!', 'success');
-
-                    const cartBadge = document.querySelector('.cart-count');
-                    if (cartBadge && data.cartCount !== undefined) {
-                        cartBadge.textContent = data.cartCount;
-                    }
-
+            .then(async response => {
+                const contentType = response.headers.get('content-type');
+                
+                // Handle 401 Unauthorized
+                if (response.status === 401) {
+                    showToast('Please login to add items to cart', 'error');
                     setTimeout(() => {
+                        showLoginModal();
+                    }, 1500);
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    return;
+                }
+                
+                // Handle 400 Bad Request
+                if (response.status === 400) {
+                    const data = await response.json();
+                    showToast(data.message || 'Invalid request', 'error');
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    return;
+                }
+                
+                // Check if response is JSON
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        button.innerHTML = '<i class="fas fa-check"></i>';
+                        showToast('Product added to cart successfully!', 'success');
+
+                        // Update cart count using the global function from header
+                        if (typeof window.updateCartCount === 'function') {
+                            window.updateCartCount(data.cartCount);
+                        }
+
+                        setTimeout(() => {
+                            button.innerHTML = originalText;
+                            button.disabled = false;
+                        }, 2000);
+                    } else {
+                        showToast(data.message || 'Error adding to cart', 'error');
                         button.innerHTML = originalText;
                         button.disabled = false;
-                    }, 2000);
+                    }
                 } else {
-                    showMessage(data.message || 'Error adding to cart', 'error');
+                    // Not JSON response - possible HTML redirect
+                    showToast('Please login to add items to cart', 'error');
+                    setTimeout(() => {
+                        showLoginModal();
+                    }, 1500);
                     button.innerHTML = originalText;
                     button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showMessage('An error occurred. Please try again.', 'error');
+                showToast('Network error. Please check your connection.', 'error');
                 button.innerHTML = originalText;
                 button.disabled = false;
             });
         }
 
-        // Show message function
-        function showMessage(message, type) {
-            const messageBox = document.createElement('div');
-            messageBox.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed top-0 end-0 m-4`;
-            messageBox.style.zIndex = '9999';
-            messageBox.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            document.body.appendChild(messageBox);
+        // Initialize main add to cart with improved error handling
+        function initializeMainAddToCart() {
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
 
-            setTimeout(() => {
-                if (messageBox.parentNode) {
-                    messageBox.remove();
-                }
-            }, 3000);
+                    const productId = '<%= product._id %>';
+                    const originalText = this.innerHTML;
+                    
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Adding...';
+
+                    fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            productId: productId,
+                            quantity: 1
+                        })
+                    })
+                    .then(async response => {
+                        const contentType = response.headers.get('content-type');
+                        
+                        // Handle 401 Unauthorized
+                        if (response.status === 401) {
+                            showToast('Please login to add items to cart', 'error');
+                            setTimeout(() => {
+                                showLoginModal();
+                            }, 1500);
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                            return;
+                        }
+                        
+                        // Handle 400 Bad Request
+                        if (response.status === 400) {
+                            const data = await response.json();
+                            showToast(data.message || 'Invalid request', 'error');
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                            return;
+                        }
+                        
+                        // Check if response is JSON
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                this.innerHTML = '<i class="fas fa-check"></i> Added!';
+                                showToast('Product added to cart successfully!', 'success');
+
+                                // Update cart count using the global function from header
+                                if (typeof window.updateCartCount === 'function') {
+                                    window.updateCartCount(data.cartCount);
+                                }
+
+                                setTimeout(() => {
+                                    this.innerHTML = originalText;
+                                    this.disabled = false;
+                                }, 2000);
+                            } else {
+                                showToast(data.message || 'Error adding to cart', 'error');
+                                this.innerHTML = originalText;
+                                this.disabled = false;
+                            }
+                        } else {
+                            // Not JSON response - possible HTML redirect
+                            showToast('Please login to add items to cart', 'error');
+                            setTimeout(() => {
+                                showLoginModal();
+                            }, 1500);
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Network error. Please check your connection.', 'error');
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    });
+                });
+            }
         }
     </script>
 </body>
