@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artemis - Premium Crakers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Artemis - Premium Crackers | Responsive Header</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
@@ -15,22 +15,22 @@
             --light-color: #f8f9fa;
         }
 
-        /* Header-specific styles only */
+        /* Header-specific styles only - fully responsive, no functionality changes */
         .artemis-top-bar {
             background-color: var(--dark-color);
             color: white;
-            padding: 8px 0;
             font-size: 0.85rem;
             width: 100%;
         }
 
         .artemis-top-bar .container {
             max-width: 100%;
-            padding: 0 15px;
+            padding: 0 20px;
         }
 
         .artemis-top-bar .top-contact span {
             margin-right: 20px;
+            white-space: nowrap;
         }
 
         .artemis-top-bar .top-contact i {
@@ -41,34 +41,101 @@
         .artemis-navbar {
             background-color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px 0;
+            padding: 12px 0;
             width: 100%;
         }
 
         .artemis-navbar .container {
             max-width: 100%;
-            padding: 0 15px;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Brand wrapper for mobile flexibility */
+        .navbar-brand-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: auto;
         }
 
         .artemis-navbar .navbar-brand {
             font-weight: 800;
             color: var(--primary-color);
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             letter-spacing: 0.5px;
+            line-height: 1.2;
+            white-space: normal;
         }
 
-        .artemis-navbar .tshirt-icon {
-            color: var(--primary-color);
+        /* Hide Bootstrap default toggler - we don't use collapsed menu */
+        .navbar-toggler {
+            display: none !important;
+        }
+
+        /* Main nav container: always visible, no collapse */
+        .artemis-navbar .navbar-collapse {
+            display: flex !important;
+            flex-grow: 1;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        /* Navigation list: horizontal by default, adapts to mobile wrap */
+        .artemis-navbar .navbar-nav {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .artemis-navbar .nav-item {
+            list-style: none;
         }
 
         .artemis-navbar .nav-link {
             font-weight: 600;
             color: var(--dark-color);
-            padding: 0.5rem 1rem !important;
+            padding: 0.5rem 0.9rem !important;
+            white-space: nowrap;
         }
 
         .artemis-navbar .nav-link:hover {
             color: var(--primary-color);
+        }
+
+        /* Action buttons wrapper: flex wrap + accessible spacing */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .artemis-navbar .btn-outline-dark,
+        .artemis-navbar .btn-primary,
+        .artemis-navbar .btn-outline-primary {
+            padding: 0.4rem 0.9rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .artemis-navbar .btn-outline-dark {
+            border-color: #dee2e6;
+            color: var(--dark-color);
+        }
+
+        .artemis-navbar .btn-outline-dark:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
         }
 
         .artemis-navbar .btn-primary {
@@ -91,8 +158,10 @@
             color: white;
         }
 
+        /* User dropdown (original functionality preserved) */
         .artemis-navbar .user-dropdown {
             position: relative;
+            display: inline-block;
         }
 
         .artemis-navbar .user-dropdown-menu {
@@ -131,18 +200,12 @@
         }
 
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
-        /* Toast notification for header events */
+        /* Toast notification (unchanged) */
         .header-toast {
             position: fixed;
             top: 80px;
@@ -165,54 +228,181 @@
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ========== FULLY RESPONSIVE: MOBILE & DESKTOP ========== */
+        /* For screens up to 1200px (laptops) - still fully visible */
+        @media (max-width: 1199px) {
+            .artemis-navbar .nav-link {
+                padding: 0.5rem 0.7rem !important;
+                font-size: 0.9rem;
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+            .header-actions {
+                margin-left: 10px;
+                gap: 6px;
+            }
+            .artemis-navbar .btn-outline-dark,
+            .artemis-navbar .btn-primary,
+            .artemis-navbar .btn-outline-primary {
+                padding: 0.35rem 0.8rem;
+                font-size: 0.85rem;
             }
         }
 
-        /* Responsive adjustments */
+        /* Tablet and small desktop (<= 992px) - keep all elements visible, wrap gracefully */
         @media (max-width: 992px) {
-            .artemis-top-bar .top-contact span {
-                margin-right: 10px;
-                font-size: 0.75rem;
-            }
-
-            .artemis-navbar .navbar-nav {
-                margin-top: 15px;
-            }
-
-            .artemis-navbar .user-dropdown-menu {
-                position: static;
-                box-shadow: none;
-                padding-left: 20px;
-            }
-            
-            .artemis-top-bar .container,
-            .artemis-navbar .container {
+            .artemis-top-bar .container {
                 padding: 0 15px;
             }
+            .artemis-top-bar .top-contact span {
+                margin-right: 12px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+            .artemis-navbar .container {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0 15px;
+            }
+            .navbar-brand-wrapper {
+                width: 100%;
+                margin-bottom: 12px;
+                justify-content: space-between;
+            }
+            .artemis-navbar .navbar-brand {
+                font-size: 1.5rem;
+            }
+            .artemis-navbar .navbar-collapse {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .artemis-navbar .navbar-nav {
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: 12px;
+                gap: 0.2rem;
+            }
+            .artemis-navbar .nav-link {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.9rem;
+            }
+            .header-actions {
+                justify-content: center;
+                margin-left: 0;
+                margin-top: 6px;
+                margin-bottom: 6px;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            .user-section {
+                display: inline-flex;
+            }
         }
 
+        /* Mobile screens (<= 768px): all key elements visible, never hidden, no hamburger */
         @media (max-width: 768px) {
             .artemis-top-bar .d-flex {
                 flex-direction: column;
                 text-align: center;
+                gap: 5px;
             }
-            
             .artemis-top-bar .top-contact span {
-                display: block;
-                margin-right: 0;
-                margin-bottom: 5px;
+                display: inline-block;
+                margin-right: 12px;
+                margin-bottom: 0;
+                white-space: nowrap;
             }
-            
             .artemis-top-bar .delivery-info {
-                margin-top: 5px;
+                margin-top: 0;
             }
+            .artemis-navbar {
+                padding: 12px 0;
+            }
+            .navbar-brand-wrapper {
+                margin-bottom: 10px;
+            }
+            .artemis-navbar .navbar-brand {
+                font-size: 1.4rem;
+            }
+            .artemis-navbar .navbar-nav {
+                justify-content: center;
+                gap: 4px;
+                row-gap: 8px;
+                margin-bottom: 8px;
+            }
+            .artemis-navbar .nav-link {
+                padding: 0.35rem 0.7rem !important;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+            .header-actions {
+                gap: 8px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .artemis-navbar .btn-outline-dark,
+            .artemis-navbar .btn-primary,
+            .artemis-navbar .btn-outline-primary {
+                padding: 0.3rem 0.7rem;
+                font-size: 0.8rem;
+            }
+            .position-relative .badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.45rem;
+            }
+            .artemis-navbar .user-dropdown-menu {
+                min-width: 130px;
+                right: 0;
+                left: auto;
+            }
+        }
+
+        /* Extra small devices (<= 480px): maintain no loss, adjust spacing */
+        @media (max-width: 480px) {
+            .artemis-top-bar .top-contact {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            .artemis-top-bar .top-contact span {
+                margin-right: 0;
+                white-space: normal;
+                font-size: 0.7rem;
+            }
+            .artemis-navbar .navbar-nav {
+                gap: 2px;
+            }
+            .artemis-navbar .nav-link {
+                padding: 0.3rem 0.5rem !important;
+                font-size: 0.8rem;
+            }
+            .header-actions {
+                gap: 6px;
+            }
+            .artemis-navbar .btn-outline-dark,
+            .artemis-navbar .btn-primary,
+            .artemis-navbar .btn-outline-primary {
+                padding: 0.25rem 0.6rem;
+                font-size: 0.75rem;
+            }
+            .artemis-navbar .navbar-brand {
+                font-size: 1.3rem;
+            }
+            .user-dropdown .btn-outline-primary {
+                max-width: 130px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
         }
     </style>
 </head>
@@ -227,29 +417,31 @@
     <!-- Top Bar -->
     <div class="artemis-top-bar">
         <div class="container">
-            <div class="d-flex justify-content-between">
-                <div class="top-contact">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="top-contact d-flex flex-wrap">
                     <span><i class="fas fa-phone"></i> +91 7868829460</span>
                     <span><i class="fas fa-envelope"></i> opensurfaces21@gmail.com</span>
                 </div>
                 <div class="delivery-info">
-                    <span>5-7 Business days delivery </span>
+                    <span>5-7 Business days delivery</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Navigation Bar -->
-    <nav class="artemis-navbar navbar navbar-expand-lg navbar-light sticky-top">
+    <!-- Navigation Bar - fully responsive, all elements visible without collapse -->
+    <nav class="artemis-navbar navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-tshirt me-2 tshirt-icon"></i>Artemis Crakers
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+            <!-- Brand area (no hamburger menu) -->
+            <div class="navbar-brand-wrapper">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-tshirt me-2 tshirt-icon"></i>Artemis Crakers
+                </a>
+            </div>
+
+            <!-- Always-visible navigation wrapper (no collapse menu) -->
+            <div class="navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" href="/">Home</a>
                     </li>
@@ -259,18 +451,20 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/about">About</a>
                     </li>
-                     <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center">
-                    <a href="/wishlist" class="btn btn-outline-dark me-2 position-relative">
+                
+                <!-- Right side action buttons: Wishlist, Cart, Login/Signup/UserDropdown -->
+                <div class="header-actions">
+                    <a href="/wishlist" class="btn btn-outline-dark position-relative">
                         <i class="fas fa-heart"></i>
                         <span id="wishlist-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary wishlist-count">
                             <%= typeof wishlistCount !== 'undefined' ? wishlistCount : 0 %>
                         </span>
                     </a>
-                    <a href="/cart" class="btn btn-outline-dark me-2 position-relative">
+                    <a href="/cart" class="btn btn-outline-dark position-relative">
                         <i class="fas fa-shopping-cart"></i>
                         <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary cart-count">
                             <%= typeof cartCount !== 'undefined' ? cartCount : 0 %>
@@ -305,9 +499,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Fixed script with proper wishlist count synchronization -->
+    <!-- Complete Header Sync Manager - original functionality preserved, no demo user -->
     <script>
-        // Header Sync Manager - Fixed version
+        // Header Sync Manager - Full original functionality, no demo additions
         class HeaderSyncManager {
             constructor() {
                 this.init();
@@ -339,8 +533,6 @@
                     console.log('Wishlist updated event received:', event.detail);
                     if (event.detail && event.detail.wishlistCount !== undefined) {
                         this.updateWishlistCount(event.detail.wishlistCount);
-                        
-                        // Update localStorage with the new count
                         this.updateWishlistStorage(event.detail.wishlistCount);
                     }
                     if (event.detail && event.detail.message) {
@@ -348,7 +540,6 @@
                     }
                 });
 
-                // Listen for cart removal events specifically
                 document.addEventListener('cartItemRemoved', (event) => {
                     console.log('Cart item removed event received:', event.detail);
                     if (event.detail && event.detail.cartCount !== undefined) {
@@ -357,14 +548,13 @@
                     }
                 });
 
-                // Initial fetch from server - this is the source of truth
+                // Initial fetch from server - source of truth
                 this.fetchCountsFromServer();
 
                 // Set up periodic sync with server
                 this.setupPeriodicSync();
             }
 
-            // Handle cart sync from storage event
             handleCartSync(e) {
                 console.log('Cart sync from another tab:', e.newValue);
                 if (e.newValue) {
@@ -380,7 +570,6 @@
                 }
             }
 
-            // Handle wishlist sync from storage event
             handleWishlistSync(e) {
                 console.log('Wishlist sync from another tab:', e.newValue);
                 if (e.newValue) {
@@ -396,49 +585,38 @@
                 }
             }
 
-            // Update cart count with animation
             updateCartCount(count) {
                 const cartCountElement = document.querySelector('.cart-count');
                 if (cartCountElement) {
                     const oldCount = parseInt(cartCountElement.textContent) || 0;
                     const newCount = parseInt(count) || 0;
-                    
                     cartCountElement.textContent = newCount;
-                    
-                    // Add animation if count changed
                     if (oldCount !== newCount) {
                         cartCountElement.classList.add('badge-pulse');
                         setTimeout(() => {
                             cartCountElement.classList.remove('badge-pulse');
                         }, 500);
-                        
                         console.log(`Cart count updated: ${oldCount} → ${newCount}`);
                     }
                 }
             }
 
-            // Update wishlist count with animation
             updateWishlistCount(count) {
                 const wishlistCountElement = document.querySelector('.wishlist-count');
                 if (wishlistCountElement) {
                     const oldCount = parseInt(wishlistCountElement.textContent) || 0;
                     const newCount = parseInt(count) || 0;
-                    
                     wishlistCountElement.textContent = newCount;
-                    
-                    // Add animation if count changed
                     if (oldCount !== newCount) {
                         wishlistCountElement.classList.add('badge-pulse');
                         setTimeout(() => {
                             wishlistCountElement.classList.remove('badge-pulse');
                         }, 500);
-                        
                         console.log(`Wishlist count updated: ${oldCount} → ${newCount}`);
                     }
                 }
             }
 
-            // Update wishlist storage with just the count
             updateWishlistStorage(count) {
                 try {
                     localStorage.setItem('wishlistSync', JSON.stringify({
@@ -450,7 +628,6 @@
                 }
             }
 
-            // Clear wishlist storage (call this when logging out)
             clearWishlistStorage() {
                 try {
                     localStorage.removeItem('wishlistSync');
@@ -459,39 +636,32 @@
                 }
             }
 
-            // Show toast notification
             showToast(message) {
                 const toast = document.getElementById('headerToast');
-                const span = toast.querySelector('span');
-                
-                span.textContent = message;
-                toast.style.display = 'flex';
-                
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 3000);
+                if (toast) {
+                    const span = toast.querySelector('span');
+                    span.textContent = message;
+                    toast.style.display = 'flex';
+                    setTimeout(() => {
+                        toast.style.display = 'none';
+                    }, 3000);
+                }
             }
 
-            // Fetch latest counts from server - THIS IS THE SOURCE OF TRUTH
             fetchCountsFromServer() {
                 fetch('/api/header-counts')
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Always update with server data first
                             this.updateCartCount(data.cartCount);
                             this.updateWishlistCount(data.wishlistCount);
-                            
-                            // Update localStorage with server data for cross-tab sync
                             this.updateLocalStorageFromServer(data);
                         }
                     })
                     .catch(error => console.error('Error fetching counts:', error));
             }
 
-            // Update localStorage with server data (but don't read from it on init)
             updateLocalStorageFromServer(data) {
-                // Update cart in localStorage
                 try {
                     localStorage.setItem('cartSync', JSON.stringify({
                         data: { cartCount: data.cartCount },
@@ -500,8 +670,6 @@
                 } catch (e) {
                     console.error('Error updating cart storage:', e);
                 }
-
-                // Update wishlist in localStorage
                 try {
                     localStorage.setItem('wishlistSync', JSON.stringify({
                         data: { length: data.wishlistCount },
@@ -512,28 +680,23 @@
                 }
             }
 
-            // Set up periodic sync with server
             setupPeriodicSync() {
-                // Sync every 30 seconds
                 setInterval(() => {
                     this.fetchCountsFromServer();
                 }, 30000);
             }
         }
 
-        // Initialize the header sync manager
+        // Initialize header sync manager
         document.addEventListener('DOMContentLoaded', function() {
             window.headerSync = new HeaderSyncManager();
             
-            // Clear any stale localStorage data that might be causing issues
+            // Clear stale localStorage data
             try {
-                // Check if we have any old wishlist data that might be stale
                 const wishlistStorage = localStorage.getItem('wishlistSync');
                 if (wishlistStorage) {
                     const timestamp = JSON.parse(wishlistStorage).timestamp;
                     const fiveMinutes = 5 * 60 * 1000;
-                    
-                    // If data is older than 5 minutes, remove it and rely on server
                     if (Date.now() - timestamp > fiveMinutes) {
                         localStorage.removeItem('wishlistSync');
                         console.log('Cleared stale wishlist data from localStorage');
@@ -544,28 +707,25 @@
             }
         });
 
-        // Function to manually update cart count (can be called from other pages)
+        // Expose global functions for cross-page communication
         function updateCartCount(count) {
             if (window.headerSync) {
                 window.headerSync.updateCartCount(count);
             }
         }
 
-        // Function to manually update wishlist count (can be called from other pages)
         function updateWishlistCount(count) {
             if (window.headerSync) {
                 window.headerSync.updateWishlistCount(count);
             }
         }
 
-        // Function to clear wishlist storage (call this on logout)
         function clearWishlistStorage() {
             if (window.headerSync) {
                 window.headerSync.clearWishlistStorage();
             }
         }
 
-        // Function to trigger cart removal event
         function triggerCartRemoval(cartCount, message) {
             const event = new CustomEvent('cartItemRemoved', { 
                 detail: { 
@@ -576,7 +736,6 @@
             document.dispatchEvent(event);
         }
 
-        // Function to trigger cart update event
         function triggerCartUpdate(cartCount, message) {
             const event = new CustomEvent('cartUpdated', { 
                 detail: { 
@@ -587,7 +746,6 @@
             document.dispatchEvent(event);
         }
 
-        // Function to trigger wishlist update event
         function triggerWishlistUpdate(wishlistCount, message) {
             const event = new CustomEvent('wishlistUpdated', { 
                 detail: { 
@@ -598,14 +756,13 @@
             document.dispatchEvent(event);
         }
 
-        // Function to trigger a sync from server
         function syncCountsWithServer() {
             if (window.headerSync) {
                 window.headerSync.fetchCountsFromServer();
             }
         }
 
-        // Listen for visibility change to sync when tab becomes active
+        // Visibility change sync
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden && window.headerSync) {
                 console.log('Tab became active, syncing counts...');
@@ -613,7 +770,7 @@
             }
         });
 
-        // Listen for logout events (you'll need to dispatch this from your logout function)
+        // Logout event handler
         document.addEventListener('userLoggedOut', function() {
             clearWishlistStorage();
             if (window.headerSync) {
@@ -622,7 +779,7 @@
             }
         });
 
-        // Expose functions globally for use in other pages
+        // Expose functions globally
         window.cartWishlistSync = {
             updateCartCount,
             updateWishlistCount,

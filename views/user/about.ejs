@@ -2,54 +2,421 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>About Us - Artemis Crakers</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+    
+    <!-- Header Styles - Exactly matching the reference header (no conflicts) -->
     <style>
+        /* ========== HEADER STYLES (EXACT MATCH FROM REFERENCE) ========== */
         :root {
             --primary-color: #3a86ff;
             --secondary-color: #ff006e;
             --dark-color: #2b2d42;
             --light-color: #f8f9fa;
-            --border-color: #dee2e6;
-            --cracker-orange: #ff6b35;
-            --cracker-gold: #ffd93d;
-            --cracker-red: #e53e3e;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-            background-color: #fff;
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
         }
 
+        .artemis-top-bar {
+            background-color: var(--dark-color);
+            color: white;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .artemis-top-bar .container {
+            max-width: 100%;
+            padding: 0 20px;
+        }
+
+        .artemis-top-bar .top-contact span {
+            margin-right: 20px;
+            white-space: nowrap;
+        }
+
+        .artemis-top-bar .top-contact i {
+            margin-right: 5px;
+            color: var(--primary-color);
+        }
+
+        .artemis-navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+            width: 100%;
+        }
+
+        .artemis-navbar .container {
+            max-width: 100%;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: auto;
+        }
+
+        .artemis-navbar .navbar-brand {
+            font-weight: 800;
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            white-space: normal;
+        }
+
+        .navbar-toggler {
+            display: none !important;
+        }
+
+        .artemis-navbar .navbar-collapse {
+            display: flex !important;
+            flex-grow: 1;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .artemis-navbar .navbar-nav {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .artemis-navbar .nav-item {
+            list-style: none;
+        }
+
+        .artemis-navbar .nav-link {
+            font-weight: 600;
+            color: var(--dark-color);
+            padding: 0.5rem 0.9rem !important;
+            white-space: nowrap;
+        }
+
+        .artemis-navbar .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .artemis-navbar .btn-outline-dark,
+        .artemis-navbar .btn-primary,
+        .artemis-navbar .btn-outline-primary {
+            padding: 0.4rem 0.9rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .artemis-navbar .btn-outline-dark {
+            border-color: #dee2e6;
+            color: var(--dark-color);
+        }
+
+        .artemis-navbar .btn-outline-dark:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .artemis-navbar .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .artemis-navbar .btn-primary:hover {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .artemis-navbar .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .artemis-navbar .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .artemis-navbar .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .artemis-navbar .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            left: auto;
+            min-width: 150px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 10px 0;
+            display: none;
+            z-index: 1000;
+        }
+
+        .artemis-navbar .user-dropdown:hover .user-dropdown-menu {
+            display: block;
+        }
+
+        .artemis-navbar .user-dropdown-item {
+            display: block;
+            padding: 8px 20px;
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .artemis-navbar .user-dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .badge-pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .header-toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .header-toast i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 1199px) {
+            .artemis-navbar .nav-link {
+                padding: 0.5rem 0.7rem !important;
+                font-size: 0.9rem;
+            }
+            .header-actions {
+                margin-left: 10px;
+                gap: 6px;
+            }
+            .artemis-navbar .btn-outline-dark,
+            .artemis-navbar .btn-primary,
+            .artemis-navbar .btn-outline-primary {
+                padding: 0.35rem 0.8rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .artemis-top-bar .container {
+                padding: 0 15px;
+            }
+            .artemis-top-bar .top-contact span {
+                margin-right: 12px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+            .artemis-navbar .container {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 0 15px;
+            }
+            .navbar-brand-wrapper {
+                width: 100%;
+                margin-bottom: 12px;
+                justify-content: space-between;
+            }
+            .artemis-navbar .navbar-brand {
+                font-size: 1.5rem;
+            }
+            .artemis-navbar .navbar-collapse {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .artemis-navbar .navbar-nav {
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-bottom: 12px;
+                gap: 0.2rem;
+            }
+            .artemis-navbar .nav-link {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.9rem;
+            }
+            .header-actions {
+                justify-content: center;
+                margin-left: 0;
+                margin-top: 6px;
+                margin-bottom: 6px;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            .user-section {
+                display: inline-flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .artemis-top-bar .d-flex {
+                flex-direction: column;
+                text-align: center;
+                gap: 5px;
+            }
+            .artemis-top-bar .top-contact span {
+                display: inline-block;
+                margin-right: 12px;
+                margin-bottom: 0;
+                white-space: nowrap;
+            }
+            .artemis-top-bar .delivery-info {
+                margin-top: 0;
+            }
+            .artemis-navbar {
+                padding: 12px 0;
+            }
+            .navbar-brand-wrapper {
+                margin-bottom: 10px;
+            }
+            .artemis-navbar .navbar-brand {
+                font-size: 1.4rem;
+            }
+            .artemis-navbar .navbar-nav {
+                justify-content: center;
+                gap: 4px;
+                row-gap: 8px;
+                margin-bottom: 8px;
+            }
+            .artemis-navbar .nav-link {
+                padding: 0.35rem 0.7rem !important;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+            .header-actions {
+                gap: 8px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .artemis-navbar .btn-outline-dark,
+            .artemis-navbar .btn-primary,
+            .artemis-navbar .btn-outline-primary {
+                padding: 0.3rem 0.7rem;
+                font-size: 0.8rem;
+            }
+            .position-relative .badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.45rem;
+            }
+            .artemis-navbar .user-dropdown-menu {
+                min-width: 130px;
+                right: 0;
+                left: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .artemis-top-bar .top-contact {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+            .artemis-top-bar .top-contact span {
+                margin-right: 0;
+                white-space: normal;
+                font-size: 0.7rem;
+            }
+            .artemis-navbar .navbar-nav {
+                gap: 2px;
+            }
+            .artemis-navbar .nav-link {
+                padding: 0.3rem 0.5rem !important;
+                font-size: 0.8rem;
+            }
+            .header-actions {
+                gap: 6px;
+            }
+            .artemis-navbar .btn-outline-dark,
+            .artemis-navbar .btn-primary,
+            .artemis-navbar .btn-outline-primary {
+                padding: 0.25rem 0.6rem;
+                font-size: 0.75rem;
+            }
+            .artemis-navbar .navbar-brand {
+                font-size: 1.3rem;
+            }
+            .user-dropdown .btn-outline-primary {
+                max-width: 130px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        /* ========== ABOUT PAGE STYLES (NO CONFLICT WITH HEADER) ========== */
         .about-container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 20px 15px;
         }
 
-        /* Header Section - Simple */
         .about-header {
             text-align: center;
             margin-bottom: 25px;
             padding-bottom: 15px;
-            border-bottom: 2px solid var(--cracker-orange);
+            border-bottom: 2px solid #ff6b35;
         }
 
         .about-title {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--dark-color);
+            color: #2b2d42;
             margin-bottom: 5px;
         }
 
         .about-title i {
-            color: var(--cracker-orange);
+            color: #ff6b35;
             margin: 0 8px;
             font-size: 1.8rem;
         }
@@ -59,7 +426,6 @@
             font-size: 1rem;
         }
 
-        /* Hero Section - Simple Two Column */
         .about-hero {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -78,12 +444,12 @@
         .hero-content h2 {
             font-size: 1.6rem;
             font-weight: 600;
-            color: var(--dark-color);
+            color: #2b2d42;
             margin-bottom: 15px;
         }
 
         .hero-content h2 i {
-            color: var(--cracker-orange);
+            color: #ff6b35;
             margin-right: 8px;
         }
 
@@ -96,20 +462,20 @@
 
         .hero-highlight {
             background: rgba(255, 107, 53, 0.1);
-            border-left: 4px solid var(--cracker-orange);
+            border-left: 4px solid #ff6b35;
             padding: 12px 15px;
             border-radius: 0 4px 4px 0;
             margin-top: 20px;
         }
 
         .hero-highlight i {
-            color: var(--cracker-orange);
+            color: #ff6b35;
             margin-right: 8px;
         }
 
         .hero-highlight span {
             font-weight: 600;
-            color: var(--cracker-red);
+            color: #e53e3e;
         }
 
         .hero-image {
@@ -143,7 +509,7 @@
 
         .hero-image-content i {
             font-size: 4rem;
-            color: var(--cracker-gold);
+            color: #ffd93d;
             margin-bottom: 15px;
             display: block;
         }
@@ -152,11 +518,12 @@
             font-size: 1.5rem;
             font-weight: 700;
             background: linear-gradient(135deg, #ff6b35, #ffd93d);
-                        -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
         }
 
-        /* Simple Stats */
         .simple-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -175,14 +542,14 @@
 
         .stat-item i {
             font-size: 2rem;
-            color: var(--cracker-orange);
+            color: #ff6b35;
             margin-bottom: 8px;
         }
 
         .stat-number {
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--dark-color);
+            color: #2b2d42;
             display: block;
         }
 
@@ -191,7 +558,6 @@
             font-size: 0.9rem;
         }
 
-        /* Values Section - Simple Cards */
         .values-section {
             margin-bottom: 30px;
         }
@@ -199,13 +565,13 @@
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
-            color: var(--dark-color);
+            color: #2b2d42;
             margin-bottom: 20px;
             text-align: center;
         }
 
         .section-title i {
-            color: var(--cracker-orange);
+            color: #ff6b35;
             margin: 0 8px;
         }
 
@@ -226,7 +592,7 @@
 
         .value-card:hover {
             transform: translateY(-3px);
-            border-color: var(--cracker-orange);
+            border-color: #ff6b35;
         }
 
         .value-icon {
@@ -238,14 +604,14 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 12px;
-            color: var(--cracker-orange);
+            color: #ff6b35;
             font-size: 1.3rem;
         }
 
         .value-card h4 {
             font-size: 1rem;
             font-weight: 600;
-            color: var(--dark-color);
+            color: #2b2d42;
             margin-bottom: 8px;
         }
 
@@ -256,7 +622,6 @@
             margin: 0;
         }
 
-        /* Safety Section - Important for crackers */
         .safety-section {
             background: linear-gradient(135deg, #fff5f0 0%, #fff0e6 100%);
             border-radius: 8px;
@@ -266,7 +631,7 @@
         }
 
         .safety-section h3 {
-            color: var(--cracker-red);
+            color: #e53e3e;
             font-size: 1.3rem;
             font-weight: 600;
             margin-bottom: 15px;
@@ -289,7 +654,7 @@
         }
 
         .safety-item i {
-            color: var(--cracker-orange);
+            color: #ff6b35;
             font-size: 1.1rem;
             margin-top: 2px;
         }
@@ -300,11 +665,10 @@
             font-size: 0.9rem;
         }
 
-        /* CTA Section - Simple */
         .about-cta {
             text-align: center;
             padding: 30px;
-            background: var(--light-color);
+            background: #f8f9fa;
             border-radius: 6px;
             border: 1px solid #eee;
         }
@@ -312,7 +676,7 @@
         .about-cta h3 {
             font-size: 1.4rem;
             font-weight: 600;
-            color: var(--dark-color);
+            color: #2b2d42;
             margin-bottom: 10px;
         }
 
@@ -339,8 +703,9 @@
         }
 
         .btn-primary {
-            background: var(--cracker-orange);
+            background: #ff6b35;
             color: white;
+            border: none;
         }
 
         .btn-primary:hover {
@@ -350,64 +715,194 @@
 
         .btn-outline {
             border: 1px solid #ddd;
-            color: var(--dark-color);
+            color: #2b2d42;
+            background: white;
         }
 
         .btn-outline:hover {
             background: #f5f5f5;
         }
 
-        /* Responsive */
-        @media (max-width: 992px) {
+        /* About page responsive styles */
+        @media (max-width: 991px) {
+            .about-container {
+                max-width: 720px;
+            }
             .values-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
+            .about-container {
+                padding: 15px 12px;
+            }
+            .about-title {
+                font-size: 1.6rem;
+            }
             .about-hero {
                 grid-template-columns: 1fr;
+                gap: 0;
             }
-            
+            .hero-content {
+                padding: 20px;
+                order: 1;
+            }
+            .hero-image {
+                padding: 30px 20px;
+                order: 0;
+            }
             .simple-stats {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
-            
+            .stat-item {
+                padding: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                text-align: left;
+            }
+            .values-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .value-card {
+                padding: 15px;
+                display: flex;
+                align-items: center;
+                text-align: left;
+                gap: 15px;
+            }
+            .value-icon {
+                margin: 0;
+                width: 45px;
+                height: 45px;
+                flex-shrink: 0;
+            }
+            .safety-section {
+                padding: 18px;
+            }
             .safety-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
-            
+            .about-cta {
+                padding: 20px;
+            }
             .cta-buttons {
                 flex-direction: column;
                 align-items: center;
+                gap: 10px;
             }
-            
             .btn {
                 width: 100%;
-                max-width: 250px;
+                max-width: 220px;
+                justify-content: center;
             }
         }
 
-        @media (max-width: 576px) {
-            .values-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 480px) {
+            .about-title {
+                font-size: 1.4rem;
             }
-            
-            .hero-content {
-                padding: 20px;
-            }
-            
             .hero-content h2 {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
-<body>
-    <%- include('../partials/user/header') %>
 
+<body>
+    <!-- Header Toast Notification -->
+    <div id="headerToast" class="header-toast">
+        <i class="fas fa-info-circle"></i>
+        <span></span>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="artemis-top-bar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="top-contact d-flex flex-wrap">
+                    <span><i class="fas fa-phone"></i> +91 7868829460</span>
+                    <span><i class="fas fa-envelope"></i> opensurfaces21@gmail.com</span>
+                </div>
+                <div class="delivery-info">
+                    <span>5-7 Business days delivery</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar - fully responsive, all elements visible without collapse -->
+    <nav class="artemis-navbar navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <div class="navbar-brand-wrapper">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-tshirt me-2 tshirt-icon"></i>Artemis Crakers
+                </a>
+            </div>
+
+            <div class="navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/#products">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                
+                <div class="header-actions">
+                    <a href="/wishlist" class="btn btn-outline-dark position-relative">
+                        <i class="fas fa-heart"></i>
+                        <span id="wishlist-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary wishlist-count">
+                            <%= typeof wishlistCount !== 'undefined' ? wishlistCount : 0 %>
+                        </span>
+                    </a>
+                    <a href="/cart" class="btn btn-outline-dark position-relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary cart-count">
+                            <%= typeof cartCount !== 'undefined' ? cartCount : 0 %>
+                        </span>
+                    </a>
+
+                    <div class="user-section ms-2">
+                        <% if (user) { %>
+                            <div class="user-dropdown">
+                                <a href="#" class="btn btn-outline-primary">
+                                    <i class="fas fa-user me-1"></i>
+                                    <%= user.name ? user.name : (user.firstName + " " + user.lastName) %>
+                                </a>
+                                <div class="user-dropdown-menu">
+                                    <a href="/profile" class="user-dropdown-item">Profile</a>
+                                    <a href="/logout" class="user-dropdown-item">Logout</a>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <a href="/login" class="btn btn-primary me-2">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                            <a href="/signup" class="btn btn-outline-primary">
+                                <i class="fas fa-user-plus me-1"></i>Signup
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- About Page Content -->
     <div class="about-container">
-        <!-- Simple Header -->
         <div class="about-header">
             <h1 class="about-title">
                 <i class="fas fa-star"></i>
@@ -417,7 +912,6 @@
             <p class="about-subtitle">Lighting up celebrations since 2015</p>
         </div>
 
-        <!-- Hero Section -->
         <div class="about-hero">
             <div class="hero-content">
                 <h2>
@@ -448,7 +942,6 @@
             </div>
         </div>
 
-        <!-- Simple Stats -->
         <div class="simple-stats">
             <div class="stat-item">
                 <i class="fas fa-users"></i>
@@ -467,7 +960,6 @@
             </div>
         </div>
 
-        <!-- Values Section -->
         <div class="values-section">
             <h3 class="section-title">
                 <i class="fas fa-chevron-right"></i>
@@ -506,7 +998,6 @@
             </div>
         </div>
 
-        <!-- Safety Guidelines - Important for cracker site -->
         <div class="safety-section">
             <h3>
                 <i class="fas fa-exclamation-triangle"></i>
@@ -532,7 +1023,6 @@
             </div>
         </div>
 
-        <!-- Simple CTA -->
         <div class="about-cta">
             <h3>Ready to Light Up Your Celebration?</h3>
             <p>Browse our collection of premium crackers for every occasion</p>
@@ -549,6 +1039,137 @@
         </div>
     </div>
 
-    <%- include('../partials/user/footer') %>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        class HeaderSyncManager {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'cartSync') this.handleCartSync(e);
+                    if (e.key === 'wishlistSync') this.handleWishlistSync(e);
+                });
+
+                document.addEventListener('cartUpdated', (event) => {
+                    if (event.detail && event.detail.cartCount !== undefined) this.updateCartCount(event.detail.cartCount);
+                    if (event.detail && event.detail.message) this.showToast(event.detail.message);
+                });
+
+                document.addEventListener('wishlistUpdated', (event) => {
+                    if (event.detail && event.detail.wishlistCount !== undefined) {
+                        this.updateWishlistCount(event.detail.wishlistCount);
+                        this.updateWishlistStorage(event.detail.wishlistCount);
+                    }
+                    if (event.detail && event.detail.message) this.showToast(event.detail.message);
+                });
+
+                document.addEventListener('cartItemRemoved', (event) => {
+                    if (event.detail && event.detail.cartCount !== undefined) {
+                        this.updateCartCount(event.detail.cartCount);
+                        this.showToast(event.detail.message || 'Item removed from cart');
+                    }
+                });
+
+                this.fetchCountsFromServer();
+                this.setupPeriodicSync();
+            }
+
+            handleCartSync(e) {
+                if (e.newValue) {
+                    try {
+                        const cartData = JSON.parse(e.newValue).data;
+                        if (cartData && cartData.cartCount !== undefined) this.updateCartCount(cartData.cartCount);
+                    } catch (error) {}
+                }
+            }
+
+            handleWishlistSync(e) {
+                if (e.newValue) {
+                    try {
+                        const wishlistData = JSON.parse(e.newValue).data;
+                        if (wishlistData && wishlistData.length !== undefined) this.updateWishlistCount(wishlistData.length);
+                    } catch (error) {}
+                }
+            }
+
+            updateCartCount(count) {
+                const cartCountElement = document.querySelector('.cart-count');
+                if (cartCountElement) {
+                    const newCount = parseInt(count) || 0;
+                    cartCountElement.textContent = newCount;
+                    cartCountElement.classList.add('badge-pulse');
+                    setTimeout(() => cartCountElement.classList.remove('badge-pulse'), 500);
+                }
+            }
+
+            updateWishlistCount(count) {
+                const wishlistCountElement = document.querySelector('.wishlist-count');
+                if (wishlistCountElement) {
+                    const newCount = parseInt(count) || 0;
+                    wishlistCountElement.textContent = newCount;
+                    wishlistCountElement.classList.add('badge-pulse');
+                    setTimeout(() => wishlistCountElement.classList.remove('badge-pulse'), 500);
+                }
+            }
+
+            updateWishlistStorage(count) {
+                try {
+                    localStorage.setItem('wishlistSync', JSON.stringify({ data: { length: count }, timestamp: Date.now() }));
+                } catch (error) {}
+            }
+
+            clearWishlistStorage() {
+                try { localStorage.removeItem('wishlistSync'); } catch (error) {}
+            }
+
+            showToast(message) {
+                const toast = document.getElementById('headerToast');
+                if (toast) {
+                    toast.querySelector('span').textContent = message;
+                    toast.style.display = 'flex';
+                    setTimeout(() => toast.style.display = 'none', 3000);
+                }
+            }
+
+            fetchCountsFromServer() {
+                fetch('/api/header-counts')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.updateCartCount(data.cartCount);
+                            this.updateWishlistCount(data.wishlistCount);
+                            this.updateLocalStorageFromServer(data);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching counts:', error));
+            }
+
+            updateLocalStorageFromServer(data) {
+                try {
+                    localStorage.setItem('cartSync', JSON.stringify({ data: { cartCount: data.cartCount }, timestamp: Date.now() }));
+                    localStorage.setItem('wishlistSync', JSON.stringify({ data: { length: data.wishlistCount }, timestamp: Date.now() }));
+                } catch (e) {}
+            }
+
+            setupPeriodicSync() {
+                setInterval(() => this.fetchCountsFromServer(), 30000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.headerSync = new HeaderSyncManager();
+        });
+
+        window.cartWishlistSync = {
+            updateCartCount: (count) => window.headerSync?.updateCartCount(count),
+            updateWishlistCount: (count) => window.headerSync?.updateWishlistCount(count),
+            clearWishlistStorage: () => window.headerSync?.clearWishlistStorage(),
+            syncCountsWithServer: () => window.headerSync?.fetchCountsFromServer()
+        };
+    </script>
 </body>
 </html>
+<%- include('../partials/user/footer') %>

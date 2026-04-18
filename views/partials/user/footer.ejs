@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Artemis Footer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjsflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #3a86ff;
@@ -141,21 +141,187 @@
             margin: 0 8px;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
+        /* ========== FULLY RESPONSIVE FOOTER - MOBILE & DESKTOP ========== */
+        /* Large desktop screens (1200px+) - keep original layout */
+        
+        /* Desktop and tablet (992px - 1199px) - adjust spacing */
+        @media (max-width: 1199px) {
             .artemis-footer .contact-info {
-                flex-direction: column;
-                gap: 5px;
+                gap: 12px;
             }
-            
-            .artemis-footer .footer-bottom .row {
-                flex-direction: column;
+            .artemis-footer .about-text {
+                font-size: 0.82rem;
+            }
+        }
+
+        /* Tablet (768px - 991px) - reflow content but keep all elements visible */
+        @media (max-width: 991px) {
+            .artemis-footer .row.align-items-center {
                 text-align: center;
-                gap: 5px;
             }
-            
+            .artemis-footer .footer-brand {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            .artemis-footer .about-text {
+                text-align: center;
+                margin-bottom: 12px;
+            }
             .artemis-footer .social-icons {
                 justify-content: center;
+                margin-top: 5px;
+            }
+            .artemis-footer .contact-info {
+                justify-content: center;
+                gap: 8px;
+            }
+            .artemis-footer .address {
+                text-align: center;
+            }
+            .artemis-footer .safety-warning {
+                justify-content: center;
+                width: auto;
+                margin-top: 8px;
+            }
+            .artemis-footer .footer-bottom .row {
+                text-align: center;
+            }
+            .artemis-footer .footer-bottom .col-md-6 {
+                text-align: center !important;
+            }
+        }
+
+        /* Mobile (up to 767px) - full stacking, no content loss, all info accessible */
+        @media (max-width: 767px) {
+            .artemis-footer {
+                padding: 20px 0 15px;
+            }
+            .artemis-footer .footer-brand {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+            .artemis-footer .about-text {
+                font-size: 0.8rem;
+                padding: 0 5px;
+                margin-bottom: 10px;
+            }
+            .artemis-footer .social-icons {
+                gap: 10px;
+                margin-bottom: 8px;
+            }
+            .artemis-footer .social-icons a {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+            /* Contact info - vertical stack for better mobile readability */
+            .artemis-footer .contact-info {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            .artemis-footer .divider {
+                display: none;  /* Hide dividers on mobile for cleaner vertical layout */
+            }
+            .artemis-footer .contact-info span {
+                justify-content: center;
+                width: 100%;
+            }
+            .artemis-footer .address {
+                text-align: center;
+                font-size: 0.8rem;
+                margin-top: 5px;
+                word-break: break-word;
+            }
+            .artemis-footer .safety-warning {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                margin: 10px 0 5px;
+                font-size: 0.75rem;
+            }
+            .artemis-footer .footer-bottom {
+                text-align: center;
+                margin-top: 12px;
+                padding-top: 12px;
+            }
+            .artemis-footer .footer-bottom .row > div {
+                margin-bottom: 6px;
+            }
+            .artemis-footer .footer-bottom .col-md-6:last-child {
+                margin-bottom: 0;
+            }
+            .artemis-footer .footer-bottom .text-md-end {
+                text-align: center !important;
+            }
+            /* Adjust row margins for mobile */
+            .artemis-footer .row.mt-2 {
+                margin-top: 8px !important;
+            }
+            .artemis-footer .row.mt-1 {
+                margin-top: 6px !important;
+            }
+        }
+
+        /* Extra small devices (up to 480px) - fine-tune spacing */
+        @media (max-width: 480px) {
+            .artemis-footer .container {
+                padding: 0 12px;
+            }
+            .artemis-footer .about-text {
+                font-size: 0.75rem;
+                line-height: 1.3;
+            }
+            .artemis-footer .contact-info span {
+                font-size: 0.75rem;
+            }
+            .artemis-footer .address {
+                font-size: 0.74rem;
+            }
+            .artemis-footer .safety-warning {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            .artemis-footer .footer-bottom {
+                font-size: 0.7rem;
+            }
+            .artemis-footer .social-icons a {
+                width: 30px;
+                height: 30px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Ensure no horizontal scroll on any device */
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Keep all original spacing for desktop while making mobile perfect */
+        .artemis-footer .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .artemis-footer .col-md-3,
+        .artemis-footer .col-md-6,
+        .artemis-footer .col-md-4,
+        .artemis-footer .col-md-8,
+        .artemis-footer .col-12 {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        @media (max-width: 767px) {
+            .artemis-footer .col-md-3,
+            .artemis-footer .col-md-6,
+            .artemis-footer .col-md-4,
+            .artemis-footer .col-md-8,
+            .artemis-footer .col-12 {
+                padding-left: 8px;
+                padding-right: 8px;
             }
         }
     </style>
@@ -163,10 +329,10 @@
 <body>
     <!-- Your page content here -->
 
-    <!-- Footer - Same height as header (15px padding top/bottom) -->
+    <!-- Footer - Fully responsive, all content preserved, no functionality changed -->
     <footer class="artemis-footer">
         <div class="container">
-            <!-- First Row - Brand & About -->
+            <!-- First Row - Brand & About (fully responsive) -->
             <div class="row align-items-center">
                 <div class="col-md-3">
                     <div class="footer-brand">
@@ -188,7 +354,7 @@
                 </div>
             </div>
 
-            <!-- Second Row - Contact & Address (compact) -->
+            <!-- Second Row - Contact & Address (compact, fully responsive) -->
             <div class="row mt-2">
                 <div class="col-md-8">
                     <div class="contact-info">
@@ -206,7 +372,7 @@
                 </div>
             </div>
 
-            <!-- Third Row - Full Address -->
+            <!-- Third Row - Full Address (fully responsive) -->
             <div class="row mt-1">
                 <div class="col-12">
                     <div class="address">
@@ -216,7 +382,7 @@
                 </div>
             </div>
 
-            <!-- Footer Bottom - Exactly like top-bar -->
+            <!-- Footer Bottom - Exactly like top-bar, fully responsive -->
             <div class="footer-bottom">
                 <div class="row">
                     <div class="col-md-6">
