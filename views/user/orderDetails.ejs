@@ -1,10 +1,10 @@
-<%-include("../partials/user/header.ejs")%>
+<%- include("../partials/user/header.ejs") %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title><%= title %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -20,6 +20,12 @@
             --text: #333;
             --text-muted: #6c757d;
             --offer-color: #ff416c;
+            --sidebar-bg: #2c3e50;
+            --sidebar-active: #3498db;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -28,17 +34,114 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .container-fluid {
-            padding: 15px;
+        /* Main container with sidebar */
+        .order-details-container {
+            display: flex;
+            max-width: 98%;
+            margin: 20px auto 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        /* Sidebar Styles */
+        .profile-sidebar {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .profile-sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-sidebar-menu li {
+            margin: 0;
+        }
+
+        .profile-sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+            white-space: nowrap;
+        }
+
+        .profile-sidebar-menu a:hover {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .profile-sidebar-menu a.profile-active {
+            background-color: var(--sidebar-active);
+            border-left-color: #2980b9;
+            color: white;
+        }
+
+        .profile-sidebar-menu i {
+            margin-right: clamp(6px, 2vw, 8px);
+            width: 16px;
+            text-align: center;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+        }
+
+        .profile-logout {
+            padding: clamp(15px, 4vw, 20px) clamp(15px, 4vw, 20px) 10px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-logout-btn {
+            width: 100%;
+            padding: clamp(10px, 2vw, 12px);
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+            min-height: 44px;
+        }
+
+        .profile-logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .profile-logout-btn i {
+            margin-right: 6px;
+        }
+
+        /* Main Content */
+        .order-main-content {
+            flex: 1;
+            padding: clamp(14px, 4vw, 20px) clamp(12px, 4vw, 20px);
+            background: #f5f5f5;
+            overflow-x: hidden;
         }
 
         .order-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border-radius: 8px;
-            padding: 20px;
+            padding: clamp(15px, 4vw, 20px);
             margin-bottom: 20px;
         }
 
@@ -56,20 +159,20 @@
             color: white;
             font-weight: 600;
             padding: 12px 15px;
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
             border: none;
         }
 
         .product-img {
-            width: 60px;
-            height: 60px;
+            width: clamp(45px, 10vw, 60px);
+            height: clamp(45px, 10vw, 60px);
             object-fit: cover;
             border-radius: 6px;
         }
 
         .no-img {
-            width: 60px;
-            height: 60px;
+            width: clamp(45px, 10vw, 60px);
+            height: clamp(45px, 10vw, 60px);
             background: #f0f0f0;
             border-radius: 6px;
             display: flex;
@@ -144,60 +247,22 @@
         }
 
         /* Order Status Badges */
-        .status-pending {
-            background: var(--warning);
-            color: #000;
-        }
-
-        .status-confirmed {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .status-shipped {
-            background: var(--primary);
-            color: white;
-        }
-
-        .status-delivered {
-            background: var(--success);
-            color: white;
-        }
-
-        .status-cancelled {
-            background: var(--danger);
-            color: white;
-        }
-
-        .status-returned {
-            background: #ff6b6b;
-            color: white;
-        }
+        .status-pending { background: var(--warning); color: #000; }
+        .status-confirmed { background: #17a2b8; color: white; }
+        .status-shipped { background: var(--primary); color: white; }
+        .status-delivered { background: var(--success); color: white; }
+        .status-cancelled { background: var(--danger); color: white; }
+        .status-returned { background: #ff6b6b; color: white; }
 
         /* Payment Status Badges */
-        .payment-pending {
-            background: var(--warning);
-            color: #000;
-        }
-
-        .payment-paid {
-            background: var(--success);
-            color: white;
-        }
-
-        .payment-failed {
-            background: var(--danger);
-            color: white;
-        }
-
-        .payment-refunded {
-            background: #6c757d;
-            color: white;
-        }
+        .payment-pending { background: var(--warning); color: #000; }
+        .payment-paid { background: var(--success); color: white; }
+        .payment-failed { background: var(--danger); color: white; }
+        .payment-refunded { background: #6c757d; color: white; }
 
         .btn {
-            font-size: 0.8rem;
-            padding: 6px 12px;
+            font-size: clamp(0.75rem, 2.5vw, 0.8rem);
+            padding: clamp(5px, 2vw, 6px) clamp(10px, 3vw, 12px);
             border: none;
             border-radius: 4px;
             transition: all 0.3s;
@@ -207,25 +272,10 @@
             transform: translateY(-1px);
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-warning {
-            background: var(--warning);
-            color: #000;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: #000; }
 
         .price-breakdown {
             background: var(--light);
@@ -238,7 +288,7 @@
             justify-content: space-between;
             padding: 6px 0;
             border-bottom: 1px solid var(--border);
-            font-size: 0.85rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.85rem);
         }
 
         .price-row:last-child {
@@ -292,7 +342,7 @@
         .table th,
         .table td {
             padding: 8px;
-            font-size: 0.85rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.85rem);
             vertical-align: middle;
         }
 
@@ -313,367 +363,492 @@
             gap: 4px;
         }
 
-        @media (max-width: 768px) {
-            .container-fluid {
-                padding: 10px;
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .profile-sidebar-menu a,
+            .profile-logout-btn,
+            .btn {
+                min-height: 44px;
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .order-details-container {
+                flex-direction: column;
+                max-width: 95%;
+            }
+            
+            .profile-sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .profile-sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                padding-bottom: 5px;
+            }
+            
+            .profile-sidebar-menu::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .profile-sidebar-menu::-webkit-scrollbar-thumb {
+                background-color: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            
+            .profile-sidebar-menu li {
+                flex-shrink: 0;
+            }
+            
+            .profile-sidebar-menu a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                white-space: nowrap;
+                padding: 12px 15px;
+            }
+            
+            .profile-sidebar-menu a.profile-active {
+                border-left: none;
+                border-bottom-color: #2980b9;
+            }
+            
+            .profile-logout {
+                padding: 10px 15px;
+                margin-top: 10px;
             }
 
-            .order-header {
+            .order-main-content {
                 padding: 15px;
             }
+        }
 
-            .product-img,
-            .no-img {
-                width: 50px;
-                height: 50px;
+        @media (max-width: 768px) {
+            .order-details-container {
+                max-width: 100%;
+                border-radius: 0;
+                margin: 0 0 25px;
+            }
+
+            .order-header .row {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .order-header .col-md-6:last-child {
+                margin-top: 10px;
+            }
+
+            .product-img, .no-img {
+                width: 45px;
+                height: 45px;
+            }
+
+            .address-card {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .order-main-content {
+                padding: 12px 10px;
+            }
+
+            .profile-sidebar-menu a {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
+            .profile-sidebar-menu i {
+                margin-right: 6px;
+            }
+
+            .profile-logout-btn {
+                padding: 12px;
+            }
+
+            .table {
+                font-size: 0.8rem;
             }
 
             .btn {
-                font-size: 0.75rem;
-                padding: 5px 10px;
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .order-header .d-flex {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .price-row {
+                font-size: 0.8rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid">
-        <!-- Order Header -->
-        <div class="order-header">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h2 class="h4 mb-1">Order Details</h2>
-                    <p class="mb-1 small">Order ID: <strong><%= order.displayOrderId || '' %></strong></p>
-                    <p class="mb-0 small">Placed on: <strong><%= order.formattedDate || '' %></strong></p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <span class="badge status-<%= (order.orderStatus || 'pending').toLowerCase() %>">
-                        <%= order.orderStatus || 'Pending' %>
-                    </span>
-                    <div class="mt-2">
-                        <a href="/orders/<%= order._id || '' %>/invoice" class="btn btn-primary me-2" target="_blank">
-                            <i class="fas fa-file-invoice me-1"></i> Invoice
-                        </a>
-                        <a href="/my-orders" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-1"></i> Back
-                        </a>
+    <div class="order-details-container">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+            <ul class="profile-sidebar-menu">
+                <li><a href="/profile"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="/my-orders" class="profile-active"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                <li><a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                <li><a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a></li>
+                <li><a href="/changePassword"><i class="fas fa-key"></i> Change Password</a></li>
+            </ul>
+            <div class="profile-logout">
+                <button class="profile-logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="order-main-content">
+            <!-- Order Header -->
+            <div class="order-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="h4 mb-1">Order Details</h2>
+                        <p class="mb-1 small">Order ID: <strong><%= order.displayOrderId || '' %></strong></p>
+                        <p class="mb-0 small">Placed on: <strong><%= order.formattedDate || '' %></strong></p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span class="badge status-<%= (order.orderStatus || 'pending').toLowerCase() %>">
+                            <%= order.orderStatus || 'Pending' %>
+                        </span>
+                        <div class="mt-2">
+                            <a href="/orders/<%= order._id || '' %>/invoice" class="btn btn-primary me-2" target="_blank">
+                                <i class="fas fa-file-invoice me-1"></i> Invoice
+                            </a>
+                            <a href="/my-orders" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <!-- Order Items -->
-            <div class="col-lg-8">
-                <div class="order-card card">
-                    <div class="card-header">
-                        <i class="fas fa-box me-2"></i> Order Items (<%= order.orderedItem ? order.orderedItem.length : 0 %>)
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Size</th>
-                                        <th>Price Details</th>
-                                        <th>Qty</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (order.orderedItem && order.orderedItem.length > 0) { 
-                                        var totalRegularPrice = 0;
-                                        var totalSavings = 0;
-                                    %>
-                                        <% for (var i = 0; i < order.orderedItem.length; i++) { 
-                                            var item = order.orderedItem[i];
-                                            var product = item.productId || {};
-                                            var isFree = item.productPrice === 0;
-                                            var itemRegularPrice = Number(product.regularPrice || product.salePrice || item.productPrice || 0);
-                                            var itemSalePrice = Number(item.productPrice || 0);
-                                            var hasOffer = itemRegularPrice > itemSalePrice;
-                                            var itemSavings = (itemRegularPrice - itemSalePrice) * item.quantity;
-                                            
-                                            totalRegularPrice += itemRegularPrice * item.quantity;
-                                            totalSavings += itemSavings > 0 ? itemSavings : 0;
-                                        %>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <% if (product.images && product.images.length > 0) { 
-                                                            var imagePath = product.images[0];
-                                                            if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-                                                                imagePath = '/uploads/productsImages/' + imagePath;
-                                                            }
-                                                        %>
-                                                            <img src="<%= imagePath || 'https://placehold.co/60x60/f0f0f0/808080?text=No+Image' %>" class="product-img me-3"
-                                                                onerror="this.src='https://placehold.co/60x60/f0f0f0/808080?text=No+Image'">
-                                                        <% } else { %>
-                                                            <div class="no-img me-3"><i class="fas fa-image"></i></div>
-                                                        <% } %>
-                                                        <div>
-                                                            <h6 class="mb-1 small">
-                                                                <%= product.productName || 'Product not available' %>
-                                                                <% if (isFree) { %>
-                                                                    <span class="free-badge">FREE</span>
-                                                                <% } else if (hasOffer) { %>
-                                                                    <span class="offer-tag">Offer</span>
-                                                                <% } %>
-                                                            </h6>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td><%= item.size || 'N/A' %></td>
-                                                <td>
-                                                    <div class="item-price-details">
-                                                        <div class="price-row-compact">
-                                                            <% if (isFree) { %>
-                                                                <span class="text-danger fw-bold">FREE</span>
-                                                                <% if (itemRegularPrice > 0) { %>
-                                                                    <span class="original-price">₹<%= itemRegularPrice.toFixed(2) %></span>
-                                                                <% } %>
-                                                            <% } else if (hasOffer) { %>
-                                                                <span class="current-price">₹<%= itemSalePrice.toFixed(2) %></span>
-                                                                <span class="original-price">₹<%= itemRegularPrice.toFixed(2) %></span>
-                                                                <span class="discount-badge">-<%= Math.round((itemRegularPrice - itemSalePrice) / itemRegularPrice * 100) %>%</span>
-                                                            <% } else { %>
-                                                                <span>₹<%= itemSalePrice.toFixed(2) %></span>
-                                                            <% } %>
-                                                        </div>
-                                                        <% if (!isFree && hasOffer && itemSavings > 0) { %>
-                                                            <div class="savings-amount">
-                                                                Saved: ₹<%= (itemRegularPrice - itemSalePrice).toFixed(2) %> on this item
-                                                            </div>
-                                                        <% } %>
-                                                    </div>
-                                                </td>
-                                                <td><%= item.quantity %></td>
-                                                <td>
-                                                    <% if (isFree) { %>
-                                                        <span class="text-danger fw-bold">FREE</span>
-                                                    <% } else { %>
-                                                        <span>₹<%= (itemSalePrice * item.quantity).toFixed(2) %></span>
-                                                    <% } %>
-                                                </td>
-                                            </tr>
-                                        <% } %>
-                                        
-                                        <!-- Display Total Savings Row if any -->
-                                        <% if (totalSavings > 0) { %>
-                                            <tr class="table-success">
-                                                <td colspan="5" class="text-end">
-                                                    <span class="fw-bold text-success">
-                                                        <i class="fas fa-tag me-2"></i>
-                                                        You saved: ₹<%= totalSavings.toFixed(2) %> on this order
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        <% } %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="5" class="text-center py-4">
-                                                <i class="fas fa-box-open text-muted fa-2x mb-2"></i>
-                                                <p class="text-muted mb-0">No items found in this order</p>
-                                            </td>
-                                        </tr>
-                                    <% } %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Actions - Only show if order can be cancelled -->
-                <% if (order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed') { %>
+            <div class="row g-3">
+                <!-- Order Items -->
+                <div class="col-lg-8">
                     <div class="order-card card">
                         <div class="card-header">
-                            <i class="fas fa-cog me-2"></i> Order Actions
-                        </div>
-                        <div class="card-body">
-                            <button id="cancel-order-btn" class="btn btn-danger">
-                                <i class="fas fa-times-circle me-2"></i> Cancel Entire Order
-                            </button>
-                            <p class="text-muted mt-2 small">
-                                Note: You can cancel the entire order before it's shipped.
-                            </p>
-                        </div>
-                    </div>
-                <% } %>
-
-                <!-- Return Request - Only for delivered orders -->
-                <% if (order.orderStatus === 'Delivered') { %>
-                    <div class="order-card card">
-                        <div class="card-header">
-                            <i class="fas fa-undo me-2"></i> Return Request
-                        </div>
-                        <div class="card-body">
-                            <% if (order.returnStatus) { %>
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    Return Status: <strong><%= order.returnStatus %></strong>
-                                    <% if (order.returnReason) { %>
-                                        <br>Reason: <%= order.returnReason %>
-                                    <% } %>
-                                </div>
-                            <% } else { %>
-                                <button id="return-order-btn" class="btn btn-warning">
-                                    <i class="fas fa-undo me-2"></i> Request Return
-                                </button>
-                                <p class="text-muted mt-2 small">
-                                    You can request a return for the entire order within 7 days of delivery.
-                                </p>
-                            <% } %>
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-
-            <!-- Order Summary & Details -->
-            <div class="col-lg-4">
-                <!-- Order Summary -->
-                <div class="order-card card">
-                    <div class="card-header">
-                        <i class="fas fa-receipt me-2"></i> Order Summary
-                    </div>
-                    <div class="card-body">
-                        <div class="price-breakdown">
-                            <div class="price-row">
-                                <span>Subtotal:</span>
-                                <span>₹<%= (order.subtotal || 0).toFixed(2) %></span>
-                            </div>
-                            
-                            <% if (order.totalSavings && order.totalSavings > 0) { %>
-                                <div class="price-row">
-                                    <span>Offer Savings:</span>
-                                    <span class="text-success">-₹<%= order.totalSavings.toFixed(2) %></span>
-                                </div>
-                            <% } %>
-                            
-                            <% if (order.couponDiscount > 0) { %>
-                                <div class="price-row">
-                                    <span>Coupon Discount:</span>
-                                    <span class="text-success">-₹<%= order.couponDiscount.toFixed(2) %></span>
-                                </div>
-                            <% } %>
-                            
-                            <div class="price-row">
-                                <span>Shipping:</span>
-                                <span>FREE</span>
-                            </div>
-                            
-                            <div class="price-row">
-                                <span>Total:</span>
-                                <span>₹<%= (order.finalAmount || order.orderAmount || 0).toFixed(2) %></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Information -->
-                <div class="order-card card">
-                    <div class="card-header">
-                        <i class="fas fa-credit-card me-2"></i> Payment Information
-                    </div>
-                    <div class="card-body">
-                        <div class="row small">
-                            <div class="col-6 text-muted">Payment Method:</div>
-                            <div class="col-6"><%= order.paymentMethod || 'N/A' %></div>
-
-                            <div class="col-6 text-muted">Payment Status:</div>
-                            <div class="col-6">
-                                <span class="badge payment-<%= (order.paymentStatus || 'pending').toLowerCase() %>">
-                                    <%= order.paymentStatus || 'Pending' %>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shipping Address -->
-                <% if (order.shippingAddress) { %>
-                    <div class="order-card card">
-                        <div class="card-header">
-                            <i class="fas fa-map-marker-alt me-2"></i> Shipping Address
+                            <i class="fas fa-box me-2"></i> Order Items (<%= order.orderedItem ? order.orderedItem.length : 0 %>)
                         </div>
                         <div class="card-body p-0">
-                            <div class="address-card">
-                                <h6 class="small"><i class="fas fa-user me-2"></i>
-                                    <%= order.shippingAddress.name || (userData ? userData.name : '') %>
-                                </h6>
-                                <p class="mb-1 small">
-                                    <i class="fas fa-home me-2"></i>
-                                    <%= order.shippingAddress.houseName || '' %>
-                                    <% if (order.shippingAddress.street) { %>, <%= order.shippingAddress.street %><% } %>
-                                </p>
-                                <p class="mb-1 small">
-                                    <i class="fas fa-city me-2"></i>
-                                    <%= order.shippingAddress.city || '' %>, <%= order.shippingAddress.state || '' %> - <%= order.shippingAddress.pincode || '' %>
-                                </p>
-                                <p class="mb-1 small">
-                                    <i class="fas fa-phone me-2"></i>
-                                    <%= order.shippingAddress.number || order.shippingAddress.phone || (userData ? userData.phone : '') || 'Not provided' %>
-                                </p>
-                                <p class="mb-0 small">
-                                    <i class="fas fa-envelope me-2"></i>
-                                    <%= order.shippingAddress.email || (userData ? userData.email : '') %>
-                                </p>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Size</th>
+                                            <th>Price Details</th>
+                                            <th>Qty</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (order.orderedItem && order.orderedItem.length > 0) { 
+                                            var totalRegularPrice = 0;
+                                            var totalSavings = 0;
+                                        %>
+                                            <% for (var i = 0; i < order.orderedItem.length; i++) { 
+                                                var item = order.orderedItem[i];
+                                                var product = item.productId || {};
+                                                var isFree = item.productPrice === 0;
+                                                var itemRegularPrice = Number(product.regularPrice || product.salePrice || item.productPrice || 0);
+                                                var itemSalePrice = Number(item.productPrice || 0);
+                                                var hasOffer = itemRegularPrice > itemSalePrice;
+                                                var itemSavings = (itemRegularPrice - itemSalePrice) * item.quantity;
+                                                
+                                                totalRegularPrice += itemRegularPrice * item.quantity;
+                                                totalSavings += itemSavings > 0 ? itemSavings : 0;
+                                            %>
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <% if (product.images && product.images.length > 0) { 
+                                                                var imagePath = product.images[0];
+                                                                if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
+                                                                    imagePath = '/uploads/productsImages/' + imagePath;
+                                                                }
+                                                            %>
+                                                                <img src="<%= imagePath || 'https://placehold.co/60x60/f0f0f0/808080?text=No+Image' %>" class="product-img me-3"
+                                                                    onerror="this.src='https://placehold.co/60x60/f0f0f0/808080?text=No+Image'">
+                                                            <% } else { %>
+                                                                <div class="no-img me-3"><i class="fas fa-image"></i></div>
+                                                            <% } %>
+                                                            <div>
+                                                                <h6 class="mb-1 small">
+                                                                    <%= product.productName || 'Product not available' %>
+                                                                    <% if (isFree) { %>
+                                                                        <span class="free-badge">FREE</span>
+                                                                    <% } else if (hasOffer) { %>
+                                                                        <span class="offer-tag">Offer</span>
+                                                                    <% } %>
+                                                                </h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td><%= item.size || 'N/A' %></td>
+                                                    <td>
+                                                        <div class="item-price-details">
+                                                            <div class="price-row-compact">
+                                                                <% if (isFree) { %>
+                                                                    <span class="text-danger fw-bold">FREE</span>
+                                                                    <% if (itemRegularPrice > 0) { %>
+                                                                        <span class="original-price">₹<%= itemRegularPrice.toFixed(2) %></span>
+                                                                    <% } %>
+                                                                <% } else if (hasOffer) { %>
+                                                                    <span class="current-price">₹<%= itemSalePrice.toFixed(2) %></span>
+                                                                    <span class="original-price">₹<%= itemRegularPrice.toFixed(2) %></span>
+                                                                    <span class="discount-badge">-<%= Math.round((itemRegularPrice - itemSalePrice) / itemRegularPrice * 100) %>%</span>
+                                                                <% } else { %>
+                                                                    <span>₹<%= itemSalePrice.toFixed(2) %></span>
+                                                                <% } %>
+                                                            </div>
+                                                            <% if (!isFree && hasOffer && itemSavings > 0) { %>
+                                                                <div class="savings-amount">
+                                                                    Saved: ₹<%= (itemRegularPrice - itemSalePrice).toFixed(2) %> on this item
+                                                                </div>
+                                                            <% } %>
+                                                        </div>
+                                                    </td>
+                                                    <td><%= item.quantity %></td>
+                                                    <td>
+                                                        <% if (isFree) { %>
+                                                            <span class="text-danger fw-bold">FREE</span>
+                                                        <% } else { %>
+                                                            <span>₹<%= (itemSalePrice * item.quantity).toFixed(2) %></span>
+                                                        <% } %>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+                                            
+                                            <!-- Display Total Savings Row if any -->
+                                            <% if (totalSavings > 0) { %>
+                                                <tr class="table-success">
+                                                    <td colspan="5" class="text-end">
+                                                        <span class="fw-bold text-success">
+                                                            <i class="fas fa-tag me-2"></i>
+                                                            You saved: ₹<%= totalSavings.toFixed(2) %> on this order
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="5" class="text-center py-4">
+                                                    <i class="fas fa-box-open text-muted fa-2x mb-2"></i>
+                                                    <p class="text-muted mb-0">No items found in this order</p>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-                <% } %>
 
-                <!-- Order Timeline -->
-                <div class="order-card card">
-                    <div class="card-header">
-                        <i class="fas fa-history me-2"></i> Order Timeline
-                    </div>
-                    <div class="card-body">
-                        <div class="timeline">
-                            <div class="timeline-item active">
-                                <h6 class="mb-1 small">Order Placed</h6>
-                                <p class="text-muted small mb-0"><%= order.formattedDate || '' %></p>
+                    <!-- Order Actions -->
+                    <% if (order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed') { %>
+                        <div class="order-card card">
+                            <div class="card-header">
+                                <i class="fas fa-cog me-2"></i> Order Actions
                             </div>
+                            <div class="card-body">
+                                <button id="cancel-order-btn" class="btn btn-danger">
+                                    <i class="fas fa-times-circle me-2"></i> Cancel Entire Order
+                                </button>
+                                <p class="text-muted mt-2 small">
+                                    Note: You can cancel the entire order before it's shipped.
+                                </p>
+                            </div>
+                        </div>
+                    <% } %>
 
-                            <% if (order.orderStatus !== 'Pending' && order.orderStatus !== 'Cancelled') { %>
+                    <!-- Return Request -->
+                    <% if (order.orderStatus === 'Delivered') { %>
+                        <div class="order-card card">
+                            <div class="card-header">
+                                <i class="fas fa-undo me-2"></i> Return Request
+                            </div>
+                            <div class="card-body">
+                                <% if (order.returnStatus) { %>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Return Status: <strong><%= order.returnStatus %></strong>
+                                        <% if (order.returnReason) { %>
+                                            <br>Reason: <%= order.returnReason %>
+                                        <% } %>
+                                    </div>
+                                <% } else { %>
+                                    <button id="return-order-btn" class="btn btn-warning">
+                                        <i class="fas fa-undo me-2"></i> Request Return
+                                    </button>
+                                    <p class="text-muted mt-2 small">
+                                        You can request a return for the entire order within 7 days of delivery.
+                                    </p>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+
+                <!-- Order Summary & Details -->
+                <div class="col-lg-4">
+                    <!-- Order Summary -->
+                    <div class="order-card card">
+                        <div class="card-header">
+                            <i class="fas fa-receipt me-2"></i> Order Summary
+                        </div>
+                        <div class="card-body">
+                            <div class="price-breakdown">
+                                <div class="price-row">
+                                    <span>Subtotal:</span>
+                                    <span>₹<%= (order.subtotal || 0).toFixed(2) %></span>
+                                </div>
+                                
+                                <% if (order.totalSavings && order.totalSavings > 0) { %>
+                                    <div class="price-row">
+                                        <span>Offer Savings:</span>
+                                        <span class="text-success">-₹<%= order.totalSavings.toFixed(2) %></span>
+                                    </div>
+                                <% } %>
+                                
+                                <% if (order.couponDiscount > 0) { %>
+                                    <div class="price-row">
+                                        <span>Coupon Discount:</span>
+                                        <span class="text-success">-₹<%= order.couponDiscount.toFixed(2) %></span>
+                                    </div>
+                                <% } %>
+                                
+                                <div class="price-row">
+                                    <span>Shipping:</span>
+                                    <span>FREE</span>
+                                </div>
+                                
+                                <div class="price-row">
+                                    <span>Total:</span>
+                                    <span>₹<%= (order.finalAmount || order.orderAmount || 0).toFixed(2) %></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Information -->
+                    <div class="order-card card">
+                        <div class="card-header">
+                            <i class="fas fa-credit-card me-2"></i> Payment Information
+                        </div>
+                        <div class="card-body">
+                            <div class="row small">
+                                <div class="col-6 text-muted">Payment Method:</div>
+                                <div class="col-6"><%= order.paymentMethod || 'N/A' %></div>
+
+                                <div class="col-6 text-muted">Payment Status:</div>
+                                <div class="col-6">
+                                    <span class="badge payment-<%= (order.paymentStatus || 'pending').toLowerCase() %>">
+                                        <%= order.paymentStatus || 'Pending' %>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address -->
+                    <% if (order.shippingAddress) { %>
+                        <div class="order-card card">
+                            <div class="card-header">
+                                <i class="fas fa-map-marker-alt me-2"></i> Shipping Address
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="address-card">
+                                    <h6 class="small"><i class="fas fa-user me-2"></i>
+                                        <%= order.shippingAddress.name || (userData ? userData.name : '') %>
+                                    </h6>
+                                    <p class="mb-1 small">
+                                        <i class="fas fa-home me-2"></i>
+                                        <%= order.shippingAddress.houseName || '' %>
+                                        <% if (order.shippingAddress.street) { %>, <%= order.shippingAddress.street %><% } %>
+                                    </p>
+                                    <p class="mb-1 small">
+                                        <i class="fas fa-city me-2"></i>
+                                        <%= order.shippingAddress.city || '' %>, <%= order.shippingAddress.state || '' %> - <%= order.shippingAddress.pincode || '' %>
+                                    </p>
+                                    <p class="mb-1 small">
+                                        <i class="fas fa-phone me-2"></i>
+                                        <%= order.shippingAddress.number || order.shippingAddress.phone || (userData ? userData.phone : '') || 'Not provided' %>
+                                    </p>
+                                    <p class="mb-0 small">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        <%= order.shippingAddress.email || (userData ? userData.email : '') %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <!-- Order Timeline -->
+                    <div class="order-card card">
+                        <div class="card-header">
+                            <i class="fas fa-history me-2"></i> Order Timeline
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
                                 <div class="timeline-item active">
-                                    <h6 class="mb-1 small">Order Confirmed</h6>
-                                    <p class="text-muted small mb-0">Order confirmed by seller</p>
+                                    <h6 class="mb-1 small">Order Placed</h6>
+                                    <p class="text-muted small mb-0"><%= order.formattedDate || '' %></p>
                                 </div>
-                            <% } %>
 
-                            <% if (order.orderStatus === 'Shipped' || order.orderStatus === 'Delivered' || order.orderStatus === 'Returned') { %>
-                                <div class="timeline-item active">
-                                    <h6 class="mb-1 small">Shipped</h6>
-                                    <p class="text-muted small mb-0">Order shipped to your address</p>
-                                </div>
-                            <% } %>
+                                <% if (order.orderStatus !== 'Pending' && order.orderStatus !== 'Cancelled') { %>
+                                    <div class="timeline-item active">
+                                        <h6 class="mb-1 small">Order Confirmed</h6>
+                                        <p class="text-muted small mb-0">Order confirmed by seller</p>
+                                    </div>
+                                <% } %>
 
-                            <% if (order.orderStatus === 'Delivered' || order.orderStatus === 'Returned') { %>
-                                <div class="timeline-item active">
-                                    <h6 class="mb-1 small">Delivered</h6>
-                                    <p class="text-muted small mb-0">Order has been delivered</p>
-                                </div>
-                            <% } %>
+                                <% if (order.orderStatus === 'Shipped' || order.orderStatus === 'Delivered' || order.orderStatus === 'Returned') { %>
+                                    <div class="timeline-item active">
+                                        <h6 class="mb-1 small">Shipped</h6>
+                                        <p class="text-muted small mb-0">Order shipped to your address</p>
+                                    </div>
+                                <% } %>
 
-                            <% if (order.orderStatus === 'Cancelled') { %>
-                                <div class="timeline-item">
-                                    <h6 class="mb-1 small text-danger">Cancelled</h6>
-                                    <p class="text-muted small mb-0">Order has been cancelled</p>
-                                </div>
-                            <% } %>
+                                <% if (order.orderStatus === 'Delivered' || order.orderStatus === 'Returned') { %>
+                                    <div class="timeline-item active">
+                                        <h6 class="mb-1 small">Delivered</h6>
+                                        <p class="text-muted small mb-0">Order has been delivered</p>
+                                    </div>
+                                <% } %>
 
-                            <% if (order.orderStatus === 'Returned') { %>
-                                <div class="timeline-item">
-                                    <h6 class="mb-1 small">Returned</h6>
-                                    <p class="text-muted small mb-0">Order has been returned</p>
-                                </div>
-                            <% } %>
+                                <% if (order.orderStatus === 'Cancelled') { %>
+                                    <div class="timeline-item">
+                                        <h6 class="mb-1 small text-danger">Cancelled</h6>
+                                        <p class="text-muted small mb-0">Order has been cancelled</p>
+                                    </div>
+                                <% } %>
+
+                                <% if (order.orderStatus === 'Returned') { %>
+                                    <div class="timeline-item">
+                                        <h6 class="mb-1 small">Returned</h6>
+                                        <p class="text-muted small mb-0">Order has been returned</p>
+                                    </div>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <!-- Cancel Order Modal -->
@@ -904,8 +1079,36 @@
 
                 if (toast) toast.show();
             }
+
+            // Logout functionality
+            var logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async function() {
+                    try {
+                        const res = await fetch('/logout', { method: 'POST' });
+                        if (res.ok) {
+                            window.location.href = '/';
+                        } else {
+                            showNotification('Error', 'Logout failed. Please try again.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        showNotification('Error', 'An error occurred during logout.', 'error');
+                    }
+                });
+            }
+
+            // Highlight active sidebar link
+            var currentPage = window.location.pathname;
+            var sidebarLinks = document.querySelectorAll('.profile-sidebar-menu a');
+            sidebarLinks.forEach(function(link) {
+                link.classList.remove('profile-active');
+                if (link.getAttribute('href') === currentPage || (currentPage.includes('/my-orders') && link.getAttribute('href') === '/my-orders')) {
+                    link.classList.add('profile-active');
+                }
+            });
         });
     </script>
 </body>
 </html>
-<%-include("../partials/user/footer.ejs")%>
+<%- include("../partials/user/footer.ejs") %>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Profile - AllScouts</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,12 +19,17 @@
             --sidebar-active: #3498db;
         }
         
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text-color);
             background-color: #fff;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
         
         .profile-header {
@@ -35,9 +40,10 @@
         }
         
         .profile-title {
-            font-size: 1.8rem;
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
             font-weight: 700;
             margin-bottom: 10px;
+            padding: 0 15px;
         }
         
         .breadcrumb {
@@ -45,6 +51,7 @@
             background: transparent;
             font-size: 0.85rem;
             margin-bottom: 0;
+            flex-wrap: wrap;
         }
         
         .breadcrumb-item a {
@@ -69,6 +76,7 @@
             background-color: var(--sidebar-bg);
             color: white;
             padding: 20px 0;
+            transition: transform 0.3s ease;
         }
 
         .profile-sidebar-menu {
@@ -144,10 +152,11 @@
         .profile-main-content {
             flex: 1;
             padding: 25px;
+            min-width: 0;
         }
 
         .profile-page-title {
-            font-size: 1.5rem;
+            font-size: clamp(1.3rem, 4vw, 1.5rem);
             margin-bottom: 5px;
             color: #2c3e50;
             font-weight: 600;
@@ -199,13 +208,15 @@
 
         .profile-user-info {
             flex: 1;
+            min-width: 0;
         }
 
         .profile-user-name {
-            font-size: 1.3rem;
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
             margin: 0 0 15px 0;
             color: #2c3e50;
             font-weight: 600;
+            word-break: break-word;
         }
 
         /* Properly aligned user details */
@@ -231,6 +242,7 @@
 
         .profile-user-detail-value {
             color: #2c3e50;
+            word-break: break-word;
         }
 
         .profile-edit-link {
@@ -288,11 +300,24 @@
             
             .profile-sidebar {
                 width: 100%;
+                padding: 10px 0;
             }
             
             .profile-sidebar-menu {
                 display: flex;
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                padding-bottom: 5px;
+            }
+            
+            .profile-sidebar-menu::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .profile-sidebar-menu::-webkit-scrollbar-thumb {
+                background-color: rgba(255,255,255,0.3);
+                border-radius: 4px;
             }
             
             .profile-sidebar-menu li {
@@ -303,47 +328,75 @@
                 border-left: none;
                 border-bottom: 3px solid transparent;
                 white-space: nowrap;
+                padding: 12px 15px;
             }
             
             .profile-sidebar-menu a.profile-active {
                 border-left: none;
                 border-bottom-color: #2980b9;
             }
+            
+            .profile-logout {
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
         }
 
         @media (max-width: 768px) {
+            .profile-container {
+                max-width: 100%;
+                border-radius: 0;
+                margin: 0 0 25px;
+            }
+            
             .profile-main-content {
-                padding: 20px;
+                padding: 20px 15px;
             }
             
             .profile-header {
                 padding: 30px 0 20px;
             }
             
-            .profile-title {
-                font-size: 1.5rem;
-            }
-            
             .profile-user-section {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
+                padding: 20px 15px;
             }
             
             .profile-user-avatar {
                 margin-right: 0;
-                margin-bottom: 15px;
+                margin-bottom: 20px;
+                width: 120px;
+                height: 120px;
+            }
+            
+            .profile-user-info {
+                width: 100%;
             }
             
             .profile-user-detail-item {
                 flex-direction: column;
-                align-items: center;
-                text-align: center;
+                align-items: flex-start;
+                text-align: left;
+                margin-bottom: 15px;
             }
             
             .profile-user-detail-label {
                 min-width: auto;
                 margin-bottom: 5px;
+                font-size: 0.9rem;
+            }
+            
+            .profile-user-detail-value {
+                width: 100%;
+                padding-left: 0;
+            }
+            
+            .profile-edit-link {
+                width: 100%;
+                text-align: center;
+                padding: 12px 20px;
             }
         }
 
@@ -356,12 +409,88 @@
                 padding: 25px 0 15px;
             }
             
-            .profile-title {
-                font-size: 1.3rem;
+            .profile-user-section {
+                padding: 15px 12px;
+                margin-bottom: 15px;
+            }
+            
+            .profile-user-avatar {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .profile-page-title {
+                margin-bottom: 8px;
+            }
+            
+            .profile-page-subtitle {
+                margin-bottom: 15px;
+                font-size: 0.85rem;
+            }
+            
+            .profile-sidebar-menu a {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .profile-sidebar-menu i {
+                margin-right: 6px;
+                font-size: 0.85rem;
+            }
+            
+            .profile-logout-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .breadcrumb {
+                font-size: 0.8rem;
+                padding: 0 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-user-detail-item {
+                margin-bottom: 12px;
+            }
+            
+            .profile-user-name {
+                margin-bottom: 12px;
+            }
+            
+            .alert {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+                margin-bottom: 15px;
+            }
+            
+            footer p {
+                font-size: 0.8rem !important;
+                padding: 0 10px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .profile-sidebar-menu a,
+            .profile-logout-btn,
+            .profile-edit-link {
+                min-height: 44px;
+            }
+            
+            .profile-sidebar-menu a {
+                padding: 14px 20px;
+            }
+        }
+
+        /* Prevent horizontal scroll on very small devices */
+        @media (max-width: 360px) {
+            .profile-main-content {
+                padding: 12px 10px;
             }
             
             .profile-user-section {
-                padding: 15px;
+                padding: 12px 10px;
             }
         }
     </style>
@@ -376,7 +505,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item active">Profile</li>
+                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
                 </ol>
             </nav>
         </div>
@@ -406,10 +535,10 @@
             <p class="profile-page-subtitle">Manage your account information and preferences</p>
 
             <% if (messages && messages.success && messages.success.length > 0) { %>
-                <div class="alert alert-success"><%= messages.success[0] %></div>
+                <div class="alert alert-success" role="alert"><%= messages.success[0] %></div>
             <% } %>
             <% if (messages && messages.error && messages.error.length > 0) { %>
-                <div class="alert alert-danger"><%= messages.error[0] %></div>
+                <div class="alert alert-danger" role="alert"><%= messages.error[0] %></div>
             <% } %>
 
             <!-- User Information Section -->
@@ -418,7 +547,7 @@
                     <% if (user.profileImage && user.profileImage.length > 0) { %>
                         <img src="<%= user.profileImage && user.profileImage[0] ? user.profileImage[0] : '/images/default-profile.jpg' %>" alt="Profile Image">
                     <% } else { %>
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-label="Default profile avatar">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                         </svg>
                     <% } %>
