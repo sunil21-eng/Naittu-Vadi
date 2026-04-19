@@ -156,6 +156,88 @@
             font-size: 0.8rem;
             color: #666;
         }
+
+        /* ----- Responsive adjustments for mobile (no HTML changes) ----- */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .page-header {
+                font-size: 1.8rem;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0;
+            }
+
+            .recent-orders,
+            .top-selling-products {
+                padding: 1.5rem;
+            }
+
+            .product-card-image {
+                height: 180px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .page-header {
+                font-size: 1.5rem;
+            }
+
+            .stats-card {
+                padding: 1rem;
+            }
+
+            .recent-orders,
+            .top-selling-products {
+                padding: 1rem;
+            }
+
+            .product-card-image {
+                height: 200px;
+            }
+
+            /* Ensure table remains scrollable if needed, but keep content readable */
+            .recent-orders {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 500px;
+            }
+        }
     </style>
 </head>
 <body>

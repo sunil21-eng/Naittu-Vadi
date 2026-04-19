@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Edit Address - AllScouts</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,32 +19,43 @@
             --sidebar-active: #3498db;
         }
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--text-color);
             background-color: #fff;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
+            width: 100%;
         }
         
         .edit-address-header {
             background-color: var(--light-gray);
-            padding: 40px 0 25px;
+            padding: clamp(20px, 5vw, 40px) 0 clamp(15px, 4vw, 25px);
             text-align: center;
             margin-bottom: 25px;
         }
         
         .edit-address-title {
-            font-size: 1.8rem;
+            font-size: clamp(1.4rem, 5vw, 1.8rem);
             font-weight: 700;
             margin-bottom: 10px;
+            padding: 0 15px;
         }
         
         .breadcrumb {
             justify-content: center;
             background: transparent;
-            font-size: 0.85rem;
+            font-size: clamp(0.75rem, 3vw, 0.85rem);
             margin-bottom: 0;
+            flex-wrap: wrap;
+            padding: 0 10px;
         }
         
         .breadcrumb-item a {
@@ -54,21 +65,25 @@
         
         .edit-address-container {
             display: flex;
-            max-width: 98%;
+            max-width: 1400px;
+            width: 98%;
             margin: 0 auto 25px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             overflow: hidden;
             min-height: 500px;
+            position: relative;
         }
 
         /* Sidebar Styles */
         .edit-address-sidebar {
-            width: 220px;
+            width: 260px;
             background-color: var(--sidebar-bg);
             color: white;
             padding: 20px 0;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
         }
 
         .edit-address-sidebar-menu {
@@ -84,12 +99,14 @@
         .edit-address-sidebar-menu a {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
             color: #ecf0f1;
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
+            font-weight: 500;
+            white-space: nowrap;
         }
 
         .edit-address-sidebar-menu a:hover {
@@ -104,80 +121,90 @@
         }
 
         .edit-address-sidebar-menu i {
-            margin-right: 8px;
-            width: 16px;
+            margin-right: clamp(8px, 2vw, 12px);
+            width: 20px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
         }
 
         .edit-address-logout {
-            padding: 15px 20px;
-            margin-top: 15px;
+            padding: clamp(15px, 4vw, 20px) clamp(15px, 4vw, 20px) 10px;
+            margin-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .edit-address-logout-btn {
             width: 100%;
-            padding: 10px;
+            padding: clamp(10px, 2vw, 12px);
             background-color: var(--danger-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+            min-height: 44px;
         }
 
         .edit-address-logout-btn:hover {
             background-color: #c0392b;
+            transform: scale(0.98);
         }
 
         .edit-address-logout-btn i {
-            margin-right: 6px;
+            margin-right: 8px;
         }
 
         /* Main Content Styles */
         .edit-address-main-content {
             flex: 1;
-            padding: 25px;
+            padding: clamp(14px, 4vw, 28px) clamp(12px, 4vw, 30px);
+            background: #ffffff;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         .edit-address-page-title {
-            font-size: 1.5rem;
+            font-size: clamp(1.3rem, 5vw, 1.6rem);
             margin-bottom: 5px;
             color: #2c3e50;
             font-weight: 600;
+            word-break: break-word;
         }
 
         .edit-address-page-subtitle {
             color: #7f8c8d;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            margin-bottom: clamp(16px, 4vw, 24px);
+            font-size: clamp(0.85rem, 3vw, 0.95rem);
+            border-left: 3px solid var(--primary-color);
+            padding-left: 12px;
         }
 
         /* Address Form Section */
         .edit-address-section {
             margin-bottom: 25px;
-            padding: 20px;
+            padding: clamp(14px, 4vw, 20px) clamp(14px, 4vw, 24px);
             background: white;
-            border-radius: 6px;
+            border-radius: 12px;
             box-shadow: 0 1px 5px rgba(0,0,0,0.05);
             border: 1px solid var(--border-color);
         }
 
         .edit-address-section-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
+            font-size: clamp(1.1rem, 4vw, 1.25rem);
+            margin-bottom: 20px;
             color: #2c3e50;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
             font-weight: 600;
         }
 
@@ -185,13 +212,16 @@
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            display: flex;
+            border-radius: 40px;
+            padding: clamp(8px, 2vw, 10px) clamp(16px, 3vw, 20px);
+            display: inline-flex;
             align-items: center;
             text-decoration: none;
             transition: all 0.3s;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 3vw, 0.85rem);
+            font-weight: 500;
+            min-height: 44px;
+            justify-content: center;
         }
 
         .edit-address-back-link i {
@@ -201,12 +231,12 @@
         .edit-address-back-link:hover {
             background-color: #2a75e6;
             color: white;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         /* Form Styling */
         .edit-address-form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .edit-address-form-label {
@@ -214,15 +244,15 @@
             margin-bottom: 6px;
             font-weight: 600;
             color: var(--text-color);
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
         }
 
         .edit-address-form-control {
             width: 100%;
-            padding: 10px 12px;
+            padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 14px);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 0.9rem;
+            border-radius: 8px;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
             transition: border-color 0.3s;
             box-sizing: border-box;
         }
@@ -230,65 +260,66 @@
         .edit-address-form-control:focus {
             border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.15);
         }
 
         .edit-address-form-control.error {
             border-color: var(--danger-color);
-            box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
         }
 
         .edit-address-error-message {
             color: var(--danger-color);
-            font-size: 0.8rem;
-            margin-top: 4px;
+            font-size: clamp(0.7rem, 2.5vw, 0.75rem);
+            margin-top: 5px;
             display: none;
         }
 
         .edit-address-form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: clamp(12px, 3vw, 16px);
+            margin-bottom: 8px;
         }
 
         .edit-address-form-checkbox {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-top: 8px;
-            margin-bottom: 20px;
-            padding: 12px;
+            gap: 10px;
+            margin-top: 10px;
+            margin-bottom: 22px;
+            padding: clamp(10px, 3vw, 12px) clamp(12px, 3vw, 16px);
             background-color: var(--light-gray);
-            border-radius: 4px;
+            border-radius: 10px;
         }
 
         .edit-address-form-checkbox input {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             accent-color: var(--primary-color);
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         .edit-address-form-checkbox label {
             margin-bottom: 0;
             cursor: pointer;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
         }
 
         .edit-address-form-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 14px;
             margin-top: 25px;
             padding-top: 15px;
             border-top: 1px solid var(--border-color);
         }
 
         .edit-address-btn {
-            padding: 10px 20px;
-            border-radius: 4px;
-            font-weight: 500;
+            padding: clamp(10px, 2.5vw, 12px) clamp(20px, 4vw, 24px);
+            border-radius: 40px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: inline-flex;
@@ -296,11 +327,13 @@
             justify-content: center;
             text-decoration: none;
             border: none;
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+            gap: 8px;
+            min-height: 44px;
         }
 
         .edit-address-btn i {
-            margin-right: 6px;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
         }
 
         .edit-address-btn-primary {
@@ -310,70 +343,100 @@
 
         .edit-address-btn-primary:hover {
             background-color: #2a75e6;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(58,134,255,0.3);
         }
 
         .edit-address-btn-secondary {
-            background-color: #f1f1f1;
-            color: #333;
-            border: 1px solid #ddd;
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
         }
 
         .edit-address-btn-secondary:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-1px);
+            background-color: #e2e8f0;
+            transform: translateY(-2px);
         }
 
-        /* Info text for optional fields */
         .edit-address-field-info {
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 2.5vw, 0.75rem);
             color: #6c757d;
-            margin-top: 4px;
+            margin-top: 6px;
             font-style: italic;
         }
 
-        /* Success/Error Messages */
+        /* Alert Messages */
         .edit-address-alert {
-            padding: 10px 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
+            padding: clamp(10px, 3vw, 12px) clamp(12px, 3vw, 16px);
+            border-radius: 12px;
+            margin-bottom: 20px;
             font-weight: 500;
-            font-size: 0.9rem;
-            border: none;
-            border-left: 3px solid transparent;
+            font-size: clamp(0.8rem, 3vw, 0.85rem);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            word-break: break-word;
         }
 
         .edit-address-alert-success {
-            background-color: rgba(42, 157, 143, 0.1);
-            color: var(--success-color);
-            border-left-color: var(--success-color);
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border-left: 4px solid #0284c7;
         }
 
         .edit-address-alert-error {
-            background-color: rgba(230, 57, 70, 0.1);
-            color: var(--danger-color);
-            border-left-color: var(--danger-color);
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #dc2626;
         }
 
-        /* Footer */
         footer {
             margin-top: 20px !important;
         }
 
-        /* Responsive Styles */
+        footer p {
+            font-size: clamp(0.75rem, 3vw, 0.85rem) !important;
+            padding: 0 10px;
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .edit-address-sidebar-menu a,
+            .edit-address-logout-btn,
+            .edit-address-btn,
+            .edit-address-back-link,
+            .edit-address-form-checkbox input {
+                min-height: 44px;
+            }
+        }
+
+        /* ========== RESPONSIVE BREAKPOINTS ========== */
         @media (max-width: 992px) {
             .edit-address-container {
                 flex-direction: column;
-                max-width: 95%;
+                width: 95%;
             }
             
             .edit-address-sidebar {
                 width: 100%;
+                padding: 10px 0;
             }
             
             .edit-address-sidebar-menu {
                 display: flex;
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                padding-bottom: 5px;
+            }
+            
+            .edit-address-sidebar-menu::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .edit-address-sidebar-menu::-webkit-scrollbar-thumb {
+                background-color: rgba(255,255,255,0.3);
+                border-radius: 4px;
             }
             
             .edit-address-sidebar-menu li {
@@ -384,6 +447,7 @@
                 border-left: none;
                 border-bottom: 3px solid transparent;
                 white-space: nowrap;
+                padding: 12px 15px;
             }
             
             .edit-address-sidebar-menu a.edit-address-active {
@@ -391,37 +455,58 @@
                 border-bottom-color: #2980b9;
             }
             
+            .edit-address-logout {
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
+            
+            .edit-address-main-content {
+                padding: 20px 16px;
+                width: 100%;
+            }
+            
             .edit-address-form-row {
                 grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .edit-address-section-title {
-                flex-direction: column;
                 gap: 12px;
-                align-items: flex-start;
-            }
-
-            .edit-address-form-actions {
-                flex-direction: column;
-            }
-
-            .edit-address-btn {
-                width: 100%;
             }
         }
 
         @media (max-width: 768px) {
-            .edit-address-main-content {
-                padding: 20px;
+            .edit-address-container {
+                width: 100%;
+                margin: 0 0 25px;
+                border-radius: 0;
             }
             
             .edit-address-header {
-                padding: 30px 0 20px;
+                margin-bottom: 15px;
             }
             
-            .edit-address-title {
-                font-size: 1.5rem;
+            .edit-address-main-content {
+                padding: 20px 15px;
+            }
+            
+            .edit-address-section {
+                padding: 16px 15px;
+            }
+            
+            .edit-address-section-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .edit-address-back-link {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .edit-address-form-actions {
+                flex-direction: column;
+            }
+            
+            .edit-address-btn {
+                width: 100%;
             }
         }
 
@@ -430,16 +515,33 @@
                 padding: 15px 12px;
             }
             
-            .edit-address-header {
-                padding: 25px 0 15px;
-            }
-            
-            .edit-address-title {
-                font-size: 1.3rem;
-            }
-            
             .edit-address-section {
-                padding: 15px;
+                padding: 14px 12px;
+            }
+            
+            .edit-address-sidebar-menu a {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .edit-address-sidebar-menu i {
+                margin-right: 6px;
+                font-size: 0.85rem;
+            }
+            
+            .edit-address-form-control {
+                padding: 10px 12px;
+            }
+            
+            .edit-address-logout-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .edit-address-form-checkbox {
+                flex-wrap: wrap;
             }
         }
     </style>
@@ -455,7 +557,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
                     <li class="breadcrumb-item"><a href="/addresses">Addresses</a></li>
-                    <li class="breadcrumb-item active">Edit Address</li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Address</li>
                 </ol>
             </nav>
         </div>
@@ -463,7 +565,7 @@
 
     <!-- Edit Address Content -->
     <div class="edit-address-container">
-        <!-- Sidebar -->
+        <!-- Sidebar - Horizontal scroll on mobile -->
         <aside class="edit-address-sidebar">
             <ul class="edit-address-sidebar-menu">
                 <li><a href="/profile"><i class="fas fa-user"></i> Profile</a></li>
@@ -495,13 +597,13 @@
 
                 <!-- Display success/error messages -->
                 <% if (messages && messages.success) { %>
-                    <div class="edit-address-alert edit-address-alert-success">
+                    <div class="edit-address-alert edit-address-alert-success" role="alert">
                         <i class="fas fa-check-circle"></i> <%= messages.success %>
                     </div>
                 <% } %>
 
                 <% if (messages && messages.error) { %>
-                    <div class="edit-address-alert edit-address-alert-error">
+                    <div class="edit-address-alert edit-address-alert-error" role="alert">
                         <i class="fas fa-exclamation-circle"></i> <%= messages.error %>
                     </div>
                 <% } %>
@@ -510,7 +612,7 @@
                     <input type="hidden" name="addressId" value="<%= address._id %>">
 
                     <div class="edit-address-form-group">
-                        <label for="saveAs">Address Type *</label>
+                        <label for="saveAs" class="edit-address-form-label">Address Type *</label>
                         <select id="saveAs" name="saveAs" class="edit-address-form-control" required>
                             <option value="">Select Address Type</option>
                             <option value="Home" <%= address.saveAs === 'Home' ? 'selected' : '' %>>Home</option>
@@ -521,21 +623,21 @@
                     </div>
 
                     <div class="edit-address-form-group">
-                        <label for="name">Full Name *</label>
+                        <label for="name" class="edit-address-form-label">Full Name *</label>
                         <input type="text" id="name" name="name" class="edit-address-form-control"
                             value="<%= address.name %>" placeholder="Enter your full name" required>
                         <div class="edit-address-error-message" id="nameError">Please enter a valid name (letters and spaces only)</div>
                     </div>
 
                     <div class="edit-address-form-group">
-                        <label for="email">Email Address *</label>
+                        <label for="email" class="edit-address-form-label">Email Address *</label>
                         <input type="email" id="email" name="email" class="edit-address-form-control"
                             value="<%= address.email %>" placeholder="Enter your email address" required>
                         <div class="edit-address-error-message" id="emailError">Please enter a valid email address</div>
                     </div>
 
                     <div class="edit-address-form-group">
-                        <label for="number">Phone Number *</label>
+                        <label for="number" class="edit-address-form-label">Phone Number *</label>
                         <input type="tel" id="number" name="number" class="edit-address-form-control"
                             value="<%= address.number %>" placeholder="Enter your 10-digit phone number"
                             maxlength="10" required>
@@ -543,14 +645,14 @@
                     </div>
 
                     <div class="edit-address-form-group">
-                        <label for="houseName">House/Building Name *</label>
+                        <label for="houseName" class="edit-address-form-label">House/Building Name *</label>
                         <input type="text" id="houseName" name="houseName" class="edit-address-form-control"
                             value="<%= address.houseName %>" placeholder="Enter house/building name" required>
                         <div class="edit-address-error-message" id="houseNameError">Please enter house/building name</div>
                     </div>
 
                     <div class="edit-address-form-group">
-                        <label for="street">Street Address *</label>
+                        <label for="street" class="edit-address-form-label">Street Address *</label>
                         <input type="text" id="street" name="street" class="edit-address-form-control"
                             value="<%= address.street %>" placeholder="Enter street address" required>
                         <div class="edit-address-error-message" id="streetError">Please enter street address</div>
@@ -558,13 +660,13 @@
 
                     <div class="edit-address-form-row">
                         <div class="edit-address-form-group">
-                            <label for="city">City *</label>
+                            <label for="city" class="edit-address-form-label">City *</label>
                             <input type="text" id="city" name="city" class="edit-address-form-control"
                                 value="<%= address.city %>" placeholder="Enter city" required>
                             <div class="edit-address-error-message" id="cityError">Please enter city name</div>
                         </div>
                         <div class="edit-address-form-group">
-                            <label for="state">State *</label>
+                            <label for="state" class="edit-address-form-label">State *</label>
                             <input type="text" id="state" name="state" class="edit-address-form-control"
                                 value="<%= address.state %>" placeholder="Enter state" required>
                             <div class="edit-address-error-message" id="stateError">Please enter state name</div>
@@ -573,23 +675,23 @@
 
                     <div class="edit-address-form-row">
                         <div class="edit-address-form-group">
-                            <label for="pincode">PIN Code *</label>
+                            <label for="pincode" class="edit-address-form-label">PIN Code *</label>
                             <input type="text" id="pincode" name="pincode" class="edit-address-form-control"
                                 value="<%= address.pincode %>" placeholder="Enter 6-digit PIN code"
                                 maxlength="6" required>
                             <div class="edit-address-error-message" id="pincodeError">Please enter a valid 6-digit PIN code</div>
                         </div>
                         <div class="edit-address-form-group">
-                            <label for="country">Country *</label>
+                            <label for="country" class="edit-address-form-label">Country *</label>
                             <input type="text" id="country" name="country" class="edit-address-form-control"
                                 value="<%= address.country || 'India' %>" required>
                             <div class="edit-address-error-message" id="countryError">Please enter country name</div>
                         </div>
                     </div>
 
-                    <!-- Courier Branch Field - Fixed to match schema -->
+                    <!-- Courier Branch Field -->
                     <div class="edit-address-form-group">
-                        <label for="courierBranch">Nearby MSS Courier Branch (Optional)</label>
+                        <label for="courierBranch" class="edit-address-form-label">Nearby MSS Courier Branch (Optional)</label>
                         <input type="text" id="courierBranch" name="courierBranch" class="edit-address-form-control"
                             value="<%= address.courierBranch || '' %>" placeholder="Enter nearby MSS courier branch location">
                         <div class="edit-address-field-info">
@@ -618,7 +720,7 @@
     <!-- Footer Section -->
     <footer class="bg-light py-3 mt-3">
         <div class="container text-center">
-            <p class="mb-0" style="font-size: 0.85rem;">&copy; 2023 Your Store. All rights reserved.</p>
+            <p class="mb-0">&copy; 2023 Your Store. All rights reserved.</p>
         </div>
     </footer>
 
@@ -642,28 +744,21 @@
         // Form validation and submission
         document.getElementById('editAddressForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-
-            // Clear previous errors
             clearErrors();
-
-            // Validate form
             if (validateForm()) {
                 await submitForm();
             }
         });
 
-        // Validation functions
         function validateForm() {
             let isValid = true;
 
-            // Address Type validation
             const saveAs = document.getElementById('saveAs').value;
             if (!saveAs) {
                 showError('saveAs', 'Please select an address type');
                 isValid = false;
             }
 
-            // Name validation
             const name = document.getElementById('name').value.trim();
             if (!name) {
                 showError('name', 'Full name is required');
@@ -673,7 +768,6 @@
                 isValid = false;
             }
 
-            // Email validation
             const email = document.getElementById('email').value.trim();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!email) {
@@ -684,7 +778,6 @@
                 isValid = false;
             }
 
-            // Phone validation
             const number = document.getElementById('number').value.trim();
             if (!number) {
                 showError('number', 'Phone number is required');
@@ -694,7 +787,6 @@
                 isValid = false;
             }
 
-            // House Name validation
             const houseName = document.getElementById('houseName').value.trim();
             if (!houseName) {
                 showError('houseName', 'House/Building name is required');
@@ -704,7 +796,6 @@
                 isValid = false;
             }
 
-            // Street validation
             const street = document.getElementById('street').value.trim();
             if (!street) {
                 showError('street', 'Street address is required');
@@ -714,7 +805,6 @@
                 isValid = false;
             }
 
-            // City validation
             const city = document.getElementById('city').value.trim();
             if (!city) {
                 showError('city', 'City is required');
@@ -724,7 +814,6 @@
                 isValid = false;
             }
 
-            // State validation
             const state = document.getElementById('state').value.trim();
             if (!state) {
                 showError('state', 'State is required');
@@ -734,7 +823,6 @@
                 isValid = false;
             }
 
-            // PIN Code validation
             const pincode = document.getElementById('pincode').value.trim();
             if (!pincode) {
                 showError('pincode', 'PIN code is required');
@@ -744,14 +832,11 @@
                 isValid = false;
             }
 
-            // Country validation
             const country = document.getElementById('country').value.trim();
             if (!country) {
                 showError('country', 'Country is required');
                 isValid = false;
             }
-
-            // No validation for courierBranch as it's optional
 
             return isValid;
         }
@@ -759,67 +844,55 @@
         function showError(fieldId, message) {
             const field = document.getElementById(fieldId);
             const errorElement = document.getElementById(fieldId + 'Error');
-
-            field.classList.add('error');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
+            if (field) field.classList.add('error');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
         }
 
         function clearErrors() {
-            // Remove error classes from all fields
             document.querySelectorAll('.edit-address-form-control').forEach(field => {
                 field.classList.remove('error');
             });
-
-            // Hide all error messages
             document.querySelectorAll('.edit-address-error-message').forEach(error => {
                 error.style.display = 'none';
             });
         }
 
-        // Real-time validation for phone number
+        // Real-time input validations
         document.getElementById('number').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 10) {
-                value = value.slice(0, 10);
-            }
+            if (value.length > 10) value = value.slice(0, 10);
             e.target.value = value;
         });
 
-        // Real-time validation for PIN code
         document.getElementById('pincode').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 6) {
-                value = value.slice(0, 6);
-            }
+            if (value.length > 6) value = value.slice(0, 6);
             e.target.value = value;
         });
 
-        // Name validation (letters and spaces only)
         document.getElementById('name').addEventListener('input', function (e) {
             let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
             e.target.value = value;
         });
 
-        // Form submission
         async function submitForm() {
             const form = document.getElementById('editAddressForm');
             const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             let formObj = Object.fromEntries(formData);
-            formObj.isDefault = formData.has("isDefault"); 
+            formObj.isDefault = formData.has("isDefault");
 
             try {
-                // Show loading state
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating Address...';
                 submitBtn.disabled = true;
 
                 const response = await fetch('/updateAddress', {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify(formObj)
                 });
@@ -827,21 +900,15 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Show success message and redirect
                     window.location.href = '/addresses?message=' + encodeURIComponent(data.message);
                 } else {
-                    // Show error message
                     alert('Error: ' + (data.message || 'Failed to update address'));
-
-                    // Reset button state
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error updating address:', error);
                 alert('Failed to update address. Please try again.');
-
-                // Reset button state
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
@@ -852,16 +919,14 @@
             const successAlert = document.querySelector('.edit-address-alert-success');
             if (successAlert) {
                 setTimeout(() => {
-                    successAlert.style.display = 'none';
+                    successAlert.style.transition = 'opacity 0.3s';
+                    successAlert.style.opacity = '0';
+                    setTimeout(() => successAlert.style.display = 'none', 300);
                 }, 5000);
             }
-        });
-
-        // Sidebar navigation highlighting
-        document.addEventListener('DOMContentLoaded', function() {
+            
             const currentPage = window.location.pathname;
             const sidebarLinks = document.querySelectorAll('.edit-address-sidebar-menu a');
-            
             sidebarLinks.forEach(link => {
                 if (link.getAttribute('href') === currentPage) {
                     link.classList.add('edit-address-active');
@@ -873,3 +938,4 @@
     </script>
 </body>
 <%- include('../partials/user/footer') %>
+</html>

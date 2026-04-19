@@ -196,6 +196,7 @@
             object-fit: cover;
             margin-right: 15px;
             border-radius: 5px;
+            flex-shrink: 0;
         }
 
         .product-name {
@@ -556,11 +557,13 @@
             }
         }
 
+        /* ── RESPONSIVE BREAKPOINTS ── */
+
         @media (max-width: 992px) {
             .cart-content {
                 grid-template-columns: 1fr;
             }
-            
+
             .cart-summary {
                 position: static;
             }
@@ -568,42 +571,138 @@
 
         @media (max-width: 768px) {
             .cart-header-section {
-                padding: 40px 0 30px;
+                padding: 40px 0 20px;
             }
-            
+
             .cart-title {
-                font-size: 2rem;
+                font-size: 1.6rem;
             }
-            
+
             .cart-header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px;
                 align-items: flex-start;
             }
-            
+
+            .cart-header h2 {
+                font-size: 1rem;
+            }
+
             .cart-actions {
                 width: 100%;
-                justify-content: space-between;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 8px;
             }
-            
-            .cart-table {
+
+            .cart-actions .btn {
+                flex: 1 1 auto;
+                text-align: center;
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+
+            .cart-items {
+                padding: 16px;
+            }
+
+            /* Card-style rows instead of table on mobile */
+            .cart-table thead {
+                display: none;
+            }
+
+            .cart-table,
+            .cart-table tbody,
+            .cart-table tr,
+            .cart-table td {
                 display: block;
-                overflow-x: auto;
+                width: 100%;
             }
-            
+
+            .cart-table tr {
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                margin-bottom: 16px;
+                padding: 12px;
+                background: #fff;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            }
+
+            .cart-table td {
+                padding: 6px 0;
+                border-bottom: none;
+            }
+
+            /* Product column: image left, details right */
+            .cart-table td:first-child {
+                padding-bottom: 10px;
+                border-bottom: 1px solid var(--border-color);
+                margin-bottom: 8px;
+            }
+
             .product-info {
-                flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .product-image {
-                margin-bottom: 10px;
+                width: 70px;
+                height: 70px;
+                margin-right: 12px;
             }
-            
+
+            /* Price / qty / total / action: inline label + value */
+            .cart-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #888;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 2px;
+            }
+
+            /* Bottom row: qty + total + remove in a flex row */
+            .mobile-row-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 8px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .quantity-controls {
+                gap: 6px;
+            }
+
+            .quantity-btn {
+                width: 28px;
+                height: 28px;
+            }
+
+            .item-total {
+                font-size: 1rem;
+            }
+
+            .savings-badge {
+                max-width: 100%;
+                white-space: normal;
+            }
+
             .toast-container {
-                left: 20px;
-                right: 20px;
+                left: 12px;
+                right: 12px;
                 max-width: none;
+                top: 12px;
+            }
+
+            .cart-summary {
+                padding: 16px;
+            }
+
+            .summary-title {
+                font-size: 1.1rem;
             }
         }
 
@@ -611,13 +710,34 @@
             .cart-content-section .container {
                 padding: 0 10px;
             }
-            
-            .cart-items {
-                padding: 20px;
+
+            .cart-title {
+                font-size: 1.35rem;
             }
-            
-            .cart-table td {
-                padding: 15px;
+
+            .current-price,
+            .free-price {
+                font-size: 1rem;
+            }
+
+            .original-price {
+                font-size: 0.85rem;
+            }
+
+            .checkout-btn {
+                font-size: 0.95rem;
+                padding: 10px;
+            }
+
+            .continue-shopping {
+                display: block;
+                text-align: center;
+                padding: 10px;
+            }
+
+            .product-image {
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
@@ -749,7 +869,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td data-label="Price">
                                                 <div class="price-container">
                                                     <% if (isFree) { %>
                                                         <div>
@@ -781,7 +901,7 @@
                                                     <% } %>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td data-label="Quantity">
                                                 <div class="quantity-controls">
                                                     <button class="quantity-btn decrement-btn" 
                                                             onclick="updateQuantity('<%= item._id %>', 'decrement')"
@@ -796,14 +916,14 @@
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td class="item-total">
+                                            <td data-label="Total" class="item-total">
                                                 <% if (isFree) { %>
                                                     <span class="free-price">FREE</span>
                                                 <% } else { %>
                                                     <span class="current-price">₹<%= (currentPrice * item.quantity).toLocaleString('en-IN') %></span>
                                                 <% } %>
                                             </td>
-                                            <td>
+                                            <td data-label="Remove">
                                                 <button class="action-btn remove-btn" 
                                                         onclick="removeItem('<%= item._id %>')"
                                                         title="Remove item">

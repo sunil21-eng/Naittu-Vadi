@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>
         <%= title || 'My Orders' %> - Artemis
     </title>
@@ -21,6 +21,8 @@
             --light-gray: #f8f9fa;
             --border-color: #dee2e6;
             --offer-color: #ff416c;
+            --sidebar-bg: #2c3e50;
+            --sidebar-active: #3498db;
         }
 
         * {
@@ -34,25 +36,30 @@
             background-color: #f8f9fa;
             color: var(--text-color);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .orders-header-section {
             background-color: var(--light-gray);
-            padding: 60px 0 30px;
+            padding: clamp(20px, 5vw, 40px) 0 clamp(15px, 4vw, 25px);
             text-align: center;
+            margin-bottom: 25px;
         }
 
         .orders-title {
-            font-size: 2.5rem;
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
             font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--text-color);
+            margin-bottom: 10px;
+            padding: 0 15px;
         }
 
         .breadcrumb {
             justify-content: center;
             background: transparent;
-            font-size: 0.9rem;
+            font-size: clamp(0.75rem, 3vw, 0.85rem);
+            margin-bottom: 0;
+            flex-wrap: wrap;
+            padding: 0 10px;
         }
 
         .breadcrumb-item a {
@@ -60,8 +67,104 @@
             text-decoration: none;
         }
 
-        .orders-container {
-            padding: 40px 0;
+        /* Main container with sidebar */
+        .orders-page-container {
+            display: flex;
+            max-width: 98%;
+            margin: 0 auto 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            min-height: 500px;
+        }
+
+        /* Sidebar Styles */
+        .profile-sidebar {
+            width: 220px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .profile-sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .profile-sidebar-menu li {
+            margin: 0;
+        }
+
+        .profile-sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: clamp(10px, 2vw, 12px) clamp(15px, 3vw, 20px);
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+            white-space: nowrap;
+        }
+
+        .profile-sidebar-menu a:hover {
+            background-color: #34495e;
+            color: white;
+        }
+
+        .profile-sidebar-menu a.profile-active {
+            background-color: var(--sidebar-active);
+            border-left-color: #2980b9;
+            color: white;
+        }
+
+        .profile-sidebar-menu i {
+            margin-right: clamp(6px, 2vw, 8px);
+            width: 16px;
+            text-align: center;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+        }
+
+        .profile-logout {
+            padding: clamp(15px, 4vw, 20px) clamp(15px, 4vw, 20px) 10px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .profile-logout-btn {
+            width: 100%;
+            padding: clamp(10px, 2vw, 12px);
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.85rem, 3vw, 0.9rem);
+            min-height: 44px;
+        }
+
+        .profile-logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .profile-logout-btn i {
+            margin-right: 6px;
+        }
+
+        /* Main Content */
+        .orders-main-content {
+            flex: 1;
+            padding: clamp(14px, 4vw, 25px) clamp(12px, 4vw, 25px);
+            background: #ffffff;
+            overflow-x: hidden;
         }
 
         .page-header {
@@ -757,51 +860,86 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
             }
         }
 
-        /* Responsive Design */
-        @media (max-width: 1400px) {
-            .container {
-                max-width: 1320px;
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .profile-sidebar-menu a,
+            .profile-logout-btn,
+            .search-btn,
+            .filter-btn {
+                min-height: 44px;
             }
         }
 
-        @media (max-width: 1200px) {
-            .container {
-                max-width: 1140px;
-            }
-
-            .orders-table {
-                table-layout: auto;
-            }
-
-            .col-items {
-                width: auto;
-            }
-        }
-
+        /* Responsive Styles */
         @media (max-width: 992px) {
-            .container {
-                max-width: 960px;
+            .orders-page-container {
+                flex-direction: column;
+                max-width: 95%;
+            }
+            
+            .profile-sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .profile-sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+                padding-bottom: 5px;
+            }
+            
+            .profile-sidebar-menu::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .profile-sidebar-menu::-webkit-scrollbar-thumb {
+                background-color: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            
+            .profile-sidebar-menu li {
+                flex-shrink: 0;
+            }
+            
+            .profile-sidebar-menu a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                white-space: nowrap;
+                padding: 12px 15px;
+            }
+            
+            .profile-sidebar-menu a.profile-active {
+                border-left: none;
+                border-bottom-color: #2980b9;
+            }
+            
+            .profile-logout {
+                padding: 10px 15px;
+                margin-top: 10px;
+            }
+
+            .orders-main-content {
+                padding: 20px 16px;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
-                max-width: 720px;
+            .orders-page-container {
+                max-width: 100%;
+                border-radius: 0;
+                margin: 0 0 25px;
             }
 
             .orders-header-section {
-                padding: 40px 0 20px;
-            }
-
-            .orders-title {
-                font-size: 2rem;
+                margin-bottom: 15px;
             }
 
             .page-header {
@@ -848,13 +986,8 @@
         }
 
         @media (max-width: 576px) {
-            .container {
-                max-width: 540px;
-                padding: 0 15px;
-            }
-
-            .orders-container {
-                padding: 20px 0;
+            .orders-main-content {
+                padding: 15px 12px;
             }
 
             .filter-btn {
@@ -864,6 +997,19 @@
 
             .search-btn {
                 width: 100%;
+            }
+
+            .profile-sidebar-menu a {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
+            .profile-sidebar-menu i {
+                margin-right: 6px;
+            }
+
+            .profile-logout-btn {
+                padding: 12px;
             }
         }
     </style>
@@ -883,15 +1029,32 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Home</a></li>
                         <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
-                        <li class="breadcrumb-item active">My Orders</li>
+                        <li class="breadcrumb-item active" aria-current="page">My Orders</li>
                     </ol>
                 </nav>
             </div>
         </section>
 
-        <!-- Orders Content Section -->
-        <section class="orders-container">
-            <div class="container">
+        <!-- Orders Content with Sidebar -->
+        <div class="orders-page-container">
+            <!-- Sidebar -->
+            <aside class="profile-sidebar">
+                <ul class="profile-sidebar-menu">
+                    <li><a href="/profile"><i class="fas fa-user"></i> Profile</a></li>
+                    <li><a href="/my-orders" class="profile-active"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+                    <li><a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a></li>
+                    <li><a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a></li>
+                    <li><a href="/changePassword"><i class="fas fa-key"></i> Change Password</a></li>
+                </ul>
+                <div class="profile-logout">
+                    <button class="profile-logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="orders-main-content">
                 <div class="page-header">
                     <h2>Order History</h2>
                     <div class="order-count" id="orderCount">
@@ -966,8 +1129,8 @@
                         </ul>
                     </nav>
                 </div>
-            </div>
-        </section>
+            </main>
+        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
@@ -985,7 +1148,42 @@
             document.addEventListener('DOMContentLoaded', function () {
                 loadOrders();
                 setupEventListeners();
+                setupLogout();
+                highlightActiveSidebar();
             });
+
+            // Setup logout functionality
+            function setupLogout() {
+                var logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', async () => {
+                        try {
+                            const res = await fetch('/logout', { method: 'POST' });
+                            if (res.ok) {
+                                window.location.href = '/';
+                            } else {
+                                console.error('Logout failed');
+                                showToast('Logout failed. Please try again.', 'danger');
+                            }
+                        } catch (error) {
+                            console.error('Error during logout:', error);
+                            showToast('Error during logout. Please try again.', 'danger');
+                        }
+                    });
+                }
+            }
+
+            // Highlight active sidebar link
+            function highlightActiveSidebar() {
+                const currentPage = window.location.pathname;
+                const sidebarLinks = document.querySelectorAll('.profile-sidebar-menu a');
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('profile-active');
+                    if (link.getAttribute('href') === currentPage) {
+                        link.classList.add('profile-active');
+                    }
+                });
+            }
 
             // Setup event listeners
             function setupEventListeners() {
