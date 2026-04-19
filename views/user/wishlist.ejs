@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Wishlist | Your Store</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,6 +23,7 @@
       background-color: #fff;
       margin: 0;
       padding: 0;
+      overflow-x: hidden;
     }
     
     .wishlist-header {
@@ -31,16 +32,34 @@
       text-align: center;
     }
     
+    @media (max-width: 768px) {
+      .wishlist-header {
+        padding: 40px 0 30px;
+      }
+    }
+    
     .wishlist-title {
       font-size: 3rem;
       font-weight: 700;
       margin-bottom: 15px;
     }
     
+    @media (max-width: 768px) {
+      .wishlist-title {
+        font-size: 2rem;
+      }
+    }
+    
     .breadcrumb {
       justify-content: center;
       background: transparent;
       font-size: 1.1rem;
+    }
+    
+    @media (max-width: 576px) {
+      .breadcrumb {
+        font-size: 0.9rem;
+      }
     }
     
     .breadcrumb-item a {
@@ -54,6 +73,14 @@
       margin: 40px 0;
     }
     
+    @media (max-width: 992px) {
+      .wishlist-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+    
     .wishlist-table th {
       background-color: var(--light-gray);
       padding: 18px 15px;
@@ -63,6 +90,13 @@
       font-size: 1.1rem;
     }
     
+    @media (max-width: 768px) {
+      .wishlist-table th {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+      }
+    }
+    
     .wishlist-table td {
       padding: 25px 15px;
       border-bottom: 1px solid var(--border-color);
@@ -70,9 +104,25 @@
       font-size: 1rem;
     }
     
+    @media (max-width: 768px) {
+      .wishlist-table td {
+        padding: 15px 10px;
+        min-width: 140px;
+      }
+    }
+    
     .product-info {
       display: flex;
       align-items: center;
+      min-width: 280px;
+    }
+    
+    @media (max-width: 768px) {
+      .product-info {
+        flex-direction: column;
+        align-items: flex-start;
+        min-width: 200px;
+      }
     }
     
     .product-image {
@@ -84,12 +134,28 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
+    @media (max-width: 768px) {
+      .product-image {
+        width: 70px;
+        height: 70px;
+        margin-right: 12px;
+        margin-bottom: 10px;
+      }
+    }
+    
     .product-name {
       font-weight: 600;
       font-size: 1.2rem;
       margin-bottom: 8px;
       color: var(--text-color);
       text-decoration: none;
+      display: inline-block;
+    }
+    
+    @media (max-width: 768px) {
+      .product-name {
+        font-size: 1rem;
+      }
     }
     
     .product-name:hover {
@@ -108,16 +174,34 @@
       color: #28a745;
     }
     
+    @media (max-width: 768px) {
+      .current-price {
+        font-size: 1.1rem;
+      }
+    }
+    
     .free-price {
       font-weight: 700;
       font-size: 1.4rem;
       color: #dc3545;
     }
     
+    @media (max-width: 768px) {
+      .free-price {
+        font-size: 1.1rem;
+      }
+    }
+    
     .original-price {
       text-decoration: line-through;
       color: #6c757d;
       font-size: 1.1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .original-price {
+        font-size: 0.9rem;
+      }
     }
     
     .discount-badge {
@@ -131,6 +215,13 @@
       margin-right: 8px;
     }
     
+    @media (max-width: 768px) {
+      .discount-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+      }
+    }
+    
     .free-badge {
       background-color: #dc3545;
       color: white;
@@ -140,6 +231,13 @@
       font-weight: 600;
       display: inline-block;
       margin-left: 8px;
+    }
+    
+    @media (max-width: 768px) {
+      .free-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+      }
     }
     
     .savings-badge {
@@ -155,6 +253,14 @@
       max-width: 150px;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    
+    @media (max-width: 768px) {
+      .savings-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        max-width: 120px;
+      }
     }
     
     /* Offer badge for wishlist items */
@@ -173,6 +279,13 @@
       animation: pulse 2s infinite;
     }
     
+    @media (max-width: 768px) {
+      .wishlist-offer-badge {
+        font-size: 0.7rem;
+        padding: 3px 7px;
+      }
+    }
+    
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
@@ -186,6 +299,13 @@
       font-weight: 500;
       white-space: nowrap;
       display: inline-block;
+    }
+    
+    @media (max-width: 768px) {
+      .stock-status {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+      }
     }
     
     .in-stock {
@@ -205,6 +325,13 @@
       font-size: 1.4rem;
       transition: all 0.3s;
       padding: 8px;
+    }
+    
+    @media (max-width: 768px) {
+      .action-btn {
+        font-size: 1.1rem;
+        padding: 5px;
+      }
     }
     
     .remove-btn {
@@ -228,6 +355,13 @@
       white-space: nowrap;
     }
     
+    @media (max-width: 768px) {
+      .add-to-cart-btn {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+      }
+    }
+    
     .add-to-cart-btn:hover {
       background-color: #2a75e6;
       transform: translateY(-2px);
@@ -244,10 +378,22 @@
       padding: 80px 20px;
     }
     
+    @media (max-width: 768px) {
+      .empty-wishlist {
+        padding: 50px 20px;
+      }
+    }
+    
     .empty-wishlist-icon {
       font-size: 6rem;
       color: #ddd;
       margin-bottom: 25px;
+    }
+    
+    @media (max-width: 768px) {
+      .empty-wishlist-icon {
+        font-size: 4rem;
+      }
     }
     
     .empty-wishlist h3 {
@@ -255,10 +401,22 @@
       margin-bottom: 15px;
     }
     
+    @media (max-width: 768px) {
+      .empty-wishlist h3 {
+        font-size: 1.5rem;
+      }
+    }
+    
     .empty-wishlist p {
       font-size: 1.2rem;
       color: #6c757d;
       margin-bottom: 25px;
+    }
+    
+    @media (max-width: 768px) {
+      .empty-wishlist p {
+        font-size: 1rem;
+      }
     }
     
     .continue-shopping {
@@ -273,6 +431,13 @@
       transition: all 0.3s;
     }
     
+    @media (max-width: 768px) {
+      .continue-shopping {
+        padding: 12px 25px;
+        font-size: 1rem;
+      }
+    }
+    
     .continue-shopping:hover {
       background-color: #2a75e6;
       color: white;
@@ -282,6 +447,7 @@
     .product-image-container {
       position: relative;
       display: inline-block;
+      flex-shrink: 0;
     }
     
     .category-badge {
@@ -295,6 +461,14 @@
       white-space: nowrap;
       text-align: center;
       min-width: 100px;
+    }
+    
+    @media (max-width: 768px) {
+      .category-badge {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        min-width: 80px;
+      }
     }
     
     .attribute-badge {
@@ -311,6 +485,14 @@
       text-transform: capitalize;
     }
     
+    @media (max-width: 768px) {
+      .attribute-badge {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        min-width: 80px;
+      }
+    }
+    
     .product-meta {
       margin-top: 10px;
     }
@@ -321,9 +503,21 @@
       margin-bottom: 5px;
     }
     
+    @media (max-width: 768px) {
+      .product-meta-item {
+        font-size: 0.8rem;
+      }
+    }
+    
     .category-column, .attributes-column {
       min-width: 140px;
       max-width: 160px;
+    }
+    
+    @media (max-width: 992px) {
+      .category-column, .attributes-column {
+        min-width: 120px;
+      }
     }
     
     .category-column-content, .attributes-column-content {
@@ -349,6 +543,12 @@
       font-size: 0.95rem;
     }
     
+    @media (max-width: 768px) {
+      .no-attribute-text {
+        font-size: 0.8rem;
+      }
+    }
+    
     /* Price container with offer */
     .price-offer-container {
       display: flex;
@@ -368,45 +568,32 @@
       display: inline-block;
     }
     
-    @media (max-width: 768px) {
-      .wishlist-table {
-        display: block;
-        overflow-x: auto;
+    /* Table column adjustments for mobile */
+    @media (max-width: 992px) {
+      .wishlist-table th:nth-child(2),
+      .wishlist-table th:nth-child(3),
+      .wishlist-table td:nth-child(2),
+      .wishlist-table td:nth-child(3) {
+        display: none;
       }
-      
-      .product-info {
-        flex-direction: column;
-        align-items: flex-start;
+    }
+    
+    /* Container padding for mobile */
+    .container {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    
+    @media (max-width: 576px) {
+      .container {
+        padding-left: 12px;
+        padding-right: 12px;
       }
-      
-      .product-image {
-        margin-bottom: 15px;
-        width: 80px;
-        height: 80px;
-      }
-      
-      .wishlist-table td {
-        min-width: 140px;
-      }
-      
-      .category-column, .attributes-column {
-        min-width: 120px;
-      }
-      
-      .savings-badge {
-        max-width: 120px;
-        font-size: 0.8rem;
-      }
-      
-      .category-badge, .attribute-badge {
-        font-size: 0.9rem;
-        padding: 6px 12px;
-        min-width: 90px;
-      }
-      
-      .current-price {
-        font-size: 1.2rem;
-      }
+    }
+    
+    /* Row margin adjustment */
+    .wishlist-content .container {
+      overflow-x: auto;
     }
   </style>
 </head>
@@ -492,7 +679,7 @@
                         </div>
                       </div>
                     </div>
-                  </td>
+                   </td>
                   <td class="category-column">
                     <div class="category-column-content">
                       <% if (product.category && product.category.name) { %>
@@ -503,7 +690,7 @@
                         <span class="text-muted no-attribute-text">No Category</span>
                       <% } %>
                     </div>
-                  </td>
+                   </td>
                   <td class="attributes-column">
                     <div class="attributes-column-content">
                       <div class="attributes-container">
@@ -516,7 +703,7 @@
                         <% } %>
                       </div>
                     </div>
-                  </td>
+                   </td>
                   <td>
                     <% if (product.quantity > 0 && !product.isBlocked) { %>
                       <span class="stock-status in-stock">
@@ -527,7 +714,7 @@
                         Out of Stock
                       </span>
                     <% } %>
-                  </td>
+                   </td>
                   <td>
                     <div class="price-container">
                       <% if (isFree) { %>
@@ -565,12 +752,12 @@
                         <span class="current-price">₹<%= originalPrice.toLocaleString('en-IN') %></span>
                       <% } %>
                     </div>
-                  </td>
+                   </td>
                   <td>
                     <button class="action-btn remove-btn" data-product-id="<%= product._id %>" title="Remove from wishlist">
                       <i class="fas fa-trash-alt"></i>
                     </button>
-                  </td>
+                   </td>
                   <td>
                     <% if (product.quantity > 0 && !product.isBlocked) { %>
                       <button class="add-to-cart-btn" data-product-id="<%= product._id %>">
@@ -581,8 +768,8 @@
                         Unavailable
                       </button>
                     <% } %>
-                  </td>
-                </tr>
+                   </td>
+                 </tr>
               <% }) %>
             </tbody>
           </table>
@@ -697,12 +884,12 @@
         button.addEventListener("click", async function() {
           const productId = this.getAttribute("data-product-id");
           const row = document.getElementById(`wishlist-row-${productId}`);
-          const button = this;
+          const currentButton = this;
           
           // Show loading state
-          const originalText = button.innerHTML;
-          button.innerHTML = 'Adding...';
-          button.disabled = true;
+          const originalText = currentButton.innerHTML;
+          currentButton.innerHTML = 'Adding...';
+          currentButton.disabled = true;
           
           try {
             const response = await fetch('/cart/add', {
@@ -756,8 +943,8 @@
                 icon: "error",
                 confirmButtonColor: "#d33"
               });
-              button.innerHTML = originalText;
-              button.disabled = false;
+              currentButton.innerHTML = originalText;
+              currentButton.disabled = false;
             }
           } catch (error) {
             console.error("Error adding to cart:", error);
@@ -767,8 +954,8 @@
               icon: "error",
               confirmButtonColor: "#d33"
             });
-            button.innerHTML = originalText;
-            button.disabled = false;
+            currentButton.innerHTML = originalText;
+            currentButton.disabled = false;
           }
         });
       });
