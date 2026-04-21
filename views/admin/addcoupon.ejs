@@ -349,31 +349,101 @@
             font-size: 0.8rem;
         }
 
-        /* Responsive design */
+        /* ----- Responsive adjustments (no HTML changes) ----- */
         @media (max-width: 768px) {
-            .main-content {
-                padding: 20px;
+            body {
+                flex-direction: column;
             }
-            
+
+            .main-content {
+                padding: 20px 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-container {
+                padding: 20px;
+                max-width: 100%;
+            }
+
             .form-grid {
                 grid-template-columns: 1fr;
+                gap: 0;
             }
-            
+
             .form-group.full-width {
                 grid-column: span 1;
             }
-            
+
             .discount-type {
                 flex-direction: column;
+                gap: 10px;
             }
-            
+
             .form-actions {
                 flex-direction: column;
+                gap: 10px;
             }
-            
+
             .btn {
                 width: 100%;
                 justify-content: center;
+                padding: 12px 20px;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .toggle-switch {
+                flex-wrap: wrap;
+            }
+
+            .toggle-label {
+                flex: 1;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 15px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 16px;
+            }
+
+            .form-control {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.95rem;
+            }
+
+            .discount-option label {
+                padding: 10px;
+                font-size: 0.9rem;
             }
         }
     </style>

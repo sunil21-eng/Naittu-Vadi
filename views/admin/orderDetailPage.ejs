@@ -565,15 +565,163 @@
             background-color: #e53e3e;
         }
 
-        /* Responsive */
+        /* ----- Responsive adjustments (no HTML changes) ----- */
         @media (max-width: 768px) {
-            .status-display {
+            body {
+                flex-direction: column;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .page-header {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 15px;
             }
-            
+
+            .header-left {
+                flex-wrap: wrap;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .order-title h1 {
+                font-size: 24px;
+            }
+
+            .order-date {
+                font-size: 13px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .save-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .status-display {
+                gap: 10px;
+            }
+
+            .status-badge {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .details-card {
+                padding: 16px;
+            }
+
+            .compact-items-table th,
+            .compact-items-table td {
+                padding: 12px 12px;
+            }
+
+            .compact-product-cell {
+                min-width: 200px;
+            }
+
+            .compact-product-info {
+                gap: 8px;
+            }
+
+            .compact-product-image,
+            .compact-no-image {
+                width: 40px;
+                height: 40px;
+            }
+
+            .compact-product-name {
+                font-size: 13px;
+            }
+
+            .return-section {
+                padding: 16px;
+            }
+
+            .return-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn-approve,
+            .btn-reject {
+                width: 100%;
+            }
+
+            .order-summary {
+                padding: 16px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+
+            .modal-header,
+            .modal-body,
+            .modal-footer {
+                padding: 16px;
+            }
+
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 12px;
+            }
+
+            .order-title h1 {
+                font-size: 20px;
+            }
+
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
             .status-badge {
                 width: 100%;
+                justify-content: center;
+            }
+
+            .compact-items-table {
+                min-width: 600px; /* ensures horizontal scroll */
+            }
+
+            .form-select,
+            .form-textarea {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+
+            .summary-row {
+                font-size: 14px;
+            }
+
+            .summary-row.total {
+                font-size: 15px;
             }
         }
     </style>

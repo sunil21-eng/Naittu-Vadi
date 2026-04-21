@@ -497,6 +497,128 @@
             font-style: italic;
             font-size: 14px;
         }
+
+        /* ----- Responsive adjustments for mobile (no HTML changes) ----- */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .main-title {
+                font-size: 24px;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stats-card {
+                padding: 16px;
+            }
+
+            .stats-card h5 {
+                font-size: 12px;
+            }
+
+            .stats-card h2 {
+                font-size: 20px;
+            }
+
+            .search-container {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .filter-container {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .filter-dropdown {
+                width: 100%;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .order-table {
+                min-width: 1000px; /* ensures horizontal scroll */
+            }
+
+            .order-table th,
+            .order-table td {
+                padding: 12px 16px;
+            }
+
+            .pagination-container {
+                flex-wrap: wrap;
+                padding: 12px;
+            }
+
+            .pagination-button {
+                padding: 6px 12px;
+                margin: 4px 2px;
+                font-size: 13px;
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 0 20px;
+                padding: 20px;
+            }
+
+            .modal-message {
+                font-size: 16px;
+            }
+
+            .modal-button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .main-title {
+                font-size: 22px;
+            }
+
+            .order-table {
+                min-width: 900px;
+            }
+
+            .pagination-button {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+
+            .modal-content {
+                padding: 16px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-button {
+                width: 100%;
+            }
+        }
     </style>
     <!-- Inter font from Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

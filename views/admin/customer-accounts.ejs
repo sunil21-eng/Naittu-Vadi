@@ -261,6 +261,131 @@
             justify-content: flex-end;
             gap: 10px;
         }
+
+        /* ----- Responsive adjustments for mobile (no HTML changes) ----- */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .content-title {
+                font-size: 1.5rem;
+            }
+
+            .card-header {
+                padding: 1rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            /* Form controls: stack and full width */
+            .row {
+                margin: -0.25rem;
+            }
+
+            .col-lg-4,
+            .col-md-6,
+            .col-lg-2,
+            .col-md-3,
+            .col-6 {
+                width: 100%;
+                padding: 0.25rem;
+            }
+
+            .me-auto {
+                margin-right: 0;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            /* Table scrollable */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                min-width: 600px; /* Ensures horizontal scroll on small screens */
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .badge {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+            }
+
+            .pagination {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .page-link {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+                padding: 15px;
+            }
+
+            .modal-title {
+                font-size: 1.1rem;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .content-title {
+                font-size: 1.3rem;
+            }
+
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            table {
+                min-width: 500px;
+            }
+
+            .pagination {
+                gap: 0.2rem;
+            }
+
+            .page-link {
+                padding: 0.3rem 0.6rem;
+            }
+        }
     </style>
 </head>
 <body>

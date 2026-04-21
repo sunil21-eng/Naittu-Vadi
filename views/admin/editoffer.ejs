@@ -502,37 +502,114 @@
             background-color: #fff5f5;
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
+        /* ----- Responsive adjustments (no HTML changes) ----- */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
             .main-content {
-                padding: 20px;
+                padding: 20px 16px;
             }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-group.full-width {
-                grid-column: span 1;
-            }
-            
-            .offer-type {
+
+            .header {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                margin-bottom: 20px;
             }
-            
-            .form-actions {
-                flex-direction: column;
+
+            .header h1 {
+                font-size: 1.8rem;
             }
-            
-            .btn {
+
+            .back-btn {
                 width: 100%;
                 justify-content: center;
             }
-            
-            .info-row {
+
+            .form-container {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+
+            .offer-type {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 12px 20px;
+            }
+
+            .offer-info .info-row {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 5px;
+            }
+
+            .confirmation-content {
+                width: 95%;
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .confirmation-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .confirmation-btn {
+                width: 100%;
+            }
+
+            .loading {
+                width: 90%;
+                max-width: 300px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .main-content {
+                padding: 15px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-container {
+                padding: 16px;
+            }
+
+            .form-control {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.95rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
             }
         }
     </style>

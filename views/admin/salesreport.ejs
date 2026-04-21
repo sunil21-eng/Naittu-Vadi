@@ -366,39 +366,133 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .date-row {
+        /* ----- Enhanced Responsive adjustments (no HTML changes) ----- */
+        @media screen and (max-width: 768px) {
+            body {
                 flex-direction: column;
             }
+
+            .main-content {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .filter-section {
+                padding: 20px 16px;
+            }
+
             .btn-group-custom {
                 flex-direction: column;
+                gap: 8px;
             }
+
             .btn-type {
                 width: 100%;
+                min-width: unset;
             }
-            .table-header {
+
+            .date-row {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
             }
-            .download-buttons {
+
+            .date-field {
                 width: 100%;
             }
+
+            .btn-apply {
+                width: 100%;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+
+            .table-section {
+                padding: 16px;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .download-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
             .btn-download {
-                flex: 1;
+                width: 100%;
                 justify-content: center;
+            }
+
+            /* Table scrollable */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .sales-table {
+                min-width: 700px; /* ensures horizontal scroll on small screens */
+            }
+
+            .sales-table th,
+            .sales-table td {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+            }
+
+            .no-data {
+                padding: 30px 20px;
             }
         }
 
-        @media (max-width: 480px) {
+        @media screen and (max-width: 480px) {
+            .main-content {
+                padding: 15px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .filter-title {
+                font-size: 1.1rem;
+            }
+
             .stats-row {
                 grid-template-columns: 1fr;
             }
-            .main-content {
-                padding: 20px;
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .stat-icon i {
+                font-size: 20px;
+            }
+
+            .sales-table {
+                min-width: 600px;
+            }
+
+            .btn-apply {
+                padding: 12px 20px;
             }
         }
     </style>

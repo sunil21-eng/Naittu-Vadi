@@ -375,7 +375,114 @@
                 flex-direction: column;
             }
 
+            .main-content {
+                padding: 16px;
+            }
 
+            .page-header {
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
+
+            .product-form,
+            .image-section,
+            .toggle-container {
+                padding: 16px;
+            }
+
+            .form-grid {
+                gap: 12px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            input,
+            select,
+            textarea {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+
+            .btn-submit {
+                padding: 14px;
+            }
+
+            .image-upload {
+                padding: 20px 10px;
+            }
+
+            .preview-item {
+                width: 100px;
+                height: 100px;
+            }
+
+            .toggle-container {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .toggle-label {
+                font-size: 15px;
+            }
+
+            .crop-container {
+                padding: 16px;
+                width: 95%;
+            }
+
+            .crop-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .crop-actions .btn {
+                width: 100%;
+            }
+
+            #crop-image {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 12px;
+            }
+
+            .page-header {
+                font-size: 22px;
+            }
+
+            .product-form,
+            .image-section,
+            .toggle-container {
+                padding: 12px;
+            }
+
+            .image-upload p {
+                font-size: 14px;
+            }
+
+            .preview-item {
+                width: 80px;
+                height: 80px;
+            }
+
+            .toggle-container {
+                justify-content: flex-start;
+            }
+
+            .toggle-status {
+                margin-left: 10px;
+                min-width: auto;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
