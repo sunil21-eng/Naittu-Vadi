@@ -21,20 +21,6 @@
             line-height: 1.6;
         }
 
-        /* Header */
-        .header {
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .logo {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: #4a5fe8;
-        }
-
         /* Main Container */
         .main-container {
             display: flex;
@@ -142,8 +128,8 @@
             text-decoration: underline;
         }
 
-        /* Button */
-        .btn {
+        /* Login Button – renamed to avoid Bootstrap conflicts */
+        .login-btn {
             width: 100%;
             padding: 1rem;
             background-color: #4a5fe8;
@@ -156,11 +142,11 @@
             transition: background-color 0.3s, transform 0.1s;
         }
 
-        .btn:hover {
+        .login-btn:hover {
             background-color: #3a4ed1;
         }
 
-        .btn:active {
+        .login-btn:active {
             transform: scale(0.98);
         }
 
@@ -179,34 +165,6 @@
         }
 
         .signup-text a:hover {
-            text-decoration: underline;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            border-top: 1px solid #e2e8f0;
-            font-size: 0.9rem;
-            color: #64748b;
-            background-color: #f1f5f9;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .footer-links a {
-            color: #4a5fe8;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: #3a4ed1;
             text-decoration: underline;
         }
 
@@ -235,7 +193,7 @@
             color: #b91c1c;
             border: 1px solid #fecaca;
         }
-         /* Error Styling */
+        /* Error Styling */
         .error-message {
             color: #e74c3c;
             font-size: 0.8rem;
@@ -347,9 +305,7 @@
 
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="logo">Artemis</div>
-    </header>
+    <%- include('../partials/user/header') %>
 
     <!-- Main Login Form -->
     <main class="main-container">
@@ -380,7 +336,7 @@
                 <div class="alert alert-danger"><%=message%></div>
                 <%}%>
 
-                <button type="submit" class="btn">Login</button>
+                <button type="submit" class="login-btn">Login</button>
                 
                 <div class="divider">
                     <span class="divider-text">Or continue with</span>
@@ -401,14 +357,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="#">Support</a>
-            <a href="#">Company</a>
-            <a href="#">Social Media</a>
-        </div>
-        <p>&copy; <%= new Date().getFullYear() %> Artemis. All rights reserved.</p>
-    </footer>
+    <%- include('../partials/user/footer') %>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

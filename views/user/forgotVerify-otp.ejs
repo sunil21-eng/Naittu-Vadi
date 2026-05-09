@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify OTP - Artimes</title>
+    <title>Verify OTP - Artemis</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -16,19 +16,21 @@
         body {
             background-color: #f8f9fa;
             display: flex;
-            justify-content: center;
+            flex-direction: column;         /* So header/footer stack properly */
             align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
         
-        .container {
+        /* Renamed to avoid Bootstrap .container conflict */
+        .forgot-otp-verify-container {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             width: 100%;
             max-width: 400px;
             padding: 40px;
+            margin: auto;                   /* Centers vertically after header */
         }
         
         .logo {
@@ -83,10 +85,11 @@
             box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
         }
         
-        .btn {
+        /* Renamed button class to avoid Bootstrap .btn conflict */
+        .forgot-otp-verify-btn {
             width: 100%;
             padding: 12px;
-            background-color:  #4a60e0;
+            background-color: #4a60e0;
             color: white;
             border: none;
             border-radius: 6px;
@@ -97,8 +100,8 @@
             margin-bottom: 15px;
         }
         
-        .btn:hover {
-            background-color: #3a4b4b;
+        .forgot-otp-verify-btn:hover {
+            background-color: #3a50c0;       /* Consistent hover color */
         }
         
         .resend-link {
@@ -151,7 +154,7 @@
         }
         
         @media (max-width: 480px) {
-            .container {
+            .forgot-otp-verify-container {
                 padding: 30px 25px;
             }
             
@@ -163,9 +166,13 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Header -->
+    <%- include('../partials/user/header') %>
+
+    <!-- Main OTP Verification Form -->
+    <main class="forgot-otp-verify-container">
         <div class="logo">
-            <h1>Artimes</h1>
+            <h1>Artemis</h1>
         </div>
         
         <div class="form-title">
@@ -177,38 +184,51 @@
         
         <form id="verifyOtpForm">
             <div class="otp-container">
-                <input type="text" class="otp-input" id="digit1" maxlength="1" onkeyup="moveToNext(this, 'digit2')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit2" maxlength="1" onkeyup="moveToNext(this, 'digit3')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit3" maxlength="1" onkeyup="moveToNext(this, 'digit4')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit4" maxlength="1" onkeyup="moveToNext(this, 'digit5')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit5" maxlength="1" onkeyup="moveToNext(this, 'digit6')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit6" maxlength="1" onkeyup="moveToNext(this, '')" autocomplete="off">
+                <input type="text" class="otp-input" id="digit1" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit2" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit3" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit4" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit5" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit6" maxlength="1" inputmode="numeric" autocomplete="off">
             </div>
             
-            <button type="submit" class="btn">Verify OTP</button>
+            <button type="submit" class="forgot-otp-verify-btn">Verify OTP</button>
         </form>
         
         <div class="resend-link">
             Didn't receive the code? <a id="resendLink" href="javascript:void(0)" onclick="resendOtp()">Resend OTP</a>
             <span id="countdown" class="countdown"></span>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/user/footer') %>
 
     <script>
-        // OTP input navigation
-        function moveToNext(current, nextFieldId) {
-            if (current.value.length >= current.maxLength) {
-                if (nextFieldId) document.getElementById(nextFieldId).focus();
-            }
-            
-            // Auto-submit if all fields are filled
-            const allFilled = Array.from(document.querySelectorAll('.otp-input'))
-                .every(input => input.value.length === 1);
-                
-            if (allFilled) {
-                document.getElementById('verifyOtpForm').dispatchEvent(new Event('submit', {cancelable: true}));
-            }
-        }
+        // OTP input navigation & backspace handling
+        const inputs = document.querySelectorAll('.otp-input');
+
+        inputs.forEach((input, index) => {
+            // Auto-advance on input
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                // Auto-submit if all fields are filled
+                const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
+                if (allFilled) {
+                    document.getElementById('verifyOtpForm').dispatchEvent(new Event('submit', {cancelable: true}));
+                }
+            });
+
+            // Backspace: if field is empty, move to previous
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
         
         // Form submission
         document.getElementById('verifyOtpForm').addEventListener('submit', async function(e) {
@@ -237,10 +257,10 @@
                 
                 if (response.ok && data.success) {
                     showMessage('OTP verified successfully! Redirecting...', 'success');
-                    // Redirect to reset password page
+                    // Longer delay so user can read the message
                     setTimeout(() => {
                         window.location.href = data.redirectUrl || '/resetPassword';
-                    }, 1000);
+                    }, 2000);
                 } else {
                     showMessage(data.message || 'Invalid or expired OTP', 'error');
                 }
@@ -319,7 +339,6 @@
         // Start the countdown when page loads
         window.onload = function() {
             startCountdown();
-            
             // Auto-focus on first OTP input
             document.getElementById('digit1').focus();
         };

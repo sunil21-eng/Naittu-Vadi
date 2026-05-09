@@ -21,19 +21,7 @@
             line-height: 1.6;
         }
 
-        /* Header */
-        .header {
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .logo {
-            font-weight: bold;
-            font-size: 1.5rem;
-            color: #4a5fe8;
-        }
+        /* Header styles moved to partial – keep only what’s needed here */
 
         /* Main Container */
         .main-container {
@@ -321,9 +309,7 @@
 
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="logo">Artemis</div>
-    </header>
+    <%- include('../partials/user/header') %>
 
     <!-- Main Signup Form -->
     <main class="main-container">
@@ -399,6 +385,9 @@
             <p class="signin-text">Already have an account? <a href="/login">Log In</a></p>
         </div>
     </main>
+
+    <!-- Footer -->
+    <%- include('../partials/user/footer') %>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -16,19 +16,21 @@
         body {
             background-color: #f8f9fa;
             display: flex;
-            justify-content: center;
+            flex-direction: column;         /* Allow header & footer to stack */
             align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
         
-        .container {
+        /* Renamed container to avoid Bootstrap conflicts */
+        .otp-verify-container {
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             width: 100%;
             max-width: 400px;
             padding: 40px;
+            margin: auto;                  /* Center vertically after header */
         }
         
         .logo {
@@ -83,7 +85,8 @@
             box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
         }
         
-        .btn {
+        /* Renamed button class to avoid Bootstrap .btn conflicts */
+        .verify-otp-btn {
             width: 100%;
             padding: 12px;
             background-color: #4a60e0;
@@ -97,7 +100,7 @@
             margin-bottom: 15px;
         }
         
-        .btn:hover {
+        .verify-otp-btn:hover {
             background-color: #3a50c0;
         }
         
@@ -151,7 +154,7 @@
         }
         
         @media (max-width: 480px) {
-            .container {
+            .otp-verify-container {
                 padding: 30px 25px;
             }
             
@@ -163,7 +166,11 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Header -->
+    <%- include('../partials/user/header') %>
+
+    <!-- Main OTP Verification Form -->
+    <main class="otp-verify-container">
         <div class="logo">
             <h1>Artemis</h1>
         </div>
@@ -178,47 +185,58 @@
         
         <form id="verifyOtpForm">
             <div class="otp-container">
-                <input type="text" class="otp-input" id="digit1" maxlength="1" onkeyup="moveToNext(this, 'digit2')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit2" maxlength="1" onkeyup="moveToNext(this, 'digit3')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit3" maxlength="1" onkeyup="moveToNext(this, 'digit4')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit4" maxlength="1" onkeyup="moveToNext(this, 'digit5')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit5" maxlength="1" onkeyup="moveToNext(this, 'digit6')" autocomplete="off">
-                <input type="text" class="otp-input" id="digit6" maxlength="1" onkeyup="moveToNext(this, '')" autocomplete="off">
+                <input type="text" class="otp-input" id="digit1" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit2" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit3" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit4" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit5" maxlength="1" inputmode="numeric" autocomplete="off">
+                <input type="text" class="otp-input" id="digit6" maxlength="1" inputmode="numeric" autocomplete="off">
             </div>
             
-            <button type="submit" class="btn">Verify OTP</button>
+            <button type="submit" class="verify-otp-btn">Verify OTP</button>
         </form>
         
         <div class="resend-link">
             Didn't receive the code? <a id="resendLink" href="javascript:void(0)" onclick="resendOtp()" class="disabled">Resend OTP</a>
             <span id="countdown" class="countdown"></span>
         </div>
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/user/footer') %>
 
     <script>
-        // OTP input navigation
-        function moveToNext(current, nextFieldId) {
-            if (current.value.length >= current.maxLength) {
-                if (nextFieldId) document.getElementById(nextFieldId).focus();
-            }
-            
-            // Auto-submit if all fields are filled
-            const allFilled = Array.from(document.querySelectorAll('.otp-input'))
-                .every(input => input.value.length === 1);
-                
-            if (allFilled) {
-                document.getElementById('verifyOtpForm').dispatchEvent(new Event('submit', {cancelable: true}));
-            }
-        }
-        
-        // Form submission
+        // ---------- OTP input navigation & backspace handling ----------
+        const inputs = document.querySelectorAll('.otp-input');
+
+        inputs.forEach((input, index) => {
+            // Auto-advance on input
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                // Auto-submit if all filled
+                const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
+                if (allFilled) {
+                    document.getElementById('verifyOtpForm').dispatchEvent(new Event('submit', {cancelable: true}));
+                }
+            });
+
+            // Handle backspace: if field is empty, move to previous
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && input.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        // ---------- Form submission ----------
         document.getElementById('verifyOtpForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Get the complete OTP
-            const otp = Array.from(document.querySelectorAll('.otp-input'))
-                .map(input => input.value)
-                .join('');
+            const otp = Array.from(inputs).map(input => input.value).join('');
                 
             if (otp.length !== 6) {
                 showMessage('Please enter the complete 6-digit OTP', 'error');
@@ -237,11 +255,12 @@
                 const data = await response.json();
                 
                 if (data.success) {
+                    // Show success message and redirect after a visible delay
                     showSuccessMessage(data.message || 'OTP verified successfully! Redirecting...');
-                    // Redirect after a short delay
+                    // Delay increased to 2 seconds so user can definitely read the message
                     setTimeout(() => {
                         window.location.href = data.redirectUrl || '/login';
-                    }, 1000);
+                    }, 2000);
                 } else {
                     showMessage(data.message || 'Invalid or expired OTP', 'error');
                 }
@@ -251,11 +270,10 @@
             }
         });
         
-        // Resend OTP functionality
+        // ---------- Resend OTP functionality ----------
         let canResend = false;
         let countdownTime = 60;
         
-        // Start the countdown timer
         function startCountdown() {
             const countdownEl = document.getElementById('countdown');
             const resendLink = document.getElementById('resendLink');
@@ -278,7 +296,6 @@
             }, 1000);
         }
         
-        // Resend OTP function
         async function resendOtp() {
             if (!canResend) return;
             
@@ -305,38 +322,33 @@
             }
         }
         
-        // Show message function
+        // ---------- Message helpers ----------
         function showMessage(text, type) {
             const messageEl = document.getElementById('message');
             messageEl.textContent = text;
             messageEl.className = `message ${type}`;
             messageEl.style.display = 'block';
             
-            // Hide message after 5 seconds
             setTimeout(() => {
                 messageEl.style.display = 'none';
             }, 5000);
         }
         
-        // Show success message function
         function showSuccessMessage(text) {
             const successMessageEl = document.getElementById('successMessage');
             successMessageEl.textContent = text;
             successMessageEl.className = 'message success';
             successMessageEl.style.display = 'block';
             
-            // Hide message after 5 seconds
             setTimeout(() => {
                 successMessageEl.style.display = 'none';
             }, 5000);
         }
         
-        // Start the countdown when page loads
+        // ---------- Initialisation ----------
         window.onload = function() {
             startCountdown();
-            
-            // Auto-focus on first OTP input
-            document.getElementById('digit1').focus();
+            inputs[0].focus();
         };
     </script>
 </body>
