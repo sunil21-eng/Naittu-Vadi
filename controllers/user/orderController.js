@@ -1461,24 +1461,18 @@ const generateInvoice = async (req, res) => {
 // Invoice content
 const addInvoiceContent = (doc, order) => {
   const orderItems = order.orderedItem || [];
-  const subtotal = orderItems.reduce((sum, item) => {
-    const originalPrice = item.productId?.regularPrice || item.productPrice;
-    return sum + (originalPrice * item.quantity);
-  }, 0);
-  
   const discount = order.couponDiscount || 0;
-  const offerSavings = subtotal - (order.orderAmount + discount);
   const shippingCharge = order.shippingCharge || 0;
   const orderDate = new Date(order.createdAt || Date.now()).toLocaleDateString("en-IN");
 
-  // Header
-  doc.fontSize(20).font("Helvetica-Bold").fillColor("#e74c3c").text("ALLSCOUTS", 50, 50);
+  // ─── Header ───
+  doc.fontSize(20).font("Helvetica-Bold").fillColor("#e74c3c").text("Artemis", 50, 50);
   doc.fontSize(16).fillColor("#000000").text("INVOICE", 50, 80);
   doc.fontSize(10).font("Helvetica")
     .text(`Order #: ${order.orderId || order._id}`, 50, 120)
     .text(`Date: ${orderDate}`, 50, 135);
 
-  // Billing Info
+  // ─── Billing Info ───
   doc.fontSize(12).font("Helvetica-Bold").text("Billing Information:", 50, 170);
   doc.fontSize(10).font("Helvetica")
     .text(`Customer: ${order.userId?.name || "N/A"}`, 50, 190)
@@ -1486,7 +1480,7 @@ const addInvoiceContent = (doc, order) => {
     .text(`Payment Method: ${order.paymentMethod || "N/A"}`, 50, 220)
     .text(`Payment Status: ${order.paymentStatus || "N/A"}`, 50, 235);
 
-  // Shipping Info
+  // ─── Shipping Info ───
   doc.fontSize(12).font("Helvetica-Bold").text("Shipping Information:", 300, 170);
   const shippingAddress = order.deliveryAddress || {};
   if (Object.keys(shippingAddress).length > 0) {
@@ -1500,7 +1494,7 @@ const addInvoiceContent = (doc, order) => {
     doc.fontSize(10).font("Helvetica").text("Shipping address not available", 300, 190);
   }
 
-  // Table Header
+  // ─── Table Header ───
   doc.fontSize(11).font("Helvetica-Bold").fillColor("#ffffff").rect(50, 300, 500, 20).fill("#e74c3c");
   doc.fillColor("#ffffff").text("Product", 60, 305)
     .text("Size", 200, 305)
@@ -1508,41 +1502,56 @@ const addInvoiceContent = (doc, order) => {
     .text("Unit Price", 320, 305)
     .text("Total", 400, 305);
 
-  // Table Rows
+  // ─── Table Rows + calculation of totals ───
   let yPosition = 330;
+  let actualSubtotal = 0;      // sum of (item.productPrice * quantity)
+  let originalSubtotal = 0;    // sum of (originalPrice * quantity)
+
   doc.fillColor("#000000");
   orderItems.forEach((item) => {
     if (yPosition > 700) { doc.addPage(); yPosition = 50; }
     const product = item.productId || {};
     const isFree = item.productPrice === 0;
     
+    // Determine original price (before offers) – fallback to regularPrice
+    const originalPrice = item.originalPrice || product.regularPrice || item.productPrice || 0;
+    const unitPrice = item.productPrice || 0;
+    const itemTotal = unitPrice * (item.quantity || 0);
+
+    originalSubtotal += originalPrice * (item.quantity || 0);
+    actualSubtotal += itemTotal;
+
     doc.fontSize(9).font("Helvetica")
       .text(product.productName || "Product not found", 60, yPosition)
       .text(item.size || "N/A", 200, yPosition)
       .text(item.quantity || 0, 280, yPosition)
-      .text(isFree ? "FREE" : `₹${(item.productPrice || 0).toFixed(2)}`, 320, yPosition)
-      .text(isFree ? "FREE" : `₹${(item.totalProductPrice || 0).toFixed(2)}`, 400, yPosition);
+      .text(isFree ? "FREE" : `₹${unitPrice.toFixed(2)}`, 320, yPosition)
+      .text(isFree ? "FREE" : `₹${itemTotal.toFixed(2)}`, 400, yPosition);
     yPosition += 20;
   });
 
-  // Totals
+  // ─── Totals Section ───
   const totalsY = yPosition + 40;
+  const offerSavings = originalSubtotal - actualSubtotal;
+
   doc.fontSize(11).font("Helvetica-Bold")
-    .text("Subtotal:", 350, totalsY).text(`₹${subtotal.toFixed(2)}`, 450, totalsY);
-  
+    .text("Subtotal:", 350, totalsY).text(`₹${originalSubtotal.toFixed(2)}`, 450, totalsY);
+
   if (offerSavings > 0) {
     doc.text("Offer Savings:", 350, totalsY + 20).text(`-₹${offerSavings.toFixed(2)}`, 450, totalsY + 20);
   }
-  
+
   if (discount > 0) {
     const yOffset = offerSavings > 0 ? 40 : 20;
     doc.text("Coupon Discount:", 350, totalsY + yOffset).text(`-₹${discount.toFixed(2)}`, 450, totalsY + yOffset);
   }
-  
+
   doc.text("Shipping:", 350, totalsY + 60).text(`₹${shippingCharge.toFixed(2)}`, 450, totalsY + 60);
-  
-  const grandTotal = order.orderAmount || (subtotal - offerSavings - discount + shippingCharge);
-  doc.fontSize(14).text("Grand Total:", 350, totalsY + 90).text(`₹${grandTotal.toFixed(2)}`, 450, totalsY + 90);
+
+  // Grand Total = Subtotal - Offer Savings - Coupon Discount + Shipping
+  const computedGrandTotal = originalSubtotal - offerSavings - discount + shippingCharge;
+  const finalTotal = order.orderAmount || computedGrandTotal; // use order's stored amount if available
+  doc.fontSize(14).text("Grand Total:", 350, totalsY + 90).text(`₹${finalTotal.toFixed(2)}`, 450, totalsY + 90);
 
   doc.fontSize(8).font("Helvetica")
     .text("Thank you for your business!", 50, totalsY + 130)
