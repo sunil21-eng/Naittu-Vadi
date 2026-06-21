@@ -336,6 +336,17 @@
             color: #7f8c8d;
             font-style: italic;
         }
+
+        .upload-progress {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 6px;
+            text-align: center;
+            color: #2980b9;
+        }
+
         input[readonly] {
             background-color: #f5f5f5;
             cursor: not-allowed;
@@ -485,6 +496,11 @@
                 <%= JSON.stringify(product || {}) %>
             </div>
 
+            <!-- Hidden element to store Cloudinary cloud name -->
+            <div id="cloudinary-cloud-name" style="display: none;">
+                <%= cloudinaryCloudName || '' %>
+            </div>
+
             <div class="form-container">
                 <div class="product-form">
                     <form id="edit-product-form" enctype="multipart/form-data">
@@ -578,6 +594,10 @@
                         <button class="btn" id="browse-btn">Browse</button>
                     </div>
 
+                    <div id="upload-progress" class="upload-progress">
+                        Uploading images... Please wait
+                    </div>
+
                     <div class="image-preview" id="image-preview"></div>
                     <input type="hidden" id="removedImages" name="removedImages" value="">
                 </div>
@@ -588,7 +608,7 @@
                     <img id="crop-image">
                     <div class="crop-actions">
                         <button class="btn btn-cancel" id="cancel-crop">Cancel</button>
-                        <button class="btn btn-confirm" id="confirm-crop">Crop Image</button>
+                        <button class="btn btn-confirm" id="confirm-crop">Add Image</button>
                     </div>
                 </div>
             </div>
@@ -689,15 +709,25 @@
                 const categoriesDataElement = document.getElementById('categories-data');
                 const productDataElement = document.getElementById('product-data');
                 const removedImagesInput = document.getElementById('removedImages');
-                 
+                const cloudinaryCloudNameElement = document.getElementById('cloudinary-cloud-name');
+                const uploadProgress = document.getElementById('upload-progress');
 
                 // Variables
                 let cropper;
                 let currentFile;
-                const uploadedImages = [];
-                const removedImages = [];
+                const uploadedImages = []; // New images to upload
+                const removedImages = []; // Existing images to remove (Cloudinary public IDs)
                 let categories = [];
                 let product = {};
+                let cloudinaryCloudName = '';
+
+                // Get Cloudinary cloud name
+                try {
+                    cloudinaryCloudName = cloudinaryCloudNameElement.textContent.trim();
+                    console.log("Cloudinary cloud name:", cloudinaryCloudName);
+                } catch (error) {
+                    console.error("Error getting Cloudinary cloud name:", error);
+                }
 
                 // Get categories and product data from server-rendered data
                 try {
@@ -722,14 +752,14 @@
                 dropArea.addEventListener('dragover', handleDragOver);
                 dropArea.addEventListener('drop', handleDrop);
                 cancelCropBtn.addEventListener('click', closeCropModal);
-                confirmCropBtn.addEventListener('click', cropImage);
+                confirmCropBtn.addEventListener('click', addImageToPreview);
                 form.addEventListener('submit', handleFormSubmit);
                 categorySelect.addEventListener('change', updateCategoryAttributes);
                 isListedCheckbox.addEventListener('change', updateListedStatus);
-                  document.getElementById('regularPrice').addEventListener('input', calculateDiscount);
+                document.getElementById('regularPrice').addEventListener('input', calculateDiscount);
                 document.getElementById('salePrice').addEventListener('input', calculateDiscount);
 
-                 // Function to calculate discount percentage
+                // Function to calculate discount percentage
                 function calculateDiscount() {
                     const regularPrice = parseFloat(document.getElementById('regularPrice').value) || 0;
                     const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
@@ -792,7 +822,7 @@
                     document.getElementById('discount').value = product.discount || '';
                     document.getElementById('quantity').value = product.quantity || '';
 
-                      // Calculate and set discount
+                    // Calculate and set discount
                     calculateDiscount();
 
                     // Set category
@@ -808,14 +838,14 @@
                         }, 100);
                     }
 
-                    // Set isListed status - FIXED: Use isBlocked field from product
+                    // Set isListed status - use isBlocked field from product
                     isListedCheckbox.checked = !product.isBlocked;
                     updateListedStatus();
 
-                    // Display existing images
+                    // Display existing images using Cloudinary URLs
                     if (product.images && product.images.length > 0) {
-                        product.images.forEach(image => {
-                            addImagePreview(image, false);
+                        product.images.forEach(imagePublicId => {
+                            addExistingImagePreview(imagePublicId);
                         });
                     }
                 }
@@ -923,8 +953,8 @@
                     }
                 }
 
-                // Crop image and add to preview
-                function cropImage() {
+                // Add cropped image to preview (no upload yet)
+                function addImageToPreview() {
                     if (cropper) {
                         // Get cropped canvas
                         const canvas = cropper.getCroppedCanvas({
@@ -946,7 +976,7 @@
                             // Create preview
                             const reader = new FileReader();
                             reader.onload = function (e) {
-                                addImagePreview(e.target.result, true);
+                                addNewImagePreview(e.target.result, croppedFile);
                             };
 
                             reader.readAsDataURL(blob);
@@ -957,31 +987,51 @@
                     }
                 }
 
-                // Add image preview
-                function addImagePreview(src, isNew) {
+                // Add existing image preview (from Cloudinary)
+                function addExistingImagePreview(publicId) {
                     const previewItem = document.createElement('div');
                     previewItem.className = 'preview-item';
-                    previewItem.dataset.isNew = isNew;
+                    previewItem.dataset.isNew = 'false';
+                    previewItem.dataset.publicId = publicId;
 
                     const img = document.createElement('img');
-                    img.src = isNew ? src : `/uploads/productsImages/${src}`;
+                    // Construct Cloudinary URL
+                    img.src = `https://res.cloudinary.com/${cloudinaryCloudName}/image/upload/${publicId}`;
+                    img.alt = 'Product image';
 
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'remove-image';
                     removeBtn.innerHTML = '&times;';
                     removeBtn.addEventListener('click', function () {
-                        if (!isNew) {
-                            // For existing images, add to removed images list
-                            removedImages.push(src);
-                            removedImagesInput.value = removedImages.join(',');
-                        } else {
-                            // For new images, remove from uploadedImages array
-                            const index = uploadedImages.findIndex(file =>
-                                file.name === src.split('/').pop() // Simple check, might need improvement
-                            );
-                            if (index > -1) {
-                                uploadedImages.splice(index, 1);
-                            }
+                        // For existing images, add public ID to removed images list
+                        removedImages.push(publicId);
+                        removedImagesInput.value = removedImages.join(',');
+                        previewItem.remove();
+                    });
+
+                    previewItem.appendChild(img);
+                    previewItem.appendChild(removeBtn);
+                    imagePreview.appendChild(previewItem);
+                }
+
+                // Add new image preview (from file upload)
+                function addNewImagePreview(src, file) {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.dataset.isNew = 'true';
+                    previewItem.dataset.fileIndex = uploadedImages.indexOf(file);
+
+                    const img = document.createElement('img');
+                    img.src = src;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-image';
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.addEventListener('click', function () {
+                        // For new images, remove from uploadedImages array
+                        const index = uploadedImages.indexOf(file);
+                        if (index > -1) {
+                            uploadedImages.splice(index, 1);
                         }
                         previewItem.remove();
                     });
@@ -1003,13 +1053,16 @@
                     // Create FormData object
                     const formData = new FormData(form);
 
-                    // Append removed images
+                    // Append removed images (Cloudinary public IDs)
                     formData.append('removeImages', removedImagesInput.value);
 
                     // Append new images
                     uploadedImages.forEach((file, index) => {
                         formData.append('images', file);
                     });
+
+                    // Show upload progress indicator
+                    uploadProgress.style.display = 'block';
 
                     try {
                         // Submit form
@@ -1029,11 +1082,13 @@
                                 }, 1500);
                             } else {
                                 showNotification(result.message || 'Error updating product', 'error');
+                                uploadProgress.style.display = 'none';
                             }
                         }
                     } catch (error) {
                         console.error('Error submitting form:', error);
                         showNotification('Error updating product', 'error');
+                        uploadProgress.style.display = 'none';
                     }
                 }
 

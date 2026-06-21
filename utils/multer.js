@@ -1,52 +1,36 @@
-const multer=require('multer');
-const path=require('path');
-const fs= require('fs');
+const multer = require('multer');
+const path = require('path');
 
+const filterFile = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+  
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Invalid file type. Only image files (JPEG, PNG, JPG, WebP) are allowed!"), false);
+  }
+};
 
-const filterFile=(req,file,cb)=>{
+// Memory storage is essential for Cloudinary – it provides the file buffer
+const memoryStorage = multer.memoryStorage();
 
-    const allowedTypes =["image/jpeg","image/png", "image/jpg"];
-
-    if(allowedTypes.includes(file.mimetype)){
-        cb(null,true);
-    }else{
-
-        cb(new Error("Invalid file type . Only image file are allowed!"),false)
-    }
-}
-
-const createStorage= (folderName)=>{
-
-    return multer.diskStorage({
-        destination:(req,file,cb)=>{
-            const uploadPath = path.join(__dirname,`../public/uploads/${folderName}`);
-            if(!fs.existsSync(uploadPath)){
-                fs.mkdirSync(uploadPath, { recursive: true });
-
-        }
-         cb(null, uploadPath);
-         },
-
-         filename:(req,file,cb)=>{
-            const uniqueName=Date.now()+"-"+ Math.round(Math.random() * 1e9);
-            cb(null,file.fieldname+"-"+uniqueName+path.extname(file.originalname));
-         }
-
-    });
-
-}
-
+// Product upload configuration (multiple files)
 const uploadProduct = multer({
-    storage:createStorage("productsImages"),
-    limits:{fileSize:10*1024*1024,files:5 },
-    fileFilter:filterFile
-
-})
-
-const uploadProfile = multer({
-  storage: createStorage("profileImages"),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per file
+  storage: memoryStorage,
+  limits: { 
+    fileSize: 10 * 1024 * 1024, // 10MB per file
+    files: 5 
+  },
   fileFilter: filterFile
-})
+});
 
-module.exports= {uploadProduct,uploadProfile};
+// Profile upload configuration (single file)
+const uploadProfile = multer({
+  storage: memoryStorage,
+  limits: { 
+    fileSize: 5 * 1024 * 1024 // 5MB per file
+  },
+  fileFilter: filterFile
+});
+
+module.exports = { uploadProduct, uploadProfile };

@@ -531,6 +531,11 @@
     <!-- Navigation would be included here -->
     <%-include("../partials/admin/navigation.ejs")%>
     
+    <!-- Hidden element to store Cloudinary cloud name -->
+    <div id="cloudinary-cloud-name" style="display: none;">
+        <%= cloudinaryCloudName || '' %>
+    </div>
+    
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Message container for success/error alerts -->
@@ -581,8 +586,9 @@
                                 <%= (currentPage - 1) * 6 + index + 1 %>
                             </td>
                             <td>
-                                <!-- Assuming each product has an image URL, otherwise use a placeholder -->
-                                <img class="product-image" src="/uploads/productsImages/<%= p.images[0] %>"
+                                <!-- Using Cloudinary URL for product images -->
+                                <img class="product-image" 
+                                    src="<%= p.images && p.images.length > 0 ? 'https://res.cloudinary.com/' + cloudinaryCloudName + '/image/upload/' + p.images[0] : '' %>"
                                     alt="Product Image"
                                     onerror="this.src='https://placehold.co/40x40/f0f0f0/808080?text=No+Img'">
                             </td>

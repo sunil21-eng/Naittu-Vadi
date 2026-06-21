@@ -653,13 +653,10 @@
                           </div>
                         <% } %>
                         
-                        <% if (product.images && product.images.length > 0) { 
-                          let imagePath = product.images[0];
-                          if (!imagePath.startsWith('http')) {
-                            imagePath = '/uploads/productsImages/' + imagePath;
-                          }
-                        %>
-                          <img src="<%= imagePath %>" class="product-image" 
+                        <!-- Product Image - Cloudinary URL -->
+                        <% if (product.images && product.images.length > 0) { %>
+                          <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>" 
+                               class="product-image" 
                                alt="<%= product.productName %>" loading="lazy"
                                onerror="this.onerror=null; this.src='/default-product.png';">
                         <% } else { %>

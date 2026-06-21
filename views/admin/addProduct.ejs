@@ -364,6 +364,16 @@
             cursor: not-allowed;
         }
 
+        .upload-progress {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f4fd;
+            border-radius: 6px;
+            text-align: center;
+            color: #2980b9;
+        }
+
         @media (max-width: 900px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -594,6 +604,10 @@
                         <button class="btn" id="browse-btn">Browse</button>
                     </div>
 
+                    <div id="upload-progress" class="upload-progress">
+                        Uploading images... Please wait
+                    </div>
+
                     <div class="image-preview" id="image-preview"></div>
                 </div>
             </div>
@@ -603,7 +617,7 @@
                     <img id="crop-image">
                     <div class="crop-actions">
                         <button class="btn btn-cancel" id="cancel-crop">Cancel</button>
-                        <button class="btn btn-confirm" id="confirm-crop">Crop Image</button>
+                        <button class="btn btn-confirm" id="confirm-crop">Add Image</button>
                     </div>
                 </div>
             </div>
@@ -719,12 +733,13 @@
                 const isListedCheckbox = document.getElementById('isListed');
                 const isListedStatus = document.getElementById('isListedStatus');
                 const categoriesDataElement = document.getElementById('categories-data');
+                const uploadProgress = document.getElementById('upload-progress');
 
 
                 // Variables
                 let cropper;
                 let currentFile;
-                const uploadedImages = [];
+                const uploadedImages = []; // Stores File objects for upload
                 let categories = [];
 
                 // Get categories from server-rendered data
@@ -746,7 +761,7 @@
                 dropArea.addEventListener('dragover', handleDragOver);
                 dropArea.addEventListener('drop', handleDrop);
                 cancelCropBtn.addEventListener('click', closeCropModal);
-                confirmCropBtn.addEventListener('click', cropImage);
+                confirmCropBtn.addEventListener('click', addImageToPreview);
                 form.addEventListener('submit', handleFormSubmit);
                 categorySelect.addEventListener('change', updateCategoryAttributes);
                 isListedCheckbox.addEventListener('change', updateListedStatus);
@@ -918,8 +933,8 @@
                     }
                 }
 
-                // Crop image and add to preview
-                function cropImage() {
+                // Add cropped image to preview (no upload yet)
+                function addImageToPreview() {
                     if (cropper) {
                         // Get cropped canvas
                         const canvas = cropper.getCroppedCanvas({
@@ -927,18 +942,18 @@
                             height: 440
                         });
 
-                        // Convert canvas to blob
+                        // Convert canvas to blob and create preview
                         canvas.toBlob(function (blob) {
-                            // Create a new file from the blob
+                            // Create a new file from the blob for later upload
                             const croppedFile = new File([blob], currentFile.name, {
                                 type: 'image/jpeg',
                                 lastModified: Date.now()
                             });
 
-                            // Add to uploaded images array
+                            // Add to uploaded images array (will be sent to server on form submit)
                             uploadedImages.push(croppedFile);
 
-                            // Create preview
+                            // Create preview thumbnail
                             const reader = new FileReader();
                             reader.onload = function (e) {
                                 const previewItem = document.createElement('div');
@@ -986,11 +1001,14 @@
                     // Append isListed status
                     formData.append('isListed', isListedCheckbox.checked);
 
-                    // Append images
+                    // Append images (the actual files will be uploaded to Cloudinary on server)
                     uploadedImages.forEach((file, index) => {
                         formData.append('images', file);
                     });
 
+                    // Show upload progress indicator
+                    uploadProgress.style.display = 'block';
+                    
                     try {
                         // Submit form
                         const response = await fetch('/admin/addProduct', {
@@ -1009,11 +1027,13 @@
                                 }, 1500);
                             } else {
                                 showNotification(result.message || 'Error adding product', 'error');
+                                uploadProgress.style.display = 'none';
                             }
                         }
                     } catch (error) {
                         console.error('Error submitting form:', error);
                         showNotification('Error adding product', 'error');
+                        uploadProgress.style.display = 'none';
                     }
                 }
 

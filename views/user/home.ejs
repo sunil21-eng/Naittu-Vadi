@@ -1054,14 +1054,10 @@
                                     </button>
                                 </div>
 
-                                <!-- Product Image -->
-                                <% if (product.images && product.images.length > 0) {
-                                    let imagePath = product.images[0];
-                                    if (!imagePath.startsWith('http')) {
-                                        imagePath = '/uploads/productsImages/' + imagePath;
-                                    }
-                                %>
-                                    <img src="<%= imagePath %>" class="product-image card-img-top"
+                                <!-- Product Image - Now using hardcoded Cloudinary URL -->
+                                <% if (product.images && product.images.length > 0) { %>
+                                    <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>" 
+                                        class="product-image card-img-top"
                                         alt="<%= product.productName %>" loading="lazy"
                                         onerror="this.onerror=null; this.src='/images/default-product.png';">
                                 <% } else { %>
@@ -1090,7 +1086,6 @@
                                 <!-- Price Details with Offer Support -->
                                 <div class="price-container">
                                     <% if (product.hasOffer && product.discountPercentage > 0) { %>
-                                        <!-- Product with active offer -->
                                         <span class="original-price">₹<%= Number(product.originalPrice).toLocaleString('en-IN') %></span>
                                         <span class="discounted-price">₹<%= Number(product.discountedPrice).toLocaleString('en-IN') %></span>
                                         <span class="discount-badge">-<%= product.discountPercentage %>%</span>
@@ -1100,7 +1095,6 @@
                                             </div>
                                         <% } %>
                                     <% } else if (product.regularPrice && Number(product.regularPrice) > Number(product.salePrice)) { %>
-                                        <!-- Regular discount (not from offers) -->
                                         <span class="regular-price">₹<%= Number(product.regularPrice).toLocaleString('en-IN') %></span>
                                         <span class="sale-price">₹<%= Number(product.salePrice).toLocaleString('en-IN') %></span>
                                         <% const discountPercent = Math.round(((Number(product.regularPrice) - Number(product.salePrice)) / Number(product.regularPrice)) * 100); %>
@@ -1108,7 +1102,6 @@
                                             <span class="discount-percent">-<%= discountPercent %>%</span>
                                         <% } %>
                                     <% } else { %>
-                                        <!-- No discount -->
                                         <span class="sale-price">₹<%= Number(product.salePrice).toLocaleString('en-IN') %></span>
                                     <% } %>
                                 </div>

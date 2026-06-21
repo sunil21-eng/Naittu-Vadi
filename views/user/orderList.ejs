@@ -1511,22 +1511,21 @@
                 }
             }
 
-            // Helper function to get product image
+            // Helper function to get product image - NOW USING CLOUDINARY
             function getProductImage(product) {
-                if (!product || !product.images) return '/default-product.png';
+                if (!product || !product.images || !Array.isArray(product.images) || product.images.length === 0) {
+                    return '/default-product.png';
+                }
 
-                var imagePath = Array.isArray(product.images) ? product.images[0] : product.images;
+                var imagePath = product.images[0];
 
-                if (!imagePath) return '/default-product.png';
+                // If already a full URL (Cloudinary or other), return as-is
+                if (imagePath && imagePath.startsWith('http')) {
+                    return imagePath;
+                }
 
-                // Check if image path already has full URL
-                if (imagePath.startsWith('http')) return imagePath;
-
-                // Check if image path already includes uploads directory
-                if (imagePath.includes('uploads/')) return imagePath;
-
-                // Default to productsImages directory
-                return '/uploads/productsImages/' + imagePath;
+                // Build Cloudinary URL using your cloud name
+                return 'https://res.cloudinary.com/dwne1v72e/image/upload/' + imagePath;
             }
 
             // View order details - click anywhere on row

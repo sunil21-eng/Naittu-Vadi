@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Add Cropper.js CSS and JS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <style>
@@ -671,14 +670,16 @@
 
             <h1 class="edit-profile-page-title">Edit Profile</h1>
 
-            <!-- Avatar Section with data attributes -->
+            <!-- Avatar Section with Cloudinary URL -->
             <div class="edit-profile-avatar-section">
                 <div class="edit-profile-avatar-container">
                     <div class="edit-profile-avatar" id="avatarDisplay" 
-                         data-original-image="<%= user.profileImage && user.profileImage.length > 0 ? user.profileImage[0] : '' %>"
+                         data-original-image="<%= user.profileImage && user.profileImage.length > 0 ? 'https://res.cloudinary.com/dwne1v72e/image/upload/' + user.profileImage[0] : '' %>"
                          data-has-image="<%= user.profileImage && user.profileImage.length > 0 %>">
                         <% if (user.profileImage && user.profileImage.length > 0) { %>
-                            <img src="<%= user.profileImage && user.profileImage[0] ? user.profileImage[0] : '/images/default-profile.jpg' %>" id="currentAvatar" alt="Profile Image">
+                            <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= user.profileImage[0] %>" 
+                                 id="currentAvatar" alt="Profile Image"
+                                 onerror="this.onerror=null; this.src='/images/default-profile.jpg';">
                         <% } else { %>
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" id="defaultAvatar">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
@@ -703,11 +704,10 @@
                 </div>
             </div>
 
-            <!-- Form -->
+            <!-- Form (unchanged) -->
             <form id="editProfileForm" class="edit-profile-form" method="POST" enctype="multipart/form-data">
                 <h3 class="edit-profile-section-title">Personal Information</h3>
                 
-                <!-- First Name and Last Name in a row -->
                 <div class="edit-profile-form-row">
                     <div class="edit-profile-form-group">
                         <label for="firstName" class="edit-profile-form-label">First Name *</label>
@@ -738,7 +738,6 @@
                     </div>
                 </div>
 
-                <!-- Email (now editable) -->
                 <div class="edit-profile-form-group">
                     <label for="email" class="edit-profile-form-label">Email *</label>
                     <div class="edit-profile-email-container">
@@ -758,7 +757,6 @@
                     <div class="edit-profile-form-hint" id="emailHint">Click edit to change your email address</div>
                 </div>
 
-                <!-- Phone Number -->
                 <div class="edit-profile-form-group">
                     <label for="phone" class="edit-profile-form-label">Phone Number</label>
                     <input 
@@ -773,7 +771,6 @@
                     <div class="edit-profile-form-hint">10 digits starting with 6, 7, 8, or 9</div>
                 </div>
 
-                <!-- Date of Birth -->
                 <div class="edit-profile-form-group">
                     <label for="dob" class="edit-profile-form-label">Date of Birth</label>
                     <div class="edit-profile-date-container">
@@ -783,7 +780,7 @@
                                 try { 
                                     dobValue = new Date(user.dob).toISOString().split('T')[0]; 
                                 } catch(e) { 
-                                    dobValue = user.dob; // Fallback to string value if date parsing fails
+                                    dobValue = user.dob;
                                 }
                             }
                         %>
@@ -813,7 +810,7 @@
         </main>
     </div>
 
-    <!-- Footer Section -->
+    <!-- Footer -->
     <footer class="bg-light py-3 mt-3">
         <div class="container text-center">
             <p class="mb-0" style="font-size: 0.85rem;">&copy; 2023 Your Store. All rights reserved.</p>
@@ -885,11 +882,9 @@
         let croppedFile = null;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Store original email
             const emailInput = document.getElementById('email');
             originalEmail = emailInput.value;
 
-            // Form submission handler
             const form = document.getElementById('editProfileForm');
             if (form) {
                 form.addEventListener('submit', async function(e) {
@@ -898,34 +893,27 @@
                 });
             }
 
-            // File input handler for image preview
             const fileInput = document.getElementById('fileInput');
             if (fileInput) {
                 fileInput.addEventListener('change', function(e) {
                     const file = e.target.files[0];
                     if (file) {
-                        // Check file size (5MB limit)
                         if (file.size > 5 * 1024 * 1024) {
                             alert('File size must be less than 5MB');
                             this.value = '';
                             return;
                         }
-                        
-                        // Check file type
                         const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
                         if (!allowedTypes.includes(file.type)) {
                             alert('Only JPEG, PNG, and JPG images are allowed');
                             this.value = '';
                             return;
                         }
-                        
-                        // Show cropper modal
                         showCropper(file);
                     }
                 });
             }
 
-            // Phone number input formatting
             const phoneInput = document.getElementById('phone');
             if (phoneInput) {
                 phoneInput.addEventListener('input', function(e) {
@@ -937,7 +925,6 @@
                 });
             }
 
-            // Name input validation (letters only)
             const nameInputs = document.querySelectorAll('#firstName, #lastName');
             nameInputs.forEach(input => {
                 input.addEventListener('input', function(e) {
@@ -946,7 +933,6 @@
                 });
             });
 
-            // Logout functionality
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', async () => {
@@ -955,7 +941,6 @@
                         if (res.ok) {
                             window.location.href = '/';
                         } else {
-                            console.error('Logout failed');
                             alert('Logout failed. Please try again.');
                         }
                     } catch (error) {
@@ -966,27 +951,22 @@
             }
         });
 
-        // Show cropper modal with selected image
         function showCropper(file) {
             currentFile = file;
             const cropperModal = document.getElementById('cropperModal');
             const cropperImage = document.getElementById('cropperImage');
             const cropperPreview = document.querySelector('.edit-profile-cropper-preview');
             
-            // Reset cropper if already exists
             if (cropper) {
                 cropper.destroy();
                 cropper = null;
             }
             
-            // Create URL for the file
             const imageURL = URL.createObjectURL(file);
             cropperImage.src = imageURL;
             
-            // Show modal
             cropperModal.style.display = 'flex';
             
-            // Initialize cropper after image loads
             cropperImage.onload = function() {
                 cropper = new Cropper(cropperImage, {
                     aspectRatio: 1,
@@ -1002,34 +982,22 @@
             };
         }
 
-        // Close cropper modal
         function closeCropper() {
-            const cropperModal = document.getElementById('cropperModal');
-            const fileInput = document.getElementById('fileInput');
-            
-            // Hide modal
-            cropperModal.style.display = 'none';
-            
-            // Reset file input
-            fileInput.value = '';
-            
-            // Clean up cropper
+            document.getElementById('cropperModal').style.display = 'none';
+            document.getElementById('fileInput').value = '';
             if (cropper) {
                 cropper.destroy();
                 cropper = null;
             }
-            
             currentFile = null;
         }
 
-        // Apply crop and update avatar preview
         function applyCrop() {
             if (!cropper) {
                 alert('No image to crop');
                 return;
             }
             
-            // Get cropped canvas
             const canvas = cropper.getCroppedCanvas({
                 width: 300,
                 height: 300,
@@ -1042,14 +1010,12 @@
                 return;
             }
             
-            // Convert canvas to blob with proper JPEG format
             canvas.toBlob(function(blob) {
                 if (!blob) {
                     alert('Failed to create image blob');
                     return;
                 }
                 
-                // Create a new file from the blob - EXACTLY like your product page
                 croppedFile = new File([blob], currentFile.name, {
                     type: 'image/jpeg',
                     lastModified: Date.now()
@@ -1057,16 +1023,11 @@
                 
                 console.log('Cropped file created:', croppedFile);
                 
-                // Create URL for the cropped image
                 const croppedImageURL = URL.createObjectURL(blob);
-                
-                // Update avatar preview
                 updateAvatarPreview(croppedImageURL);
                 
-                // Close cropper modal
                 closeCropper();
                 
-                // Show delete button if not already present
                 let deleteButton = document.querySelector('.edit-profile-btn-delete');
                 if (!deleteButton) {
                     deleteButton = document.createElement('button');
@@ -1077,17 +1038,15 @@
                     document.querySelector('.edit-profile-avatar-actions').appendChild(deleteButton);
                 }
                 
-            }, 'image/jpeg', 0.9); // Ensure it's JPEG format with 90% quality
+            }, 'image/jpeg', 0.9);
         }
 
-        // Enable email editing
         function enableEmailEdit() {
             const emailInput = document.getElementById('email');
             const emailEditBtn = document.getElementById('emailEditBtn');
             const emailHint = document.getElementById('emailHint');
             
             if (!isEmailEditing) {
-                // Enable editing
                 emailInput.readOnly = false;
                 emailInput.style.backgroundColor = '#ffffff';
                 emailInput.style.cursor = 'text';
@@ -1095,11 +1054,8 @@
                 emailEditBtn.classList.add('cancel');
                 emailHint.textContent = 'Enter your new email address';
                 isEmailEditing = true;
-                
-                // Focus on email input
                 emailInput.focus();
             } else {
-                // Cancel editing
                 emailInput.readOnly = true;
                 emailInput.style.backgroundColor = '#f8f9fa';
                 emailInput.style.cursor = 'not-allowed';
@@ -1111,7 +1067,6 @@
             }
         }
 
-        // Update avatar preview
         function updateAvatarPreview(imageSrc) {
             const avatarDisplay = document.getElementById('avatarDisplay');
             const currentAvatar = document.getElementById('currentAvatar');
@@ -1135,23 +1090,19 @@
             }
         }
 
-        // Clear form function
         function clearForm() {
             if (confirm('Are you sure you want to clear all changes?')) {
-                // Reset form fields to original values from server-side rendering
                 document.getElementById('firstName').value = '<%= user.firstName || "" %>';
                 document.getElementById('lastName').value = '<%= user.lastName || "" %>';
                 document.getElementById('phone').value = '<%= user.phone || "" %>';
                 document.getElementById('dob').value = '<%= dobValue %>';
                 
-                // Reset email field
                 const emailInput = document.getElementById('email');
                 emailInput.value = originalEmail;
                 if (isEmailEditing) {
-                    enableEmailEdit(); // This will cancel editing mode
+                    enableEmailEdit();
                 }
                 
-                // Reset avatar using data attributes
                 const avatarDisplay = document.getElementById('avatarDisplay');
                 const originalImage = avatarDisplay.getAttribute('data-original-image');
                 const hasImage = avatarDisplay.getAttribute('data-has-image') === 'true';
@@ -1160,7 +1111,6 @@
                 const defaultAvatar = document.getElementById('defaultAvatar');
                 
                 if (hasImage && originalImage) {
-                    // Restore original image
                     if (currentAvatar) {
                         currentAvatar.src = originalImage;
                     } else {
@@ -1178,7 +1128,6 @@
                         avatarDisplay.appendChild(img);
                     }
                     
-                    // Ensure delete button exists
                     let deleteButton = document.querySelector('.edit-profile-btn-delete');
                     if (!deleteButton) {
                         deleteButton = document.createElement('button');
@@ -1189,7 +1138,6 @@
                         document.querySelector('.edit-profile-avatar-actions').appendChild(deleteButton);
                     }
                 } else {
-                    // Show default avatar
                     if (currentAvatar) {
                         currentAvatar.remove();
                     }
@@ -1197,20 +1145,15 @@
                         defaultAvatar.style.display = 'block';
                     }
                     
-                    // Remove delete button
                     const deleteButton = document.querySelector('.edit-profile-btn-delete');
                     if (deleteButton) {
                         deleteButton.remove();
                     }
                 }
                 
-                // Clear file input
                 document.getElementById('fileInput').value = '';
-                
-                // Clear cropped file
                 croppedFile = null;
                 
-                // Clear error styles
                 document.querySelectorAll('.edit-profile-form-input').forEach(input => {
                     input.classList.remove('edit-profile-error');
                 });
@@ -1219,23 +1162,19 @@
             }
         }
 
-        // Save profile function
         async function saveProfile() {
             const form = document.getElementById('editProfileForm');
             const formData = new FormData(form);
             
-            // Add cropped profile image to form data if available - EXACTLY like your product page
             if (croppedFile) {
                 formData.append('profileImage', croppedFile);
                 console.log('Appending cropped file to form data:', croppedFile);
             }
 
-            // Clear previous error styles
             document.querySelectorAll('.edit-profile-form-input').forEach(input => {
                 input.classList.remove('edit-profile-error');
             });
 
-            // Validation
             const firstName = formData.get('firstName').trim();
             const lastName = formData.get('lastName').trim();
             const email = formData.get('email').trim();
@@ -1244,7 +1183,6 @@
 
             let hasErrors = false;
 
-            // First Name validation
             if (!firstName) {
                 document.getElementById('firstName').classList.add('edit-profile-error');
                 alert('First name is required!');
@@ -1255,7 +1193,6 @@
                 hasErrors = true;
             }
 
-            // Last Name validation
             if (!lastName) {
                 document.getElementById('lastName').classList.add('edit-profile-error');
                 alert('Last name is required!');
@@ -1266,7 +1203,6 @@
                 hasErrors = true;
             }
 
-            // Email validation
             if (!email) {
                 document.getElementById('email').classList.add('edit-profile-error');
                 alert('Email is required!');
@@ -1277,14 +1213,12 @@
                 hasErrors = true;
             }
 
-            // Phone validation
             if (phone && !/^[6-9]\d{9}$/.test(phone)) {
                 document.getElementById('phone').classList.add('edit-profile-error');
                 alert('Phone number should be 10 digits starting with 6, 7, 8, or 9!');
                 hasErrors = true;
             }
 
-            // DOB validation
             if (dob) {
                 const dobDate = new Date(dob);
                 const currentDate = new Date();
@@ -1298,7 +1232,6 @@
 
             if (!hasErrors) {
                 try {
-                    console.log('Sending form data to server...');
                     const response = await fetch('/editProfile', {
                         method: 'POST',
                         body: formData
@@ -1308,7 +1241,6 @@
 
                     if (data.success) {
                         if (data.requiresOtp) {
-                            // Show OTP modal if email was changed
                             document.getElementById('otpMessage').textContent = `We've sent a verification code to ${email}. Please enter it below:`;
                             document.getElementById('otpModal').style.display = 'flex';
                         } else {
@@ -1327,7 +1259,6 @@
             }
         }
 
-        // Delete profile image
         async function deleteProfileImage() {
             if (confirm('Are you sure you want to delete your profile image?')) {
                 try {
@@ -1338,7 +1269,6 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        // Reset avatar to default
                         const avatarDisplay = document.getElementById('avatarDisplay');
                         const currentAvatar = document.getElementById('currentAvatar');
                         const defaultAvatar = document.getElementById('defaultAvatar');
@@ -1359,13 +1289,11 @@
                             avatarDisplay.appendChild(svg);
                         }
                         
-                        // Remove delete button
                         const deleteButton = document.querySelector('.edit-profile-btn-delete');
                         if (deleteButton) {
                             deleteButton.remove();
                         }
                         
-                        // Clear cropped file
                         croppedFile = null;
                         
                         alert('Profile image deleted successfully!');
@@ -1379,7 +1307,6 @@
             }
         }
 
-        // OTP Functions
         async function verifyOtp() {
             const otp = document.getElementById('otpInput').value;
             

@@ -636,12 +636,10 @@
                             var itemSavings = (originalPrice - paidPrice) * item.quantity;
                             if (itemSavings > 0) totalItemsSavings += itemSavings;
                             
+                            // ✅ Updated: Cloudinary URL
                             var imagePath = '';
                             if (product.images && product.images.length > 0) {
-                                imagePath = product.images[0];
-                                if (imagePath && !imagePath.startsWith('http') && !imagePath.startsWith('/')) {
-                                    imagePath = '/uploads/productsImages/' + imagePath;
-                                }
+                                imagePath = 'https://res.cloudinary.com/dwne1v72e/image/upload/' + product.images[0];
                             }
                         %>
                         <div class="order-item">

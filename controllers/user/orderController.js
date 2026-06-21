@@ -762,20 +762,12 @@ const orderSuccessPage = async (req, res, next) => {
       shippingAddress: shippingAddress
     };
 
-    // Process product images for proper display
+    // ============================================================
+    // ✅ FIXED: No longer prepend /uploads/productsImages/
+    // ============================================================
     if (order.orderedItem && order.orderedItem.length > 0) {
       order.orderedItem.forEach(item => {
-        if (item.productId && item.productId.images && item.productId.images.length > 0) {
-          // Ensure images have proper paths
-          item.productId.images = item.productId.images.map(img => {
-            if (img.startsWith('http') || img.startsWith('/')) {
-              return img;
-            }
-            return `/uploads/productsImages/${img}`;
-          });
-        }
-        
-        // Check if item was free (100% off)
+        // Only mark if item was free
         item.isFree = item.productPrice === 0;
       });
     }
@@ -1112,18 +1104,12 @@ const getUserOrderDetails = async (req, res) => {
     const addressDoc = await Address.findById(order.deliveryAddress).lean();
     const shippingAddress = addressDoc?.address?.[0] || null;
 
+    // ============================================================
+    // ✅ FIXED: No longer prepend /uploads/productsImages/
+    // ============================================================
     if (order.orderedItem?.length) {
       order.orderedItem.forEach((item) => {
-        const product = item.productId;
-        if (product?.images?.length) {
-          product.images = product.images.map((img) =>
-            img && !img.startsWith("/uploads/productsImages/")
-              ? `/uploads/productsImages/${img}`
-              : img
-          );
-        }
-        
-        // Check if item was free
+        // Only mark if item was free
         item.isFree = item.productPrice === 0;
       });
     }

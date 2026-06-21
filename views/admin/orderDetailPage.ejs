@@ -884,7 +884,8 @@
                                         <td class="compact-product-cell">
                                             <div class="compact-product-info">
                                                 <% if (item.productId && item.productId.images && item.productId.images.length > 0) { %>
-                                                    <img src="/uploads/productsImages/<%= item.productId.images[0] %>" 
+                                                    <!-- Hardcoded Cloudinary cloud name -->
+                                                    <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= item.productId.images[0] %>" 
                                                          alt="<%= item.productId.productName %>" 
                                                          class="compact-product-image"
                                                          onerror="this.src='https://placehold.co/50x50/f0f0f0/808080?text=No+Img'">

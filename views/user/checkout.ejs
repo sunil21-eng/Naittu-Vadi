@@ -577,7 +577,11 @@
                                 %>
                                     <div class="d-flex mb-3 pb-3 border-bottom <%= !item.isAvailable ? 'unavailable-item' : '' %>">
                                         <% if (item.productId && item.productId.images && item.productId.images.length > 0) { %>
-                                            <img src="/uploads/productsImages/<%= item.productId.images[0] %>" alt="<%= item.productId.productName %>" class="product-image me-3" onerror="this.onerror=null; this.src='/images/placeholder.jpg';">
+                                            <!-- Updated: Cloudinary image URL -->
+                                            <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= item.productId.images[0] %>" 
+                                                 alt="<%= item.productId.productName %>" 
+                                                 class="product-image me-3" 
+                                                 onerror="this.onerror=null; this.src='/images/placeholder.jpg';">
                                         <% } else { %>
                                             <div class="product-image-placeholder me-3">
                                                 <i class="fas fa-image fa-lg"></i>

@@ -836,13 +836,10 @@
                                             data-is-blocked="<%= item.isBlocked %>">
                                             <td>
                                                 <div class="product-info">
-                                                    <% if (item.productId?.images && item.productId.images.length > 0) { 
-                                                        let imagePath = item.productId.images[0];
-                                                        if (!imagePath.startsWith('http')) {
-                                                            imagePath = '/uploads/productsImages/' + imagePath;
-                                                        }
-                                                    %>
-                                                        <img src="<%= imagePath %>" class="product-image" 
+                                                    <% if (item.productId?.images && item.productId.images.length > 0) { %>
+                                                        <!-- Updated: Cloudinary image URL -->
+                                                        <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= item.productId.images[0] %>" 
+                                                             class="product-image" 
                                                              alt="<%= item.productId?.productName %>" loading="lazy"
                                                              onerror="this.onerror=null; this.src='/default-product.png';">
                                                     <% } else { %>

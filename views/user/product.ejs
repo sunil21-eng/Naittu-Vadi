@@ -881,8 +881,10 @@
                         </button>
                     </div>
 
-                    <img id="main-product-image" src="/uploads/productsImages/<%= product.images[0] %>"
-                        alt="<%= product.productName %>" class="product-image">
+                    <!-- Main product image - now using Cloudinary -->
+                    <img id="main-product-image" 
+                         src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>"
+                         alt="<%= product.productName %>" class="product-image">
                     <div class="zoom-controls-container" id="zoom-controls">
                         <button class="zoom-control" id="zoom-out" title="Zoom Out">
                             <i class="fas fa-search-minus"></i>
@@ -897,9 +899,10 @@
                 </div>
                 <div class="thumbnail-container">
                     <% product.images.forEach(function(image, index) { %>
-                        <img src="/uploads/productsImages/<%= image %>" alt="Thumbnail <%= index + 1 %>"
-                            class="thumbnail <%= index === 0 ? 'active' : '' %>"
-                            onclick="changeImage(this, '/uploads/productsImages/<%= image %>')">
+                        <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= image %>" 
+                             alt="Thumbnail <%= index + 1 %>"
+                             class="thumbnail <%= index === 0 ? 'active' : '' %>"
+                             onclick="changeImage(this, 'https://res.cloudinary.com/dwne1v72e/image/upload/<%= image %>')">
                     <% }); %>
                 </div>
             </div>
@@ -1081,7 +1084,8 @@
                                     <a href="/product/<%= relatedProduct._id %>"
                                         style="text-decoration: none; color: inherit;">
                                         <div class="related-product-image-container">
-                                            <img src="/uploads/productsImages/<%= relatedProduct.images[0] %>"
+                                            <!-- Related product image - now using Cloudinary -->
+                                            <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= relatedProduct.images[0] %>"
                                                 alt="<%= relatedProduct.productName %>" class="related-product-image">
                                         </div>
                                         <div class="related-product-body">

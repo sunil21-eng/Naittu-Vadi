@@ -544,8 +544,11 @@
             <!-- User Information Section -->
             <div class="profile-user-section">
                 <div class="profile-user-avatar">
+                    <!-- ✅ Updated: Cloudinary URL -->
                     <% if (user.profileImage && user.profileImage.length > 0) { %>
-                        <img src="<%= user.profileImage && user.profileImage[0] ? user.profileImage[0] : '/images/default-profile.jpg' %>" alt="Profile Image">
+                        <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= user.profileImage[0] %>" 
+                             alt="Profile Image"
+                             onerror="this.onerror=null; this.src='/images/default-profile.jpg';">
                     <% } else { %>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-label="Default profile avatar">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
