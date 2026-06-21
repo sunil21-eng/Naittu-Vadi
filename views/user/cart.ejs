@@ -775,8 +775,8 @@
                     <a href="/#products" class="continue-shopping">Continue Shopping</a>
                 </div>
             <% } else { 
-                let totalSavings = 0;
                 let subtotal = 0;
+                let totalOriginalPrice = 0;
             %>
                 <div class="cart-header">
                     <h2>Items in Cart (<span id="item-count"><%= cart.items.length %></span>)</h2>
@@ -824,9 +824,10 @@
                                         const hasOffer = item.hasOffer && !isFree;
                                         const originalPrice = Number(item.originalPrice || item.productId?.regularPrice || 0);
                                         const currentPrice = Number(item.price || 0);
-                                        const itemSavings = hasOffer ? (originalPrice - currentPrice) * item.quantity : 0;
-                                        totalSavings += itemSavings;
-                                        subtotal += currentPrice * item.quantity;
+                                        const itemOriginalTotal = originalPrice * item.quantity;
+                                        const itemSubtotal = currentPrice * item.quantity;
+                                        subtotal += itemSubtotal;
+                                        totalOriginalPrice += itemOriginalTotal;
                                         
                                         const canDecrease = item.quantity > 1;
                                         const canIncrease = item.quantity < item.availableStock && !item.isBlocked;
@@ -917,7 +918,7 @@
                                                 <% if (isFree) { %>
                                                     <span class="free-price">FREE</span>
                                                 <% } else { %>
-                                                    <span class="current-price">₹<%= (currentPrice * item.quantity).toLocaleString('en-IN') %></span>
+                                                    <span class="current-price">₹<%= itemSubtotal.toLocaleString('en-IN') %></span>
                                                 <% } %>
                                             </td>
                                             <td data-label="Remove">
@@ -942,22 +943,16 @@
                             <span id="subtotal-display">₹<%= subtotal.toLocaleString('en-IN') %></span>
                         </div>
                         
-                        <% if (totalSavings > 0) { %>
-                        <div class="summary-row" style="color: #28a745;">
-                            <span>Total Savings:</span>
-                            <span id="savings-display">₹<%= totalSavings.toLocaleString('en-IN') %></span>
-                        </div>
-                        <% } %>
-                        
                         <div class="summary-row">
                             <span>Shipping:</span>
                             <span id="shipping-display">FREE</span>
                         </div>
                         
-                        <% if (cart.totalSavings && cart.totalSavings > 0) { %>
-                        <div class="summary-row" style="color: #28a745;">
-                            <span>Additional Offer Savings:</span>
-                            <span>₹<%= cart.totalSavings.toLocaleString('en-IN') %></span>
+                        <% const totalSavings = totalOriginalPrice - subtotal; %>
+                        <% if (totalSavings > 0) { %>
+                        <div class="summary-row" style="color: #28a745; font-weight: 600;">
+                            <span>Total Amount Saved:</span>
+                            <span id="total-savings-display">₹<%= totalSavings.toLocaleString('en-IN') %></span>
                         </div>
                         <% } %>
                         
