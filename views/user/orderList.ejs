@@ -4,9 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>
-        <%= title || 'My Orders' %> - Artemis
-    </title>
+
+    <!-- ===== SEO TITLE ===== -->
+    <title><%= title || 'My Orders' %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store</title>
+
+    <!-- ===== META DESCRIPTION ===== -->
+    <meta name="description" content="View your order history at Nattuvedi. Track your Nattu Vedi country crackers and Sivakasi crackers orders. Fast delivery and secure checkout." />
+
+    <!-- ===== META KEYWORDS ===== -->
+    <meta name="keywords" content="my orders, order history, track order, nattu vedi online shopping, Sivakasi crackers online, nattu vedi buy online, crackers online shopping cash on delivery, diwali crackers online, nattu vedi valangaiman, nattu vedi crackers, account management" />
+
+    <!-- ===== OPEN GRAPH TAGS ===== -->
+    <meta property="og:title" content="<%= title || 'My Orders' %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store" />
+    <meta property="og:description" content="View your order history at Nattuvedi. Track your Nattu Vedi country crackers and Sivakasi crackers orders. Fast delivery and secure checkout." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.nattuvedi.com/my-orders" />
+    <meta property="og:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+    <meta property="og:image:alt" content="Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Orders" />
+    <meta property="og:site_name" content="Nattuvedi.com" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= title || 'My Orders' %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store" />
+    <meta name="twitter:description" content="View your order history at Nattuvedi. Track your Nattu Vedi country crackers and Sivakasi crackers orders. Fast delivery and secure checkout." />
+    <meta name="twitter:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+
+    <!-- ===== ADDITIONAL SEO ===== -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Nattuvedi.com" />
+    <link rel="canonical" href="https://www.nattuvedi.com/my-orders" />
+
+    <!-- ===== JSON-LD STRUCTURED DATA: WebPage ===== -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "<%= title || 'My Orders' %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store",
+            "description": "View your order history at Nattuvedi. Track your Nattu Vedi country crackers and Sivakasi crackers orders.",
+            "url": "https://www.nattuvedi.com/my-orders",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "Nattuvedi.com",
+                "url": "https://www.nattuvedi.com/"
+            },
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://www.nattuvedi.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Profile",
+                        "item": "https://www.nattuvedi.com/profile"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "My Orders",
+                        "item": "https://www.nattuvedi.com/my-orders"
+                    }
+                ]
+            }
+        }
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

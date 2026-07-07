@@ -4,7 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+
+    <!-- ===== SEO TITLE ===== -->
+    <title><%= title %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store</title>
+
+    <!-- ===== META DESCRIPTION ===== -->
+    <meta name="description" content="Complete your order securely at Nattuvedi. Shop premium Nattu Vedi country crackers and Sivakasi crackers online. Fast delivery and secure payment." />
+
+    <!-- ===== META KEYWORDS ===== -->
+    <meta name="keywords" content="checkout, place order, nattu vedi online shopping, Sivakasi crackers online, nattu vedi buy online, crackers online shopping cash on delivery, diwali crackers online, nattu vedi valangaiman, nattu vedi crackers, payment, secure checkout" />
+
+    <!-- ===== OPEN GRAPH TAGS ===== -->
+    <meta property="og:title" content="<%= title %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store" />
+    <meta property="og:description" content="Complete your order securely at Nattuvedi. Shop premium Nattu Vedi country crackers and Sivakasi crackers online. Fast delivery and secure payment." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.nattuvedi.com/checkout" />
+    <meta property="og:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+    <meta property="og:image:alt" content="Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Checkout" />
+    <meta property="og:site_name" content="Nattuvedi.com" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="<%= title %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store" />
+    <meta name="twitter:description" content="Complete your order securely at Nattuvedi. Shop premium Nattu Vedi country crackers and Sivakasi crackers online. Fast delivery and secure payment." />
+    <meta name="twitter:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+
+    <!-- ===== ADDITIONAL SEO ===== -->
+    <meta name="robots" content="noindex, follow" />
+    <meta name="author" content="Nattuvedi.com" />
+    <link rel="canonical" href="https://www.nattuvedi.com/checkout" />
+
+    <!-- ===== JSON-LD STRUCTURED DATA: WebPage ===== -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "<%= title %> – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store",
+            "description": "Complete your order securely at Nattuvedi. Shop premium Nattu Vedi country crackers and Sivakasi crackers online.",
+            "url": "https://www.nattuvedi.com/checkout",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "Nattuvedi.com",
+                "url": "https://www.nattuvedi.com/"
+            },
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://www.nattuvedi.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Cart",
+                        "item": "https://www.nattuvedi.com/cart"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Checkout",
+                        "item": "https://www.nattuvedi.com/checkout"
+                    }
+                ]
+            }
+        }
+    </script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -1196,7 +1265,7 @@
                     key: razorpayResult.order.key_id,
                     amount: razorpayResult.order.amount,
                     currency: razorpayResult.order.currency,
-                    name: 'Artimes',
+                    name: 'Nattuvedi',
                     description: 'Order Payment',
                     order_id: razorpayResult.order.id,
                     handler: async function (response) {
@@ -1257,7 +1326,7 @@
                     modal: {
                         ondismiss: async function () {
                             console.log('❌ Payment modal dismissed by user');
-                            // Update payment status to failed when modal is closed
+                            // Update payment status to failed
                             await updatePaymentFailed(currentOrderId, 'Payment cancelled by user');
                             window.location.href = '/orderFailure/' + currentOrderId + '?error=Payment cancelled';
                         }

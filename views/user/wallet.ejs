@@ -3,7 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Wallet - AllScouts</title>
+
+    <!-- ===== SEO TITLE ===== -->
+    <title>My Wallet – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store</title>
+
+    <!-- ===== META DESCRIPTION ===== -->
+    <meta name="description" content="Manage your wallet at Nattuvedi. View balance, add funds, and track transactions. Shop premium Nattu Vedi country crackers and Sivakasi crackers online with ease." />
+
+    <!-- ===== META KEYWORDS ===== -->
+    <meta name="keywords" content="wallet, add money, transactions, nattu vedi online shopping, Sivakasi crackers online, nattu vedi buy online, crackers online shopping cash on delivery, diwali crackers online, nattu vedi valangaiman, nattu vedi crackers, account management, digital wallet, razorpay" />
+
+    <!-- ===== OPEN GRAPH TAGS ===== -->
+    <meta property="og:title" content="My Wallet – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store" />
+    <meta property="og:description" content="Manage your wallet at Nattuvedi. View balance, add funds, and track transactions. Shop premium Nattu Vedi country crackers and Sivakasi crackers online." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.nattuvedi.com/wallet" />
+    <meta property="og:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+    <meta property="og:image:alt" content="Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Wallet" />
+    <meta property="og:site_name" content="Nattuvedi.com" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="My Wallet – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store" />
+    <meta name="twitter:description" content="Manage your wallet at Nattuvedi. View balance, add funds, and track transactions. Shop premium Nattu Vedi country crackers and Sivakasi crackers online." />
+    <meta name="twitter:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+
+    <!-- ===== ADDITIONAL SEO ===== -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Nattuvedi.com" />
+    <link rel="canonical" href="https://www.nattuvedi.com/wallet" />
+
+    <!-- ===== JSON-LD STRUCTURED DATA: WebPage ===== -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "My Wallet – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store",
+            "description": "Manage your wallet at Nattuvedi. View balance, add funds, and track transactions.",
+            "url": "https://www.nattuvedi.com/wallet",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "Nattuvedi.com",
+                "url": "https://www.nattuvedi.com/"
+            },
+            "breadcrumb": {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://www.nattuvedi.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Profile",
+                        "item": "https://www.nattuvedi.com/profile"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Wallet",
+                        "item": "https://www.nattuvedi.com/wallet"
+                    }
+                ]
+            }
+        }
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -665,7 +734,7 @@
     <!-- Footer Section -->
     <footer class="bg-light py-3 mt-3">
         <div class="container text-center">
-            <p class="mb-0" style="font-size: clamp(0.75rem, 3vw, 0.85rem);">&copy; 2023 Your Store. All rights reserved.</p>
+            <p class="mb-0" style="font-size: clamp(0.75rem, 3vw, 0.85rem);">&copy; 2024 Nattuvedi – Artemis Crackers. All rights reserved.</p>
         </div>
     </footer>
 
@@ -734,7 +803,7 @@
                         key: '<%= TEST_KEY_ID %>',
                         amount: data.order.amount,
                         currency: data.order.currency,
-                        name: 'AllScouts Wallet',
+                        name: 'Nattuvedi Wallet',
                         description: 'Add money to wallet',
                         order_id: data.order.id,
                         handler: async function(response) {
