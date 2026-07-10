@@ -926,6 +926,9 @@ const orderFailure = async (req, res) => {
 };
 
 
+// ============================================================
+// RENDER ORDERS PAGE (kept for initial page load)
+// ============================================================
 const loadOrdersPage = async (req, res) => {
   let userData = null;
 
@@ -935,31 +938,10 @@ const loadOrdersPage = async (req, res) => {
 
     userData = await User.findById(userId);
 
-    // Fetch all orders for the user, populate products and delivery address
-    const orders = await Orders.find({ userId })
-      .populate("orderedItem.productId")
-      .populate("deliveryAddress")
-      .sort({ createdAt: -1 })
-      .lean();
-
-    // Calculate savings for each order
-    const ordersWithSavings = orders.map(order => {
-      let subtotal = 0;
-      order.orderedItem.forEach(item => {
-        const originalPrice = item.productId?.regularPrice || item.productPrice;
-        subtotal += originalPrice * item.quantity;
-      });
-      
-      return {
-        ...order,
-        subtotal,
-        totalSavings: subtotal - order.orderAmount
-      };
-    });
-
+    // We don't need to fetch orders here anymore since the frontend
+    // will fetch them via API. Just render the page with user data.
     res.render("user/orderList", {
       user: userData,
-      orders: ordersWithSavings,
       title: "My Orders",
     });
   } catch (error) {
@@ -971,8 +953,9 @@ const loadOrdersPage = async (req, res) => {
   }
 };
 
-
-// Get user's orders with search and pagination
+// ============================================================
+// API: GET USER'S ORDERS WITH SEARCH, FILTER & PAGINATION
+// ============================================================
 const getUserOrders = async (req, res) => {
   try {
     const userId = req.session.user?._id;
@@ -980,21 +963,33 @@ const getUserOrders = async (req, res) => {
       return res.json({ success: false, message: "User not authenticated" });
     }
 
-    const { page = 1, limit = 10, search } = req.query;
+    const { page = 1, limit = 10, search, status } = req.query;
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
+    // Build base filter
     let filter = { userId };
 
+    // Add status filter if provided and not 'all'
+    if (status && status !== 'all') {
+      filter.orderStatus = status;
+    }
+
+    // Add search filter if provided
     if (search && search.trim()) {
       const searchTerm = search.trim();
       const searchRegex = { $regex: searchTerm, $options: "i" };
 
+      // Search by order number
       const orderNumberFilter = { orderNumber: searchRegex };
 
+      // Search by product name or description
       const matchingProducts = await Product.find({
-        $or: [{ productName: searchRegex }, { description: searchRegex }],
+        $or: [
+          { productName: searchRegex }, 
+          { description: searchRegex }
+        ],
       }).select("_id");
 
       const productIds = matchingProducts.map((p) => p._id);
@@ -1008,17 +1003,18 @@ const getUserOrders = async (req, res) => {
           ],
         };
       } else {
+        // If no products match, still search by order number
         filter = { ...filter, ...orderNumberFilter };
       }
     }
 
+    // Execute queries in parallel
     const [totalOrders, orders] = await Promise.all([
       Orders.countDocuments(filter),
       Orders.find(filter)
         .populate({
           path: "orderedItem.productId",
-          select:
-            "productName images salePrice regularPrice discount description",
+          select: "productName images salePrice regularPrice discount description",
         })
         .populate({
           path: "deliveryAddress",
@@ -1032,22 +1028,62 @@ const getUserOrders = async (req, res) => {
 
     const totalPages = Math.ceil(totalOrders / limitNum);
 
+    // Format orders for frontend
     const formattedOrders = orders.map((order) => {
+      // Calculate subtotal
       let subtotal = 0;
-      order.orderedItem?.forEach(item => {
-        const originalPrice = item.productId?.regularPrice || item.productPrice;
-        subtotal += originalPrice * item.quantity;
-      });
-      
+      if (order.orderedItem && order.orderedItem.length > 0) {
+        order.orderedItem.forEach(item => {
+          const originalPrice = item.productId?.regularPrice || item.productPrice || 0;
+          subtotal += originalPrice * (item.quantity || 1);
+        });
+      }
+
+      // Format date
+      const formattedDate = order.createdAt 
+        ? new Date(order.createdAt).toLocaleDateString('en-IN', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: '2-digit' 
+          }) 
+        : '';
+
       return {
-        ...order,
-        displayOrderId: order.orderNumber
-          ? order.orderNumber.slice(0, 8).toUpperCase()
-          : order._id.toString().slice(-8).toUpperCase(),
-        formattedDate: new Date(order.createdAt).toLocaleString("en-IN"),
-        subtotal,
-        finalAmount: order.orderAmount || 0,
-        totalSavings: subtotal - order.orderAmount
+        _id: order._id,
+        orderNumber: order.orderNumber || '',
+        orderStatus: order.orderStatus || 'Pending',
+        paymentStatus: order.paymentStatus || 'Pending',
+        paymentMethod: order.paymentMethod || '',
+        orderAmount: order.orderAmount || 0,
+        finalAmount: order.finalAmount || order.orderAmount || 0,
+        couponDiscount: order.couponDiscount || 0,
+        couponCode: order.couponCode || null,
+        createdAt: order.createdAt,
+        formattedDate: formattedDate,
+        orderedItem: (order.orderedItem || []).map(item => ({
+          quantity: item.quantity || 1,
+          size: item.size || '',
+          productPrice: item.productPrice || 0,
+          isFree: item.productPrice === 0,
+          productId: {
+            _id: item.productId?._id,
+            productName: item.productId?.productName || 'Product Unavailable',
+            images: item.productId?.images || [],
+            regularPrice: item.productId?.regularPrice || 0,
+            salePrice: item.productId?.salePrice || 0,
+            description: item.productId?.description || '',
+            discount: item.productId?.discount || 0
+          }
+        })),
+        deliveryAddress: order.deliveryAddress || null,
+        subtotal: subtotal,
+        totalSavings: subtotal - (order.orderAmount || 0),
+        razorpayOrderId: order.razorpayOrderId || '',
+        razorpayPaymentId: order.razorpayPaymentId || '',
+        paymentDate: order.paymentDate || null,
+        shippingDate: order.shippingDate || null,
+        returnApproved: order.returnApproved || false,
+        isRefunded: order.isRefunded || false
       };
     });
 
@@ -1060,7 +1096,7 @@ const getUserOrders = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching user orders:", error);
-    res.json({
+    res.status(500).json({
       success: false,
       message: "Failed to fetch orders",
       error: error.message,
@@ -1068,7 +1104,6 @@ const getUserOrders = async (req, res) => {
   }
 };
 
-// Get single order details
 const getUserOrderDetails = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -1088,8 +1123,7 @@ const getUserOrderDetails = async (req, res) => {
     const order = await Orders.findOne({ _id: orderId, userId })
       .populate({
         path: "orderedItem.productId",
-        select:
-          "productName images salePrice regularPrice discount description quantity",
+        select: "productName images salePrice regularPrice discount description quantity",
       })
       .lean();
 
@@ -1104,38 +1138,36 @@ const getUserOrderDetails = async (req, res) => {
     const addressDoc = await Address.findById(order.deliveryAddress).lean();
     const shippingAddress = addressDoc?.address?.[0] || null;
 
-    // ============================================================
-    // ✅ FIXED: No longer prepend /uploads/productsImages/
-    // ============================================================
+    // Mark free items
     if (order.orderedItem?.length) {
       order.orderedItem.forEach((item) => {
-        // Only mark if item was free
         item.isFree = item.productPrice === 0;
       });
     }
 
+    // Calculate subtotal
     let subtotal = 0;
     order.orderedItem?.forEach(item => {
-      const originalPrice = item.productId?.regularPrice || item.productPrice;
-      subtotal += originalPrice * item.quantity;
+      const originalPrice = item.productId?.regularPrice || item.productPrice || 0;
+      subtotal += originalPrice * (item.quantity || 1);
     });
 
     const orderData = {
       ...order,
       displayOrderId: order.orderNumber
-        ? order.orderNumber.slice(0, 8).toUpperCase()
+        ? order.orderNumber
         : order._id.toString().slice(-8).toUpperCase(),
       formattedDate: new Date(order.createdAt).toLocaleString("en-IN"),
       subtotal,
       shippingAddress,
       finalAmount: order.orderAmount || subtotal,
-      totalSavings: subtotal - order.orderAmount
+      totalSavings: subtotal - (order.orderAmount || 0)
     };
 
     res.render("user/orderDetails", {
       order: orderData,
       user: userData,
-      title: `Order ${orderData.displayOrderId}`,
+      title: `Order #${orderData.displayOrderId}`,
     });
   } catch (error) {
     console.error("Error fetching order details:", error);
@@ -1150,6 +1182,64 @@ const getUserOrderDetails = async (req, res) => {
   }
 };
 
+
+const getOrderDetailsAPI = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.session.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Not authenticated" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ success: false, message: "Invalid order ID" });
+    }
+
+    const order = await Orders.findOne({ _id: orderId, userId })
+      .populate({
+        path: "orderedItem.productId",
+        select: "productName images salePrice regularPrice discount description",
+      })
+      .populate("deliveryAddress")
+      .lean();
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    // Calculate subtotal
+    let subtotal = 0;
+    if (order.orderedItem && order.orderedItem.length > 0) {
+      order.orderedItem.forEach(item => {
+        const originalPrice = item.productId?.regularPrice || item.productPrice || 0;
+        subtotal += originalPrice * (item.quantity || 1);
+      });
+    }
+
+    const formattedOrder = {
+      ...order,
+      formattedDate: order.createdAt 
+        ? new Date(order.createdAt).toLocaleString("en-IN") 
+        : '',
+      subtotal,
+      finalAmount: order.orderAmount || subtotal,
+      totalSavings: subtotal - (order.orderAmount || 0)
+    };
+
+    res.json({
+      success: true,
+      order: formattedOrder
+    });
+
+  } catch (error) {
+    console.error("Error fetching order details:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch order details"
+    });
+  }
+};
 
 // Cancel entire order
 const cancelOrder = async (req, res) => {
@@ -1684,6 +1774,7 @@ module.exports = {
     orderSuccessPage,
     loadOrdersPage,
     getUserOrders,
+     getOrderDetailsAPI,
     getUserOrderDetails,
     cancelOrder,
     cancelItem,
