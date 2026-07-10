@@ -42,7 +42,7 @@ const processImages = async (files, folderName) => {
     try {
       // Resize image in-memory
       const resizedBuffer = await sharp(file.buffer)
-        .resize(440, 440, { fit: 'cover' })
+        .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
         .toBuffer();
 
       // Upload to Cloudinary

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -180,12 +179,14 @@
             border-radius: 6px;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa; /* light background for letterboxing */
         }
 
+        /* ===== CHANGED: Show full rectangular image without cropping ===== */
         .preview-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;  /* was cover – now shows the whole image */
         }
 
         .remove-image {
@@ -232,6 +233,8 @@
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .btn-cancel {
@@ -248,6 +251,14 @@
 
         .btn-confirm:hover {
             background-color: #27ae60;
+        }
+
+        .btn-skip {
+            background-color: #95a5a6;
+        }
+
+        .btn-skip:hover {
+            background-color: #7f8c8d;
         }
 
         #crop-image {
@@ -412,6 +423,11 @@
                 height: 100px;
             }
 
+            /* ensure contain persists on mobile */
+            .preview-item img {
+                object-fit: contain;
+            }
+
             .toggle-container {
                 flex-wrap: wrap;
                 gap: 12px;
@@ -462,6 +478,10 @@
             .preview-item {
                 width: 80px;
                 height: 80px;
+            }
+
+            .preview-item img {
+                object-fit: contain;
             }
 
             .toggle-container {
@@ -603,12 +623,14 @@
                 </div>
             </div>
 
+            <!-- Crop Modal with Skip button -->
             <div class="crop-modal" id="crop-modal">
                 <div class="crop-container">
                     <img id="crop-image">
                     <div class="crop-actions">
                         <button class="btn btn-cancel" id="cancel-crop">Cancel</button>
-                        <button class="btn btn-confirm" id="confirm-crop">Add Image</button>
+                        <button class="btn btn-skip" id="skip-crop">Skip Crop (Use Original)</button>
+                        <button class="btn btn-confirm" id="confirm-crop">Crop & Add</button>
                     </div>
                 </div>
             </div>
@@ -616,7 +638,6 @@
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.5/jquery.validate.min.js"></script>
-
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
         <script>
@@ -684,11 +705,8 @@
                             min: "Quantity cannot be negative"
                         }
                     }
-
                 })
             });
-
-
 
             document.addEventListener('DOMContentLoaded', function () {
                 // Elements
@@ -701,6 +719,7 @@
                 const cropImageElem = document.getElementById('crop-image');
                 const cancelCropBtn = document.getElementById('cancel-crop');
                 const confirmCropBtn = document.getElementById('confirm-crop');
+                const skipCropBtn = document.getElementById('skip-crop');
                 const categorySelect = document.getElementById('category');
                 const categoryAttributeSelect = document.getElementById('categoryAttribute');
                 const notificationElem = document.getElementById('notification');
@@ -752,7 +771,8 @@
                 dropArea.addEventListener('dragover', handleDragOver);
                 dropArea.addEventListener('drop', handleDrop);
                 cancelCropBtn.addEventListener('click', closeCropModal);
-                confirmCropBtn.addEventListener('click', addImageToPreview);
+                confirmCropBtn.addEventListener('click', addCroppedImageToPreview);
+                skipCropBtn.addEventListener('click', addOriginalImageToPreview);
                 form.addEventListener('submit', handleFormSubmit);
                 categorySelect.addEventListener('change', updateCategoryAttributes);
                 isListedCheckbox.addEventListener('change', updateListedStatus);
@@ -768,7 +788,7 @@
                     
                     if (regularPrice > 0 && salePrice < regularPrice) {
                         discount = ((regularPrice - salePrice) / regularPrice) * 100;
-                        discount = Math.round(discount * 100) / 100; // Round to 2 decimal places
+                        discount = Math.round(discount * 100) / 100;
                     }
                     
                     document.getElementById('discount').value = discount;
@@ -787,10 +807,7 @@
 
                 // Populate categories dropdown
                 function populateCategories(categories) {
-                    // Clear loading message
                     categorySelect.innerHTML = '<option value="">Select category</option>';
-
-                    // Add categories from server
                     categories.forEach(category => {
                         if (category.isListed) {
                             const option = document.createElement('option');
@@ -800,8 +817,6 @@
                             categorySelect.appendChild(option);
                         }
                     });
-
-                    // If no categories found, show message
                     if (categorySelect.options.length === 1) {
                         const option = document.createElement('option');
                         option.value = "";
@@ -822,15 +837,11 @@
                     document.getElementById('discount').value = product.discount || '';
                     document.getElementById('quantity').value = product.quantity || '';
 
-                    // Calculate and set discount
                     calculateDiscount();
 
-                    // Set category
                     if (product.category && product.category.name) {
                         categorySelect.value = product.category.name;
                         updateCategoryAttributes();
-
-                        // Set category attribute after a short delay to ensure options are populated
                         setTimeout(() => {
                             if (product.categoryAttribute) {
                                 document.getElementById('categoryAttribute').value = product.categoryAttribute;
@@ -838,11 +849,9 @@
                         }, 100);
                     }
 
-                    // Set isListed status - use isBlocked field from product
                     isListedCheckbox.checked = !product.isBlocked;
                     updateListedStatus();
 
-                    // Display existing images using Cloudinary URLs
                     if (product.images && product.images.length > 0) {
                         product.images.forEach(imagePublicId => {
                             addExistingImagePreview(imagePublicId);
@@ -850,21 +859,16 @@
                     }
                 }
 
-                // Update category attributes based on selected category
+                // Update category attributes
                 function updateCategoryAttributes() {
                     const selectedOption = categorySelect.options[categorySelect.selectedIndex];
-
-                    // Check if a valid category is selected
                     if (!selectedOption.value) {
                         categoryAttributeSelect.innerHTML = '<option value="">Select category first</option>';
                         return;
                     }
-
                     const attributes = selectedOption.dataset.attributes ?
                         JSON.parse(selectedOption.dataset.attributes) : [];
-
                     categoryAttributeSelect.innerHTML = '<option value="">Select attribute</option>';
-
                     if (attributes.length === 0) {
                         const option = document.createElement('option');
                         option.value = "";
@@ -873,7 +877,6 @@
                         categoryAttributeSelect.appendChild(option);
                         return;
                     }
-
                     attributes.forEach(attr => {
                         const option = document.createElement('option');
                         option.value = attr;
@@ -882,36 +885,18 @@
                     });
                 }
 
-                // Handle file selection
-                function handleFileSelect(e) {
-                    const files = e.target.files;
-                    if (files.length > 0) {
-                        processFiles(files);
-                    }
-                }
-
-                // Handle drag over
+                // File handling functions
+                function handleFileSelect(e) { processFiles(e.target.files); }
                 function handleDragOver(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropArea.style.borderColor = '#3498db';
-                    dropArea.style.backgroundColor = '#f8fcff';
+                    e.preventDefault(); e.stopPropagation();
+                    dropArea.style.borderColor = '#3498db'; dropArea.style.backgroundColor = '#f8fcff';
                 }
-
-                // Handle drop
                 function handleDrop(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropArea.style.borderColor = '#ccc';
-                    dropArea.style.backgroundColor = 'transparent';
-
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        processFiles(files);
-                    }
+                    e.preventDefault(); e.stopPropagation();
+                    dropArea.style.borderColor = '#ccc'; dropArea.style.backgroundColor = 'transparent';
+                    processFiles(e.dataTransfer.files);
                 }
 
-                // Process selected files
                 function processFiles(files) {
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
@@ -921,180 +906,143 @@
                     }
                 }
 
-                // Open crop modal
+                // Cropper functions – free aspect ratio, high quality
                 function openCropModal(file) {
                     currentFile = file;
                     const reader = new FileReader();
-
                     reader.onload = function (e) {
                         cropImageElem.src = e.target.result;
                         cropModal.style.display = 'flex';
-
-                        // Initialize cropper
-                        if (cropper) {
-                            cropper.destroy();
-                        }
-
+                        if (cropper) { cropper.destroy(); }
                         cropper = new Cropper(cropImageElem, {
-                            aspectRatio: 1,
+                            aspectRatio: NaN,
                             viewMode: 1,
-                            autoCropArea: 0.8
+                            autoCropArea: 0.8,
+                            responsive: true
                         });
                     };
-
                     reader.readAsDataURL(file);
                 }
 
-                // Close crop modal
                 function closeCropModal() {
                     cropModal.style.display = 'none';
-                    if (cropper) {
-                        cropper.destroy();
-                    }
+                    if (cropper) { cropper.destroy(); cropper = null; }
                 }
 
-                // Add cropped image to preview (no upload yet)
-                function addImageToPreview() {
+                function addCroppedImageToPreview() {
                     if (cropper) {
-                        // Get cropped canvas
-                        const canvas = cropper.getCroppedCanvas({
-                            width: 440,
-                            height: 440
-                        });
+                        const canvas = cropper.getCroppedCanvas();
+                        const maxDimension = 1200;
+                        let w = canvas.width, h = canvas.height;
+                        if (w > maxDimension || h > maxDimension) {
+                            const ratio = Math.min(maxDimension / w, maxDimension / h);
+                            w = Math.round(w * ratio); h = Math.round(h * ratio);
+                        }
+                        const finalCanvas = document.createElement('canvas');
+                        finalCanvas.width = w; finalCanvas.height = h;
+                        const ctx = finalCanvas.getContext('2d');
+                        ctx.drawImage(canvas, 0, 0, w, h);
 
-                        // Convert canvas to blob
-                        canvas.toBlob(function (blob) {
-                            // Create a new file from the blob
+                        finalCanvas.toBlob(function (blob) {
                             const croppedFile = new File([blob], currentFile.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
+                                type: 'image/jpeg', lastModified: Date.now()
                             });
-
-                            // Add to uploaded images array
                             uploadedImages.push(croppedFile);
-
-                            // Create preview
                             const reader = new FileReader();
                             reader.onload = function (e) {
                                 addNewImagePreview(e.target.result, croppedFile);
                             };
-
                             reader.readAsDataURL(blob);
-
-                            // Close modal
                             closeCropModal();
-                        }, 'image/jpeg', 0.9);
+                        }, 'image/jpeg', 1.0);
                     }
                 }
 
-                // Add existing image preview (from Cloudinary)
+                function addOriginalImageToPreview() {
+                    if (!currentFile) { closeCropModal(); return; }
+                    uploadedImages.push(currentFile);
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        addNewImagePreview(e.target.result, currentFile);
+                    };
+                    reader.readAsDataURL(currentFile);
+                    closeCropModal();
+                }
+
+                // Image preview functions
                 function addExistingImagePreview(publicId) {
                     const previewItem = document.createElement('div');
                     previewItem.className = 'preview-item';
                     previewItem.dataset.isNew = 'false';
                     previewItem.dataset.publicId = publicId;
-
                     const img = document.createElement('img');
-                    // Construct Cloudinary URL
                     img.src = `https://res.cloudinary.com/${cloudinaryCloudName}/image/upload/${publicId}`;
                     img.alt = 'Product image';
-
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'remove-image';
                     removeBtn.innerHTML = '&times;';
                     removeBtn.addEventListener('click', function () {
-                        // For existing images, add public ID to removed images list
                         removedImages.push(publicId);
                         removedImagesInput.value = removedImages.join(',');
                         previewItem.remove();
                     });
-
                     previewItem.appendChild(img);
                     previewItem.appendChild(removeBtn);
                     imagePreview.appendChild(previewItem);
                 }
 
-                // Add new image preview (from file upload)
                 function addNewImagePreview(src, file) {
                     const previewItem = document.createElement('div');
                     previewItem.className = 'preview-item';
                     previewItem.dataset.isNew = 'true';
                     previewItem.dataset.fileIndex = uploadedImages.indexOf(file);
-
                     const img = document.createElement('img');
                     img.src = src;
-
                     const removeBtn = document.createElement('button');
                     removeBtn.className = 'remove-image';
                     removeBtn.innerHTML = '&times;';
                     removeBtn.addEventListener('click', function () {
-                        // For new images, remove from uploadedImages array
                         const index = uploadedImages.indexOf(file);
-                        if (index > -1) {
-                            uploadedImages.splice(index, 1);
-                        }
+                        if (index > -1) uploadedImages.splice(index, 1);
                         previewItem.remove();
                     });
-
                     previewItem.appendChild(img);
                     previewItem.appendChild(removeBtn);
                     imagePreview.appendChild(previewItem);
                 }
 
-                // Handle form submission
+                // Form submission
                 async function handleFormSubmit(e) {
                     e.preventDefault();
-
-                    // Validate form
-                    if (!validateForm()) {
-                        return;
-                    }
-
-                    // Create FormData object
+                    if (!validateForm()) return;
                     const formData = new FormData(form);
-
-                    // Append removed images (Cloudinary public IDs)
                     formData.append('removeImages', removedImagesInput.value);
-
-                    // Append new images
-                    uploadedImages.forEach((file, index) => {
-                        formData.append('images', file);
-                    });
-
-                    // Show upload progress indicator
+                    uploadedImages.forEach((file) => formData.append('images', file));
                     uploadProgress.style.display = 'block';
-
                     try {
-                        // Submit form
                         const response = await fetch(`/admin/productLists/edit/<%= product._id %>`, {
-                            method: 'POST',
-                            body: formData
+                            method: 'POST', body: formData
                         });
-
                         if (response.redirected) {
                             window.location.href = response.url;
                         } else {
                             const result = await response.json();
                             if (result.success) {
                                 showNotification('Product updated successfully!', 'success');
-                                setTimeout(() => {
-                                    window.location.href = '/admin/productLists';
-                                }, 1500);
+                                setTimeout(() => { window.location.href = '/admin/productLists'; }, 1500);
                             } else {
                                 showNotification(result.message || 'Error updating product', 'error');
                                 uploadProgress.style.display = 'none';
                             }
                         }
                     } catch (error) {
-                        console.error('Error submitting form:', error);
+                        console.error(error);
                         showNotification('Error updating product', 'error');
                         uploadProgress.style.display = 'none';
                     }
                 }
 
-                // Validate form
                 function validateForm() {
-                    // Check required fields
                     const requiredFields = form.querySelectorAll('[required]');
                     for (let field of requiredFields) {
                         if (!field.value.trim()) {
@@ -1103,25 +1051,18 @@
                             return false;
                         }
                     }
-
-                    // Check if sale price is less than regular price
                     const regularPrice = parseFloat(document.getElementById('regularPrice').value);
                     const salePrice = parseFloat(document.getElementById('salePrice').value);
-
                     if (salePrice > regularPrice) {
                         showNotification('Sale price cannot be greater than regular price', 'error');
                         return false;
                     }
-
                     return true;
                 }
 
-                // Show notification
                 function showNotification(message, type) {
                     notificationElem.textContent = message;
                     notificationElem.className = `notification ${type}`;
-
-                    // Auto hide after 5 seconds
                     setTimeout(() => {
                         notificationElem.textContent = '';
                         notificationElem.className = 'notification';
@@ -1130,5 +1071,4 @@
             });
         </script>
 </body>
-
 </html>
