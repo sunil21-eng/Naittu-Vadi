@@ -1,5 +1,5 @@
 const passport = require("passport");
-const googleStrategy = require("passport-google-oauth20").Strategy;
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/userSchema");
 const path = require('path');
 const dotenv = require('dotenv');
@@ -8,7 +8,7 @@ dotenv.config({ path: path.join(__dirname, '/config.env') });
 console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 
 passport.use(
-  new GoogleStrategy(
+   new googleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
