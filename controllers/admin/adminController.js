@@ -74,23 +74,6 @@ const loadDash = async function (req, res) {
 
 const logout = async function (req, res) {
 
-     // try {
-     //      req.session.destroy((err) => {
-
-     //           if (err) {
-     //                console.log("Error destroying ssession", err);
-     //                return res.redirect('/admin/pageError');
-     //           }
-     //           return res.redirect("/admin/login")
-
-     //      });
-
-     // } catch (error) {
-     //      console.log("logout failed", error)
-     //      res.redirect('/admin/pageError');
-     // }
-
-     
        try {
         delete req.session.admin;  // only remove admin data
         return res.redirect('/admin/login');
