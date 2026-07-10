@@ -808,9 +808,20 @@
                                 </div>
                                 <a href="/cart" class="btn btn-warning w-100">Review Cart</a>
                             <% } else if (cartItems && cartItems.length > 0) { %>
-                                <button class="btn btn-place-order w-100 py-3 fw-bold" onclick="placeOrder()" id="placeOrderBtn">
-                                    <i class="fas fa-shopping-bag me-2"></i>PLACE ORDER
-                                </button>
+                                <!-- ===== MINIMUM ORDER CHECK ===== -->
+                                <% if (totalAmount < 1000) { %>
+                                    <div class="alert alert-danger text-center">
+                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                        Minimum order amount is ₹1,000. Please add more items to proceed.
+                                    </div>
+                                    <button class="btn btn-place-order w-100 py-3 fw-bold" disabled>
+                                        <i class="fas fa-shopping-bag me-2"></i>PLACE ORDER
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-place-order w-100 py-3 fw-bold" onclick="placeOrder()" id="placeOrderBtn">
+                                        <i class="fas fa-shopping-bag me-2"></i>PLACE ORDER
+                                    </button>
+                                <% } %>
                             <% } else { %>
                                 <a href="/products" class="btn btn-primary-custom w-100 py-3 fw-bold">
                                     <i class="fas fa-shopping-cart me-2"></i>CONTINUE SHOPPING
@@ -940,6 +951,8 @@
         let selectedAddressId = null;
         let currentOrderId = null;
         let walletBalance = 0;
+        // ===== ADD MINIMUM ORDER TOTAL FROM SERVER =====
+        const orderTotal = parseFloat('<%= totalAmount %>') || 0;
 
         // Load wallet balance on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -1006,7 +1019,7 @@
 
         // Update wallet payment option based on balance
         function updateWalletPaymentOption() {
-            var totalAmount = parseFloat('<%= totalAmount %>') || 0;
+            var totalAmount = orderTotal; // Use the global orderTotal variable
             var walletMethod = document.getElementById('walletPaymentMethod');
             var walletMessage = document.getElementById('walletMessage');
             var walletRadio = document.getElementById('wallet');
@@ -1062,7 +1075,7 @@
 
         // Special handling for wallet payment selection
         function selectWalletPayment(element) {
-            var totalAmount = parseFloat('<%= totalAmount %>') || 0;
+            var totalAmount = orderTotal; // Use global variable
             if (walletBalance < totalAmount) {
                 alert('Insufficient wallet balance. Please choose another payment method or add money to your wallet.');
                 return;
@@ -1134,6 +1147,12 @@
 
         // Enhanced place order function with wallet support
         async function placeOrder() {
+            // ===== MINIMUM ORDER CHECK (front-end guard) =====
+            if (orderTotal < 1000) {
+                alert('Minimum order amount is ₹1,000. Please add more items to proceed.');
+                return;
+            }
+
             if (!selectedAddressId) {
                 alert('Please select a shipping address');
                 return;
@@ -1146,7 +1165,7 @@
 
             // Validate wallet balance for wallet payments
             if (paymentMethod === 'Wallet') {
-                var totalAmount = parseFloat('<%= totalAmount %>') || 0;
+                var totalAmount = orderTotal;
                 if (walletBalance < totalAmount) {
                     alert('Insufficient wallet balance. Please choose another payment method.');
                     return;
@@ -1244,7 +1263,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        amount: '<%= totalAmount %>',
+                        amount: orderTotal, // Use global variable
                         orderId: currentOrderId
                     })
                 });
