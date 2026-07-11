@@ -904,11 +904,11 @@
                                                         <!-- Updated: Cloudinary image URL -->
                                                         <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= item.productId.images[0] %>" 
                                                              class="product-image" 
-                                                             alt="<%= item.productId?.productName %>" loading="lazy"
+                                                             alt="<%= item.productId?.productName %>" loading="lazy" decoding="async"
                                                              onerror="this.onerror=null; this.src='/default-product.png';">
                                                     <% } else { %>
                                                         <img src="/default-product.png" class="product-image" 
-                                                             alt="<%= item.productId?.productName %>">
+                                                             alt="<%= item.productId?.productName %>" decoding="async">
                                                     <% } %>
                                                     <div class="product-details">
                                                         <a href="/product/<%= item.productId?._id %>" class="product-name">
@@ -1042,26 +1042,39 @@
         </div>
     </section>
 
-    <script>
+        <script>
+        // ============== NETWORK REQUEST DEDUPE / SHORT-LIVED CACHE ==============
+        // Coalesces bursts of calls (click handler + visibility change + polling + page-load
+        // checks) into a single network round trip instead of several redundant ones.
+        const _cartCache = { count: null, countTime: 0, data: null, dataTime: 0 };
+        let _countInFlight = null;
+        let _dataInFlight = null;
+        const CACHE_TTL = 2000; // ms
+
+        function _setCachedCount(count) {
+            _cartCache.count = count;
+            _cartCache.countTime = Date.now();
+        }
+
         // ============== HEADER CART COUNT SYNC FUNCTIONS ==============
-        
+
         // Show toast notification
+        const toastContainer = document.getElementById('toastContainer');
         function showToast(message, type = 'success', title = '') {
-            const toastContainer = document.getElementById('toastContainer');
             const toastId = 'toast-' + Date.now();
-            
+
             const defaultTitles = {
                 success: 'Success',
-                warning: 'Warning', 
+                warning: 'Warning',
                 danger: 'Error'
             };
-            
+
             const icons = {
                 success: '✅',
                 warning: '⚠️',
                 danger: '❌'
             };
-            
+
             const toastHTML = `
                 <div class="toast ${type}" id="${toastId}">
                     <span class="toast-icon">${icons[type]}</span>
@@ -1072,9 +1085,9 @@
                     <button class="toast-close" onclick="document.getElementById('${toastId}').remove()">×</button>
                 </div>
             `;
-            
+
             toastContainer.insertAdjacentHTML('beforeend', toastHTML);
-            
+
             // Auto remove after 5 seconds
             setTimeout(() => {
                 const toastElement = document.getElementById(toastId);
@@ -1088,15 +1101,15 @@
         function updateCartCount(count) {
             // Convert to number
             const newCount = parseInt(count) || 0;
-            
+
             // Select ALL possible cart count elements with different selectors
             const cartCountElements = document.querySelectorAll('.cart-count, #cart-count, [id="cart-count"], .badge.cart-count, a[href="/cart"] .badge');
-            
+
             cartCountElements.forEach(element => {
                 if (element) {
                     const oldCount = parseInt(element.textContent) || 0;
                     element.textContent = newCount;
-                    
+
                     // Add animation if count changed
                     if (oldCount !== newCount) {
                         element.classList.add('badge-pulse');
@@ -1106,7 +1119,7 @@
                     }
                 }
             });
-            
+
             // Also try to find the cart count by parent relationship
             const cartLinks = document.querySelectorAll('a[href="/cart"]');
             cartLinks.forEach(link => {
@@ -1116,11 +1129,11 @@
                     badge.textContent = newCount;
                 }
             });
-            
+
             // Update localStorage for cross-tab sync
             try {
                 localStorage.setItem('cartCount', newCount);
-                
+
                 // Also update the cartSync object
                 const cartSync = localStorage.getItem('cartSync');
                 if (cartSync) {
@@ -1138,15 +1151,15 @@
             } catch (error) {
                 console.error('Error updating cart count in localStorage:', error);
             }
-            
+
             console.log('Cart count updated to:', newCount);
-            
+
             // Trigger custom event for header to catch
-            const event = new CustomEvent('cartCountUpdated', { 
-                detail: { cartCount: newCount } 
+            const event = new CustomEvent('cartCountUpdated', {
+                detail: { cartCount: newCount }
             });
             document.dispatchEvent(event);
-            
+
             // If header has its own sync manager, use it
             if (window.headerSync && typeof window.headerSync.updateCartCount === 'function') {
                 window.headerSync.updateCartCount(newCount);
@@ -1157,19 +1170,19 @@
         function saveCartToStorage(cartData) {
             try {
                 const count = cartData.cartCount || 0;
-                
+
                 localStorage.setItem('cartSync', JSON.stringify({
                     data: { cartCount: count },
                     timestamp: Date.now()
                 }));
-                
+
                 localStorage.setItem('cartCount', count);
-                
+
                 // Update header if header sync manager exists
                 if (window.headerSync && typeof window.headerSync.updateCartCount === 'function') {
                     window.headerSync.updateCartCount(count);
                 }
-                
+
                 console.log('Cart data saved to localStorage:', count);
             } catch (error) {
                 console.error('Error saving cart to localStorage:', error);
@@ -1180,16 +1193,16 @@
         function triggerCartUpdate(cartCount, message) {
             // First update local count
             updateCartCount(cartCount);
-            
+
             // Then dispatch events
-            const event = new CustomEvent('cartUpdated', { 
-                detail: { 
+            const event = new CustomEvent('cartUpdated', {
+                detail: {
                     cartCount: cartCount,
                     message: message || 'Cart updated'
-                } 
+                }
             });
             document.dispatchEvent(event);
-            
+
             // Also dispatch header-specific event if needed
             const headerEvent = new CustomEvent('headerCartUpdated', {
                 detail: { cartCount: cartCount }
@@ -1201,13 +1214,13 @@
         function triggerCartRemoval(cartCount, message) {
             // First update local count
             updateCartCount(cartCount);
-            
+
             // Then dispatch events
-            const event = new CustomEvent('cartItemRemoved', { 
-                detail: { 
+            const event = new CustomEvent('cartItemRemoved', {
+                detail: {
                     cartCount: cartCount,
                     message: message || 'Item removed from cart'
-                } 
+                }
             });
             document.dispatchEvent(event);
         }
@@ -1217,19 +1230,19 @@
             // If header's sync manager exists, use it
             if (window.headerSync) {
                 console.log('Header sync manager found, using it for cart updates');
-                
+
                 // Override the updateCartCount function to use header's method
                 window.originalUpdateCartCount = updateCartCount;
                 updateCartCount = function(count) {
                     window.headerSync.updateCartCount(count);
-                    
+
                     // Also update localStorage for other tabs
                     try {
                         localStorage.setItem('cartCount', parseInt(count) || 0);
                     } catch (e) {}
                 };
             }
-            
+
             // Listen for header's custom events
             document.addEventListener('cartUpdated', (event) => {
                 if (event.detail && event.detail.cartCount !== undefined) {
@@ -1240,7 +1253,7 @@
                     }
                 }
             });
-            
+
             // Listen for cart removal events
             document.addEventListener('cartItemRemoved', (event) => {
                 if (event.detail && event.detail.cartCount !== undefined) {
@@ -1248,7 +1261,7 @@
                     updateCartCount(event.detail.cartCount);
                 }
             });
-            
+
             // Listen for our own cartCountUpdated event
             document.addEventListener('cartCountUpdated', (event) => {
                 if (event.detail && event.detail.cartCount !== undefined) {
@@ -1265,17 +1278,17 @@
         // Update quantity button states based on current quantity and stock
         function updateQuantityButtons(row) {
             if (!row) return;
-            
+
             const decrementBtn = row.querySelector('.decrement-btn');
             const incrementBtn = row.querySelector('.increment-btn');
             const quantityDisplay = row.querySelector('.quantity-display');
             const availableStock = parseInt(row.getAttribute('data-available-stock') || '0');
             const isBlocked = row.getAttribute('data-is-blocked') === 'true';
-            
+
             if (!quantityDisplay) return;
-            
+
             const currentQuantity = parseInt(quantityDisplay.textContent) || 1;
-            
+
             // Update decrement button
             if (decrementBtn) {
                 if (currentQuantity <= 1 || isBlocked) {
@@ -1284,7 +1297,7 @@
                     decrementBtn.disabled = false;
                 }
             }
-            
+
             // Update increment button
             if (incrementBtn) {
                 if (currentQuantity >= availableStock || isBlocked || availableStock === 0) {
@@ -1308,18 +1321,18 @@
             const items = [];
             const rows = document.querySelectorAll('#cart-items-body tr');
             let totalQuantity = 0;
-            
+
             rows.forEach(row => {
                 const itemId = row.getAttribute('data-item-id');
                 const quantity = parseInt(row.querySelector('.quantity-display')?.textContent || '0');
                 totalQuantity += quantity;
-                
+
                 items.push({
                     _id: itemId,
                     quantity: quantity
                 });
             });
-            
+
             return {
                 items: items,
                 cartCount: totalQuantity
@@ -1333,51 +1346,74 @@
             itemCountElements.forEach(el => {
                 if (el) el.textContent = cartData.items.length;
             });
-            
+
             // Update subtotal and total
             const subtotalDisplay = document.getElementById('subtotal-display');
             const totalDisplay = document.getElementById('total-display');
-            
+
             if (subtotalDisplay) subtotalDisplay.textContent = `₹${cartData.cartTotal.toLocaleString('en-IN')}`;
             if (totalDisplay) totalDisplay.textContent = `₹${cartData.cartTotal.toLocaleString('en-IN')}`;
-            
+
             // Update cart count in header
             updateCartCount(cartData.cartCount);
-            
+
             // Update all quantity buttons
             updateAllQuantityButtons();
         }
 
-        // Fetch latest cart data from server
-        async function fetchLatestCartData() {
-            try {
-                const response = await fetch('/api/cart/data');
-                const data = await response.json();
-                
-                if (data.success) {
-                    return data.cart;
-                }
-                return null;
-            } catch (error) {
-                console.error('Error fetching cart data:', error);
-                return null;
+        // Fetch latest cart data from server (deduped + briefly cached)
+        async function fetchLatestCartData(forceRefresh = false) {
+            const now = Date.now();
+            if (!forceRefresh && _cartCache.data !== null && (now - _cartCache.dataTime) < CACHE_TTL) {
+                return _cartCache.data;
             }
+            if (_dataInFlight) return _dataInFlight;
+
+            _dataInFlight = fetch('/api/cart/data')
+                .then(response => response.json())
+                .then(data => {
+                    const cart = data.success ? data.cart : null;
+                    if (cart !== null) {
+                        _cartCache.data = cart;
+                        _cartCache.dataTime = Date.now();
+                    }
+                    return cart;
+                })
+                .catch(error => {
+                    console.error('Error fetching cart data:', error);
+                    return null;
+                })
+                .finally(() => {
+                    _dataInFlight = null;
+                });
+
+            return _dataInFlight;
         }
 
-        // Fetch cart count from server
-        async function fetchCartCount() {
-            try {
-                const response = await fetch('/api/cart/count');
-                const data = await response.json();
-                
-                if (data.success) {
-                    return data.count;
-                }
-                return null;
-            } catch (error) {
-                console.error('Error fetching cart count:', error);
-                return null;
+        // Fetch cart count from server (deduped + briefly cached)
+        async function fetchCartCount(forceRefresh = false) {
+            const now = Date.now();
+            if (!forceRefresh && _cartCache.count !== null && (now - _cartCache.countTime) < CACHE_TTL) {
+                return _cartCache.count;
             }
+            if (_countInFlight) return _countInFlight;
+
+            _countInFlight = fetch('/api/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.success ? data.count : null;
+                    if (count !== null) _setCachedCount(count);
+                    return count;
+                })
+                .catch(error => {
+                    console.error('Error fetching cart count:', error);
+                    return null;
+                })
+                .finally(() => {
+                    _countInFlight = null;
+                });
+
+            return _countInFlight;
         }
 
         // Reload cart page content
@@ -1387,20 +1423,20 @@
                 updateIndicator.style.display = 'block';
                 updateIndicator.innerHTML = '<i class="fas fa-sync-alt fa-spin me-2"></i>Cart updated from another page. Refreshing...';
             }
-            
-            // Fetch latest cart data
-            const cartData = await fetchLatestCartData();
-            
+
+            // Fetch latest cart data (force fresh, this is a real mismatch we need to resolve)
+            const cartData = await fetchLatestCartData(true);
+
             if (cartData) {
                 // Update cart count in header
                 updateCartCount(cartData.cartCount);
-                
+
                 // Save to localStorage
                 saveCartToStorage({ cartCount: cartData.cartCount });
-                
+
                 // Show notification
                 showToast('Cart updated from another page', 'success', 'Cart Updated');
-                
+
                 // Reload the page to show updated cart items
                 setTimeout(() => {
                     location.reload();
@@ -1414,22 +1450,22 @@
 
         // Check if cart has changed in localStorage
         let lastCartSync = localStorage.getItem('cartSync');
-        
+
         function checkCartChanges() {
             const currentCartSync = localStorage.getItem('cartSync');
-            
+
             if (currentCartSync && currentCartSync !== lastCartSync) {
                 try {
                     const oldData = lastCartSync ? JSON.parse(lastCartSync) : null;
                     const newData = JSON.parse(currentCartSync);
-                    
+
                     // If timestamp is different and it's not our own update
                     if (oldData && newData && oldData.timestamp !== newData.timestamp) {
                         console.log('Cart changed in another tab/page');
                         reloadCartContent();
                         return true;
                     }
-                    
+
                     lastCartSync = currentCartSync;
                 } catch (error) {
                     console.error('Error checking cart changes:', error);
@@ -1438,8 +1474,15 @@
             return false;
         }
 
+        // Guard against duplicate overlapping requests when a user double-clicks
+        // the same quantity/remove control before the first request resolves.
+        const _processingItems = new Set();
+
         // Update item quantity
         async function updateQuantity(itemId, action) {
+            if (_processingItems.has(itemId)) return;
+            _processingItems.add(itemId);
+
             try {
                 const response = await fetch('/updateQuantity', {
                     method: 'POST',
@@ -1451,25 +1494,25 @@
                         action: action
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     showToast('Quantity updated successfully', 'success');
-                    
+
                     // Update the UI without full reload
                     const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
                     if (row) {
                         const qtyDisplay = row.querySelector('.quantity-display');
                         const itemTotal = row.querySelector('.item-total .current-price');
-                        
+
                         if (qtyDisplay) qtyDisplay.textContent = data.newQuantity;
-                        
+
                         // Update row attributes for button state calculation
                         if (data.availableStock !== undefined) {
                             row.setAttribute('data-available-stock', data.availableStock);
                         }
-                        
+
                         // Check if item is free
                         const isFree = row.querySelector('.free-price') !== null;
                         if (itemTotal) {
@@ -1479,29 +1522,34 @@
                                 itemTotal.textContent = `₹${data.itemTotal.toLocaleString('en-IN')}`;
                             }
                         }
-                        
-                        // Update quantity buttons for this row
+
+                        // Update quantity buttons for this row immediately (no need to wait
+                        // for the batched MutationObserver rescan below)
                         updateQuantityButtons(row);
-                        
+
                         // Update subtotal and total
                         const subtotalDisplay = document.getElementById('subtotal-display');
                         const totalDisplay = document.getElementById('total-display');
-                        
+
                         if (subtotalDisplay) subtotalDisplay.textContent = `₹${data.cartTotal.toLocaleString('en-IN')}`;
                         if (totalDisplay) totalDisplay.textContent = `₹${data.cartTotal.toLocaleString('en-IN')}`;
-                        
+
+                        // We already know the authoritative count from this response,
+                        // so update the cache directly instead of re-fetching it later.
+                        _setCachedCount(data.cartCount);
+
                         // Get updated cart data and save to localStorage
                         const cartData = {
                             cartCount: data.cartCount
                         };
                         saveCartToStorage(cartData);
-                        
+
                         // Update cart count in header
                         updateCartCount(data.cartCount);
-                        
+
                         // Trigger cart update event
                         triggerCartUpdate(data.cartCount, 'Cart quantity updated');
-                        
+
                         // Update last sync timestamp to prevent self-trigger
                         lastCartSync = localStorage.getItem('cartSync');
                     }
@@ -1511,6 +1559,8 @@
             } catch (error) {
                 console.error('Error updating quantity:', error);
                 showToast('Error updating quantity. Please try again.', 'danger');
+            } finally {
+                _processingItems.delete(itemId);
             }
         }
 
@@ -1527,6 +1577,9 @@
                 cancelButtonText: "Cancel"
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    if (_processingItems.has(itemId)) return;
+                    _processingItems.add(itemId);
+
                     try {
                         const response = await fetch('/removeItem', {
                             method: 'POST',
@@ -1537,26 +1590,26 @@
                                 itemId: itemId
                             })
                         });
-                        
+
                         const data = await response.json();
-                        
+
                         if (data.success) {
                             // Add removing animation to row
                             const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
                             if (row) {
                                 row.classList.add('row-removing');
-                                
+
                                 // Wait for animation to complete
                                 setTimeout(() => {
                                     row.remove();
-                                    
+
                                     // Update totals with data from server
                                     const subtotalDisplay = document.getElementById('subtotal-display');
                                     const totalDisplay = document.getElementById('total-display');
-                                    
+
                                     if (subtotalDisplay) subtotalDisplay.textContent = `₹${data.cartTotal.toLocaleString('en-IN')}`;
                                     if (totalDisplay) totalDisplay.textContent = `₹${data.cartTotal.toLocaleString('en-IN')}`;
-                                    
+
                                     // Update item counts
                                     const itemCountElements = document.querySelectorAll('#item-count, #item-count-summary');
                                     itemCountElements.forEach(el => {
@@ -1565,27 +1618,30 @@
                                             el.textContent = Math.max(0, currentCount - 1);
                                         }
                                     });
-                                    
+
+                                    // We already know the authoritative count from this response.
+                                    _setCachedCount(data.cartCount);
+
                                     // Get updated cart data
                                     const cartData = {
                                         cartCount: data.cartCount
                                     };
-                                    
+
                                     // Save to localStorage for cross-tab sync
                                     saveCartToStorage(cartData);
-                                    
+
                                     // Update cart count in header
                                     updateCartCount(data.cartCount);
-                                    
+
                                     // Update quantity buttons for remaining rows
                                     updateAllQuantityButtons();
-                                    
+
                                     // Trigger cart removal event
                                     triggerCartRemoval(data.cartCount, 'Item removed from cart');
-                                    
+
                                     // Update last sync timestamp
                                     lastCartSync = localStorage.getItem('cartSync');
-                                    
+
                                     // Check if cart is empty
                                     const remainingRows = document.querySelectorAll('#cart-items-body tr').length;
                                     if (remainingRows === 0) {
@@ -1619,6 +1675,8 @@
                             icon: "error",
                             confirmButtonColor: "#d33"
                         });
+                    } finally {
+                        _processingItems.delete(itemId);
                     }
                 }
             });
@@ -1644,24 +1702,27 @@
                                 'Content-Type': 'application/json',
                             },
                         });
-                        
+
                         const data = await response.json();
-                        
+
                         if (data.success) {
+                            // We already know the authoritative count.
+                            _setCachedCount(0);
+
                             // Save empty cart to localStorage
                             saveCartToStorage({
                                 cartCount: 0
                             });
-                            
+
                             // Update cart count in header
                             updateCartCount(0);
-                            
+
                             // Trigger cart update event
                             triggerCartUpdate(0, 'Cart cleared');
-                            
+
                             // Update last sync timestamp
                             lastCartSync = localStorage.getItem('cartSync');
-                            
+
                             Swal.fire({
                                 title: "Cleared!",
                                 text: "Your cart has been cleared successfully.",
@@ -1695,35 +1756,35 @@
         // Proceed to checkout
         function proceedToCheckout() {
             const hasUnavailableItems = document.querySelector('.out-of-stock') !== null;
-            
+
             if (hasUnavailableItems) {
                 showToast('Please remove unavailable items before checkout', 'warning');
                 return;
             }
-            
+
             const cartItems = document.querySelectorAll('#cart-items-body tr');
             if (cartItems.length === 0) {
                 showToast('Your cart is empty', 'warning');
                 return;
             }
-            
+
             window.location.href = '/checkout';
         }
 
         // ============== CROSS-PAGE SYNC CODE ==============
-        
+
         // Force check for cart changes when page becomes visible
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 console.log('Page became visible, checking for cart updates...');
                 checkCartChanges();
-                
-                // Also fetch latest cart count from server
-                fetchCartCount().then(count => {
+
+                // Force-refresh: the tab may have been hidden for a while, so bypass the cache
+                fetchCartCount(true).then(count => {
                     if (count !== null) {
                         const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
                         const storedCount = parseInt(localStorage.getItem('cartCount') || '0');
-                        
+
                         // If counts don't match, reload
                         if (count !== currentCount || count !== storedCount) {
                             console.log('Cart count mismatch detected on visibility change');
@@ -1735,80 +1796,25 @@
             }
         });
 
-        // Immediate check when page loads - multiple checks to ensure sync
-        window.addEventListener('load', function() {
-            console.log('Page loaded, checking cart sync...');
-            
-            // Check 1: Compare localStorage with displayed items
-            const storedCount = parseInt(localStorage.getItem('cartCount') || '0');
-            const displayedCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-            const itemRows = document.querySelectorAll('#cart-items-body tr').length;
-            
-            console.log('Initial check - Stored:', storedCount, 'Displayed:', displayedCount, 'Rows:', itemRows);
-            
-            // If there are items in localStorage but not showing on page, reload
-            if (storedCount > 0 && itemRows === 0) {
-                console.log('Cart has items but page shows empty, reloading...');
-                reloadCartContent();
-                return;
-            }
-            
-            // If page shows items but localStorage says empty, reload
-            if (storedCount === 0 && itemRows > 0) {
-                console.log('Page shows items but localStorage says empty, reloading...');
-                reloadCartContent();
-                return;
-            }
-            
-            // Check 2: Verify with server
-            setTimeout(() => {
-                fetchCartCount().then(count => {
-                    if (count !== null) {
-                        console.log('Server check - Count:', count, 'Display:', displayedCount);
-                        if (count !== displayedCount || count !== storedCount) {
-                            console.log('Server count mismatch, reloading...');
-                            reloadCartContent();
-                        } else {
-                            // Update localStorage to ensure it matches
-                            saveCartToStorage({ cartCount: count });
-                        }
-                    }
-                });
-            }, 500); // Check 500ms after load
-            
-            // Check 3: Double-check after 2 seconds (for slow updates)
-            setTimeout(() => {
-                fetchCartCount().then(count => {
-                    if (count !== null) {
-                        const currentDisplayedCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                        if (count !== currentDisplayedCount) {
-                            console.log('Delayed check - count mismatch, reloading...');
-                            reloadCartContent();
-                        }
-                    }
-                });
-            }, 2000);
-        });
-
         // Listen for storage events from other tabs
         window.addEventListener('storage', (e) => {
             if (e.key === 'cartSync' && e.newValue) {
                 try {
                     const oldData = lastCartSync ? JSON.parse(lastCartSync) : null;
                     const newData = JSON.parse(e.newValue);
-                    
+
                     // Check if it's a different update (different timestamp)
-                    if ((!oldData || oldData.timestamp !== newData.timestamp) && 
+                    if ((!oldData || oldData.timestamp !== newData.timestamp) &&
                         newData.data && newData.data.cartCount !== undefined) {
-                        
+
                         console.log('Cart updated from another tab:', newData);
-                        
+
                         // Update cart count in header
                         updateCartCount(newData.data.cartCount);
-                        
+
                         // Show notification
                         showToast('Cart updated in another tab', 'success', 'Sync');
-                        
+
                         // Reload to show updated cart
                         reloadCartContent();
                     }
@@ -1816,12 +1822,12 @@
                     console.error('Error parsing cart sync data:', error);
                 }
             }
-            
+
             // Also listen for simple cart count updates
             if (e.key === 'cartCount' && e.newValue) {
                 const newCount = parseInt(e.newValue);
                 const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                
+
                 if (newCount !== currentCount) {
                     updateCartCount(newCount);
                     reloadCartContent();
@@ -1833,7 +1839,7 @@
         document.addEventListener('cartUpdated', (event) => {
             if (event.detail && event.detail.cartCount !== undefined) {
                 const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                
+
                 if (event.detail.cartCount !== currentCount) {
                     updateCartCount(event.detail.cartCount);
                     reloadCartContent();
@@ -1844,7 +1850,7 @@
         document.addEventListener('cartItemRemoved', (event) => {
             if (event.detail && event.detail.cartCount !== undefined) {
                 const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                
+
                 if (event.detail.cartCount !== currentCount) {
                     updateCartCount(event.detail.cartCount);
                     if (event.detail.message) {
@@ -1860,25 +1866,24 @@
             // If user clicks on cart link or any element that might indicate they want to see updated cart
             if (e.target.closest('a[href="/cart"]') || e.target.closest('.cart-icon') || e.target.closest('.cart-count')) {
                 console.log('Cart navigation detected, checking for updates...');
-                
-                // Short delay to let any pending operations complete
-                setTimeout(() => {
-                    fetchCartCount().then(count => {
-                        if (count !== null) {
-                            const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                            if (count !== currentCount) {
-                                console.log('Cart count mismatch detected on click');
-                                reloadCartContent();
-                            }
+
+                // fetchCartCount is deduped/cached, so firing immediately (instead of after
+                // an artificial delay) is safe and gives a snappier response.
+                fetchCartCount().then(count => {
+                    if (count !== null) {
+                        const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
+                        if (count !== currentCount) {
+                            console.log('Cart count mismatch detected on click');
+                            reloadCartContent();
                         }
-                    });
-                }, 100);
+                    }
+                });
             }
         });
 
-        // Poll for changes every 2 seconds (as a fallback)
+        // Poll for changes every 2 seconds (as a fallback) - cheap localStorage comparison only
         let pollInterval;
-        
+
         function startPolling() {
             pollInterval = setInterval(() => {
                 checkCartChanges();
@@ -1902,43 +1907,49 @@
             });
         });
 
+        // Batches bursts of DOM mutations (e.g. an attribute set immediately followed by a
+        // row removal) into a single quantity-button rescan on the next animation frame,
+        // instead of doing a full O(n) rescan synchronously for every individual mutation.
+        // Row-level updates already happen instantly via updateQuantityButtons(row) above;
+        // this is only a batched safety-net rescan.
+        let _qtyRescanScheduled = false;
+        function scheduleQuantityButtonsRescan() {
+            if (_qtyRescanScheduled) return;
+            _qtyRescanScheduled = true;
+            requestAnimationFrame(() => {
+                updateAllQuantityButtons();
+                _qtyRescanScheduled = false;
+            });
+        }
+
         // Initialize event listeners and button states
         document.addEventListener('DOMContentLoaded', function() {
             const clearCartBtn = document.getElementById('clearCartBtn');
             if (clearCartBtn) {
                 clearCartBtn.addEventListener('click', clearCart);
             }
-            
+
             // Initialize last sync timestamp
             lastCartSync = localStorage.getItem('cartSync');
-            
+
             // Sync with header's sync manager
             syncWithHeaderSyncManager();
-            
-            // Force a sync of cart count on page load
-            setTimeout(() => {
-                // Get current cart count from the page
-                const cartItems = document.querySelectorAll('#cart-items-body tr');
-                const totalQuantity = Array.from(cartItems).reduce((sum, row) => {
-                    const qty = parseInt(row.querySelector('.quantity-display')?.textContent || '0');
-                    return sum + qty;
-                }, 0);
-                
-                // Update header with current cart quantity
-                if (totalQuantity > 0) {
-                    updateCartCount(totalQuantity);
-                } else {
-                    // If no items, count should be 0
-                    updateCartCount(0);
-                }
-            }, 100);
-            
+
+            // Get current cart count from the rendered rows and push it to the header
+            // immediately (DOM is already parsed at this point, no artificial delay needed).
+            const cartItems = document.querySelectorAll('#cart-items-body tr');
+            const totalQuantity = Array.from(cartItems).reduce((sum, row) => {
+                const qty = parseInt(row.querySelector('.quantity-display')?.textContent || '0');
+                return sum + qty;
+            }, 0);
+            updateCartCount(totalQuantity);
+
             // Initial sync: check localStorage on page load
             const cartCountFromStorage = localStorage.getItem('cartCount');
             if (cartCountFromStorage) {
                 const storedCount = parseInt(cartCountFromStorage);
                 const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                
+
                 if (storedCount !== currentCount) {
                     updateCartCount(storedCount);
                 }
@@ -1951,7 +1962,7 @@
                         if (cartData && cartData.cartCount !== undefined) {
                             const storedCount = cartData.cartCount;
                             const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                            
+
                             if (storedCount !== currentCount) {
                                 updateCartCount(storedCount);
                             }
@@ -1961,46 +1972,61 @@
                     }
                 }
             }
-            
+
             // Update all quantity buttons on page load
             updateAllQuantityButtons();
-            
-            // Add mutation observer to watch for any changes in the cart items
-            const observer = new MutationObserver(function(mutations) {
-                updateAllQuantityButtons();
-            });
-            
+
+            // Add mutation observer to watch for any changes in the cart items (batched via rAF)
+            const observer = new MutationObserver(scheduleQuantityButtonsRescan);
+
             const cartBody = document.getElementById('cart-items-body');
             if (cartBody) {
-                observer.observe(cartBody, { 
-                    childList: true, 
+                observer.observe(cartBody, {
+                    childList: true,
                     subtree: true,
                     attributes: true,
                     attributeFilter: ['data-available-stock', 'data-is-blocked']
                 });
             }
-            
+
             // Start observing cart count element once it exists
             const cartCountElement = document.querySelector('.cart-count');
             if (cartCountElement) {
-                cartCountObserver.observe(cartCountElement, { 
-                    childList: true, 
+                cartCountObserver.observe(cartCountElement, {
+                    childList: true,
                     characterData: true,
-                    subtree: true 
+                    subtree: true
                 });
             }
-            
-            // Also update cart count from server on page load
-            fetchCartCount().then(count => {
-                if (count !== null) {
-                    const currentCount = parseInt(document.querySelector('.cart-count')?.textContent || '0');
-                    if (count !== currentCount) {
-                        updateCartCount(count);
-                        saveCartToStorage({ cartCount: count });
+
+            // ---- Single authoritative server sync check ----
+            // Runs once, on DOMContentLoaded (doesn't wait for images to finish loading like
+            // the 'load' event would), replacing what used to be three separate staggered
+            // fetches (immediate + 500ms + 2000ms) to the same endpoint.
+            const storedCountForServerCheck = parseInt(localStorage.getItem('cartCount') || '0');
+            const displayedCountForServerCheck = parseInt(document.querySelector('.cart-count')?.textContent || '0');
+            const itemRowCount = document.querySelectorAll('#cart-items-body tr').length;
+
+            if (storedCountForServerCheck > 0 && itemRowCount === 0) {
+                console.log('Cart has items but page shows empty, reloading...');
+                reloadCartContent();
+            } else if (storedCountForServerCheck === 0 && itemRowCount > 0) {
+                console.log('Page shows items but localStorage says empty, reloading...');
+                reloadCartContent();
+            } else {
+                fetchCartCount().then(count => {
+                    if (count !== null) {
+                        console.log('Server check - Count:', count, 'Display:', displayedCountForServerCheck);
+                        if (count !== displayedCountForServerCheck || count !== storedCountForServerCheck) {
+                            console.log('Server count mismatch, reloading...');
+                            reloadCartContent();
+                        } else {
+                            saveCartToStorage({ cartCount: count });
+                        }
                     }
-                }
-            });
-            
+                });
+            }
+
             // Start polling for changes
             startPolling();
         });
@@ -2015,6 +2041,7 @@
             }
         });
     </script>
+
 </body>
 </html>
 <%- include('../partials/user/footer') %>
