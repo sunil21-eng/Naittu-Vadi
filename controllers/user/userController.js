@@ -64,12 +64,121 @@ async function sendEmailVerification(email, otp) {
         });
 
         const info = await transport.sendMail({
-            from: process.env.NODEMAILER_EMAIL,
-            to: email,
-            subject: "Verify your account?",
-            text: `Your OTP is : ${otp}`,
-            html: `<b> Your OTP is : ${otp} </b>`,
-        })
+    from: process.env.NODEMAILER_EMAIL,
+    to: email,
+    subject: "Verify your account?",
+    text: `Your Nattuvedi – Artemis verification code is: ${otp}. This code is valid for 10 minutes. Never share it with anyone. If you didn't request this, please ignore this email.`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify your Nattuvedi account</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f7fc;font-family:Arial,sans-serif;">
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#ffffff;margin:30px auto;border-radius:16px;border-collapse:collapse;">
+
+    <!-- HEADER -->
+    <tr>
+        <td style="padding:28px 40px 16px;text-align:center;border-bottom:1px solid #eef3f9;">
+            <h1 style="margin:0;font-size:26px;font-weight:700;color:#0b1a33;">
+                <span style="color:#3a86ff;">🔥</span> Nattuvedi
+                <span style="color:#3a86ff;">–</span>
+                <span style="color:#ff006e;">Artemis</span> Crackers
+            </h1>
+            <p style="margin:4px 0 0;font-size:13px;color:#7a8ba8;">Premium country crackers since 2010</p>
+        </td>
+    </tr>
+
+    <!-- BODY -->
+    <tr>
+        <td style="padding:32px 40px 24px;">
+            <h2 style="margin:0 0 6px;font-size:22px;font-weight:600;color:#0b1a33;">Verify Your Email</h2>
+            <p style="margin:0 0 18px;font-size:15px;color:#4a5b74;line-height:1.6;">
+                Thank you for signing up with <strong>Nattuvedi – Artemis</strong>!
+                Use the code below to complete your registration.
+            </p>
+
+            <!-- OTP BOX -->
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f8faff;border-radius:12px;border:1px solid #e6edf8;margin:8px 0 18px;">
+                <tr>
+                    <td style="padding:28px 20px;text-align:center;">
+                        <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#3a86ff;text-transform:uppercase;letter-spacing:1.2px;">Verification Code</p>
+                        <div style="display:inline-block;background:#ffffff;border-radius:10px;padding:14px 32px;border:1px solid #dce6f2;">
+                            <span style="font-size:38px;font-weight:700;letter-spacing:6px;color:#0b1a33;font-family:'Courier New',monospace;">${otp}</span>
+                        </div>
+                        <p style="margin:16px 0 0;font-size:13px;color:#7a8ba8;">⏱ Valid for 10 minutes</p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- SECURITY TIP -->
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#fcf5f0;border-radius:10px;border-left:4px solid #ff6b6b;margin:20px 0 6px;">
+                <tr>
+                    <td style="padding:14px 18px;">
+                        <p style="margin:0;font-size:13px;color:#7a5a44;line-height:1.5;">
+                            <span style="font-weight:600;">🔒 Security tip:</span>
+                            Never share this code. Nattuvedi – Artemis will never ask for it.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+        <td style="padding:0 40px 30px;">
+            <hr style="border:0;height:1px;background:#eef3f9;margin:0 0 22px;" />
+
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+                <tr>
+                    <td style="padding-bottom:12px;text-align:center;">
+                        <span style="font-weight:800;color:#3a86ff;font-size:18px;">🔥 Nattuvedi – Artemis Crackers</span><br />
+                        <span style="color:#4a5b74;font-size:13px;display:block;margin-top:4px;">
+                            Premium Nattu Vedi country crackers &amp; Sivakasi crackers since 2010.
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:6px 0 8px;text-align:center;">
+                        <span style="color:#2d4059;font-size:13px;line-height:1.7;">
+                            📞 +91 78688 29460 &nbsp;|&nbsp;
+                            ✉️ opensurfaces21@gmail.com &nbsp;|&nbsp;
+                            📍 Singarapettai - 635307
+                        </span><br />
+                        <span style="display:inline-block;margin-top:6px;background:#fff0f0;padding:4px 14px;border-radius:20px;color:#ff6b6b;font-size:12px;font-weight:600;">
+                            ⚠️ 18+ Only • Celebrate Safely
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 0 12px;text-align:center;color:#4a5b74;font-size:13px;">
+                        🏪 Dharmaraja nagar • 🏭 Singarapettai, Krishnagiri
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:1px solid #eef3f9;padding-top:16px;text-align:center;color:#7a8ba8;font-size:12px;line-height:1.6;">
+                        © 2024 Nattuvedi – Artemis Crackers &nbsp;•&nbsp; Made with ❤️<br />
+                        <span style="display:inline-block;margin-top:4px;">🆔 Sale to minors prohibited</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<div style="text-align:center;font-size:11px;color:#9aabbf;padding:10px 20px 30px;font-family:Arial,sans-serif;">
+    This email was sent to <span style="color:#4a5b74;">${email}</span><br />
+    If you didn't request this, please ignore it.
+</div>
+
+</body>
+</html>
+    `
+});
 
 
         return info.accepted.length > 0
@@ -298,96 +407,96 @@ const logout = async function (req, res) {
 
 
 const applyOffers = async (products) => {
-  try {
-    const currentDate = new Date();
-    console.log("Current Date:", currentDate);
+    try {
+        const currentDate = new Date();
+        console.log("Current Date:", currentDate);
 
-    const activeOffers = await Offer.find({
-      status: true,
-      startDate: { $lte: currentDate },
-      endDate: { $gte: currentDate },
-    });
-
-    console.log("Active Offers Found:", activeOffers.length);
-    
-    if (activeOffers.length === 0) {
-      console.log("No active offers found");
-      return products.map(product => {
-        const productWithoutOffer = product.toObject();
-        productWithoutOffer.hasOffer = false;
-        return productWithoutOffer;
-      });
-    }
-
-    console.log("Active Offers:", activeOffers.map(o => ({
-      name: o.offerName,
-      type: o.offerType,
-      discount: o.discount,
-      categoryIds: o.categoryId.map(id => id.toString())
-    })));
-
-    const productsWithOffers = products.map((product) => {
-      const productWithOffer = product.toObject();
-      
-      // Convert IDs to strings for comparison
-      const productId = product._id.toString();
-      const productCategoryId = product.category?._id?.toString() || product.category?.toString();
-
-      console.log(`Checking product: ${product.productName}`);
-      console.log(`Product ID: ${productId}`);
-      console.log(`Product Category ID: ${productCategoryId}`);
-
-      // Check if product has any applicable offers
-      const applicableOffers = activeOffers.filter((offer) => {
-        if (offer.offerType === "product") {
-          return offer.productId.some(id => id.toString() === productId);
-        } else if (offer.offerType === "category") {
-          // Check if this product's category matches any category in the offer
-          return offer.categoryId.some(id => id.toString() === productCategoryId);
-        }
-        return false;
-      });
-
-      console.log(`Applicable offers for ${product.productName}:`, applicableOffers.length);
-
-      if (applicableOffers.length > 0) {
-        const maxDiscount = Math.max(
-          ...applicableOffers.map((offer) => offer.discount)
-        );
-
-        // Calculate discounted price (if discount is 100%, price becomes 0)
-        const discountedPrice = product.salePrice * (1 - maxDiscount / 100);
-
-        productWithOffer.originalPrice = product.salePrice;
-        productWithOffer.discountedPrice = Math.round(discountedPrice);
-        productWithOffer.discountPercentage = maxDiscount;
-        productWithOffer.hasOffer = true;
-        
-        console.log(`Applied ${maxDiscount}% discount to ${product.productName}:`, {
-          originalPrice: product.salePrice,
-          discountedPrice: productWithOffer.discountedPrice,
-          finalPrice: discountedPrice
+        const activeOffers = await Offer.find({
+            status: true,
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate },
         });
-      } else {
-        productWithOffer.hasOffer = false;
-      }
 
-      return productWithOffer;
-    });
+        console.log("Active Offers Found:", activeOffers.length);
 
-    // Log summary of products with offers
-    const productsWithOffersCount = productsWithOffers.filter(p => p.hasOffer).length;
-    console.log(`Total products with offers: ${productsWithOffersCount} out of ${productsWithOffers.length}`);
+        if (activeOffers.length === 0) {
+            console.log("No active offers found");
+            return products.map(product => {
+                const productWithoutOffer = product.toObject();
+                productWithoutOffer.hasOffer = false;
+                return productWithoutOffer;
+            });
+        }
 
-    return productsWithOffers;
-  } catch (error) {
-    console.error("Error applying offers:", error);
-    return products.map(product => {
-      const productWithoutOffer = product.toObject();
-      productWithoutOffer.hasOffer = false;
-      return productWithoutOffer;
-    });
-  }
+        console.log("Active Offers:", activeOffers.map(o => ({
+            name: o.offerName,
+            type: o.offerType,
+            discount: o.discount,
+            categoryIds: o.categoryId.map(id => id.toString())
+        })));
+
+        const productsWithOffers = products.map((product) => {
+            const productWithOffer = product.toObject();
+
+            // Convert IDs to strings for comparison
+            const productId = product._id.toString();
+            const productCategoryId = product.category?._id?.toString() || product.category?.toString();
+
+            console.log(`Checking product: ${product.productName}`);
+            console.log(`Product ID: ${productId}`);
+            console.log(`Product Category ID: ${productCategoryId}`);
+
+            // Check if product has any applicable offers
+            const applicableOffers = activeOffers.filter((offer) => {
+                if (offer.offerType === "product") {
+                    return offer.productId.some(id => id.toString() === productId);
+                } else if (offer.offerType === "category") {
+                    // Check if this product's category matches any category in the offer
+                    return offer.categoryId.some(id => id.toString() === productCategoryId);
+                }
+                return false;
+            });
+
+            console.log(`Applicable offers for ${product.productName}:`, applicableOffers.length);
+
+            if (applicableOffers.length > 0) {
+                const maxDiscount = Math.max(
+                    ...applicableOffers.map((offer) => offer.discount)
+                );
+
+                // Calculate discounted price (if discount is 100%, price becomes 0)
+                const discountedPrice = product.salePrice * (1 - maxDiscount / 100);
+
+                productWithOffer.originalPrice = product.salePrice;
+                productWithOffer.discountedPrice = Math.round(discountedPrice);
+                productWithOffer.discountPercentage = maxDiscount;
+                productWithOffer.hasOffer = true;
+
+                console.log(`Applied ${maxDiscount}% discount to ${product.productName}:`, {
+                    originalPrice: product.salePrice,
+                    discountedPrice: productWithOffer.discountedPrice,
+                    finalPrice: discountedPrice
+                });
+            } else {
+                productWithOffer.hasOffer = false;
+            }
+
+            return productWithOffer;
+        });
+
+        // Log summary of products with offers
+        const productsWithOffersCount = productsWithOffers.filter(p => p.hasOffer).length;
+        console.log(`Total products with offers: ${productsWithOffersCount} out of ${productsWithOffers.length}`);
+
+        return productsWithOffers;
+    } catch (error) {
+        console.error("Error applying offers:", error);
+        return products.map(product => {
+            const productWithoutOffer = product.toObject();
+            productWithoutOffer.hasOffer = false;
+            return productWithoutOffer;
+        });
+    }
 };
 
 
@@ -479,7 +588,7 @@ const loadHome = async function (req, res) {
             .skip(skip)
             .limit(limit)
             .sort(sortOptions);
-            // Removed .lean() here
+        // Removed .lean() here
 
         // Apply offers to products
         const productsWithOffers = await applyOffers(products);
@@ -511,7 +620,7 @@ const loadHome = async function (req, res) {
             limit
         }
 
-   // Common data to pass to the view
+        // Common data to pass to the view
         const viewData = {
             currentPage: page,
             totalPage: totalPages,
@@ -533,7 +642,7 @@ const loadHome = async function (req, res) {
                 userData.name = userData.name || `${userData.firstName} ${userData.lastName}`;
             }
             return res.render("user/home", {
-                 ...viewData,
+                ...viewData,
                 user: userData,
                 currentPage: page,
                 totalPage: totalPages,
@@ -549,7 +658,7 @@ const loadHome = async function (req, res) {
             });
         } else {
             return res.render("user/home", {
-                 ...viewData,
+                ...viewData,
                 user: null,
                 currentPage: page,
                 totalPage: totalPages,
@@ -585,7 +694,7 @@ const loadProduct = async function (req, res) {
         const productData = await Product.findById(productId)
             .populate("category", "name")
             .populate("categoryAttribute", "name");
-            // Remove .lean() here
+        // Remove .lean() here
 
         if (!productData || productData.isBlocked) {
             return res.status(404).render('page-404', { error: "Product not found" });
@@ -610,20 +719,20 @@ const loadProduct = async function (req, res) {
             .limit(4)
             .populate('category', 'name')
             .populate('categoryAttribute', 'name');
-            // Remove .lean() here
+        // Remove .lean() here
 
         const relatedProductsWithOffers = await applyOffers(relatedProducts);
 
         if (user) {
             const userData = await User.findById(user._id);
-            return res.render("user/product", { 
-                user: userData, 
+            return res.render("user/product", {
+                user: userData,
                 product: productWithOffer, // Use product with offers
                 relatedProducts: relatedProductsWithOffers // Use related products with offers
             });
         } else {
-            return res.render("user/product", { 
-                user: null, 
+            return res.render("user/product", {
+                user: null,
                 product: productWithOffer, // Use product with offers
                 relatedProducts: relatedProductsWithOffers // Use related products with offers
             });
@@ -662,9 +771,9 @@ const getWishlist = async function (req, res) {
         // Apply offers to wishlist products
         if (wishlistProducts.length > 0) {
             wishlistProducts = await applyOffers(wishlistProducts);
-            
+
             // Optional: Log to verify offers are applied
-            console.log("Wishlist products with offers:", 
+            console.log("Wishlist products with offers:",
                 wishlistProducts.map(p => ({
                     name: p.productName,
                     hasOffer: p.hasOffer,
@@ -762,7 +871,7 @@ const removeFromWishlist = async function (req, res) {
         if (!userId) {
             return res.status(401).json({ success: false, message: "Please log in" });
         }
-        
+
         const user = await User.findById(userId);
 
         if (!user) {
@@ -885,7 +994,7 @@ const toggleWishlist = async (req, res) => {
 const loadContact = async function (req, res) {
     try {
         let user = req.session?.user;
-        
+
         // Common data for the contact page
         const viewData = {
             currentFilters: {}, // Empty object for contact page
@@ -900,17 +1009,17 @@ const loadContact = async function (req, res) {
             colors: [],
             priceRange: { minPrice: 0, maxPrice: 0 }
         };
-        
+
         if (user) {
             const userData = await User.findById(req.session?.user?._id);
-            return res.render('user/contact', { 
+            return res.render('user/contact', {
                 ...viewData,
-                user: userData 
+                user: userData
             });
         } else {
-            return res.render('user/contact', { 
+            return res.render('user/contact', {
                 ...viewData,
-                user: null 
+                user: null
             });
         }
 
@@ -923,7 +1032,7 @@ const loadContact = async function (req, res) {
 const loadAbout = async function (req, res) {
     try {
         let user = req.session?.user;
-        
+
         // Common data for the about page
         const viewData = {
             currentFilters: {}, // Empty object for about page
@@ -938,17 +1047,17 @@ const loadAbout = async function (req, res) {
             colors: [],
             priceRange: { minPrice: 0, maxPrice: 0 }
         };
-        
+
         if (user) {
             const userData = await User.findById(req.session?.user?._id);
-            return res.render('user/about', { 
+            return res.render('user/about', {
                 ...viewData,
-                user: userData 
+                user: userData
             });
         } else {
-            return res.render('user/about', { 
+            return res.render('user/about', {
                 ...viewData,
-                user: null 
+                user: null
             });
         }
 

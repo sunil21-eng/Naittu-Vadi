@@ -257,13 +257,126 @@ async function sendEmailVerification(toEmail, otp) {
         pass: process.env.NODEMAILER_PASSWORD
       }
     });
-    const mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: toEmail,
-      subject: "Profile Update OTP Verification",
-      text: `Your OTP is :${otp}`,
-      html: `<b> Your OTP is :${otp} </b>`
-    };
+
+    
+const mailOptions = {
+    from: process.env.NODEMAILER_EMAIL,
+    to: toEmail,
+    subject: "Profile Update OTP Verification",
+    text: `Your Nattuvedi – Artemis profile update verification code is: ${otp}. This code is valid for 10 minutes. Never share it with anyone. If you didn't request this change, please contact our support immediately.`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Update OTP – Nattuvedi</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f7fc;font-family:Arial,sans-serif;">
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#ffffff;margin:30px auto;border-radius:16px;border-collapse:collapse;">
+
+    <!-- HEADER -->
+    <tr>
+        <td style="padding:28px 40px 16px;text-align:center;border-bottom:1px solid #eef3f9;">
+            <h1 style="margin:0;font-size:26px;font-weight:700;color:#0b1a33;">
+                <span style="color:#3a86ff;">🔥</span> Nattuvedi
+                <span style="color:#3a86ff;">–</span>
+                <span style="color:#ff006e;">Artemis</span> Crackers
+            </h1>
+            <p style="margin:4px 0 0;font-size:13px;color:#7a8ba8;">Premium country crackers since 2010</p>
+        </td>
+    </tr>
+
+    <!-- BODY -->
+    <tr>
+        <td style="padding:32px 40px 24px;">
+            <h2 style="margin:0 0 6px;font-size:22px;font-weight:600;color:#0b1a33;">Profile Update Verification</h2>
+            <p style="margin:0 0 18px;font-size:15px;color:#4a5b74;line-height:1.6;">
+                You have requested to update your profile information on <strong>Nattuvedi – Artemis</strong>.
+                To confirm this action, please enter the verification code below.
+            </p>
+
+            <!-- OTP BOX -->
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#f8faff;border-radius:12px;border:1px solid #e6edf8;margin:8px 0 18px;">
+                <tr>
+                    <td style="padding:28px 20px;text-align:center;">
+                        <p style="margin:0 0 10px;font-size:13px;font-weight:600;color:#3a86ff;text-transform:uppercase;letter-spacing:1.2px;">Verification Code</p>
+                        <div style="display:inline-block;background:#ffffff;border-radius:10px;padding:14px 32px;border:1px solid #dce6f2;">
+                            <span style="font-size:38px;font-weight:700;letter-spacing:6px;color:#0b1a33;font-family:'Courier New',monospace;">${otp}</span>
+                        </div>
+                        <p style="margin:16px 0 0;font-size:13px;color:#7a8ba8;">⏱ Valid for 10 minutes</p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- SECURITY TIP -->
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#fcf5f0;border-radius:10px;border-left:4px solid #ff6b6b;margin:20px 0 6px;">
+                <tr>
+                    <td style="padding:14px 18px;">
+                        <p style="margin:0;font-size:13px;color:#7a5a44;line-height:1.5;">
+                            <span style="font-weight:600;">🔒 Security tip:</span>
+                            Never share this code. Nattuvedi – Artemis will never ask for it.
+                            If you did not initiate this change, please contact us immediately.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- FOOTER -->
+    <tr>
+        <td style="padding:0 40px 30px;">
+            <hr style="border:0;height:1px;background:#eef3f9;margin:0 0 22px;" />
+
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+                <tr>
+                    <td style="padding-bottom:12px;text-align:center;">
+                        <span style="font-weight:800;color:#3a86ff;font-size:18px;">🔥 Nattuvedi – Artemis Crackers</span><br />
+                        <span style="color:#4a5b74;font-size:13px;display:block;margin-top:4px;">
+                            Premium Nattu Vedi country crackers &amp; Sivakasi crackers since 2010.
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:6px 0 8px;text-align:center;">
+                        <span style="color:#2d4059;font-size:13px;line-height:1.7;">
+                            📞 +91 78688 29460 &nbsp;|&nbsp;
+                            ✉️ opensurfaces21@gmail.com &nbsp;|&nbsp;
+                            📍 Singarapettai - 635307
+                        </span><br />
+                        <span style="display:inline-block;margin-top:6px;background:#fff0f0;padding:4px 14px;border-radius:20px;color:#ff6b6b;font-size:12px;font-weight:600;">
+                            ⚠️ 18+ Only • Celebrate Safely
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 0 12px;text-align:center;color:#4a5b74;font-size:13px;">
+                        🏪 Dharmaraja nagar • 🏭 Singarapettai, Krishnagiri
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:1px solid #eef3f9;padding-top:16px;text-align:center;color:#7a8ba8;font-size:12px;line-height:1.6;">
+                        © 2024 Nattuvedi – Artemis Crackers &nbsp;•&nbsp; Made with ❤️<br />
+                        <span style="display:inline-block;margin-top:4px;">🆔 Sale to minors prohibited</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<div style="text-align:center;font-size:11px;color:#9aabbf;padding:10px 20px 30px;font-family:Arial,sans-serif;">
+    This email was sent to <span style="color:#4a5b74;">${toEmail}</span><br />
+    If you didn't request a profile update, please ignore this email or contact our support.
+</div>
+
+</body>
+</html>
+    `
+};
+
     await transporter.sendMail(mailOptions);
     return true;
   } catch (err) {

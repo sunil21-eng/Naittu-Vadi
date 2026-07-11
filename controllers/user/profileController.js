@@ -24,12 +24,310 @@ const sendVerificationEmail = async function (email, otp) {
         });
 
         const mailInfo = await transport.sendMail({
-
             from: process.env.NODEMAILER_EMAIL,
             to: email,
-            subject: " Artimes verification code for forgot password",
+            subject: "Artimes verification code for forgot password",
             text: `Your OTP is :${otp}`,
-            html: `<b> Your OTP is :${otp} </b>`
+            html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nattuvedi – OTP Verification</title>
+</head>
+
+<body style="
+margin: 0;
+padding: 0;
+background-color: #f4f7fc;
+font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+">
+
+    <!-- ============================================================
+    MAIN WRAPPER (TABLE)
+    ============================================================ -->
+    <table align="center" cellpadding="0" cellspacing="0" border="0"
+    style="
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    margin: 30px auto;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+    border-collapse: collapse;
+    ">
+
+    <!-- ============================================================
+    HEADER – Nattuvedi Brand
+    ============================================================ -->
+    <tr>
+        <td style="
+        padding: 28px 40px 16px 40px;
+        text-align: center;
+        border-bottom: 1px solid #eef3f9;
+        ">
+        <!-- Brand Name with fire icon -->
+        <h1 style="
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        color: #0b1a33;
+        ">
+        <span style="color: #3a86ff;">🔥</span> Nattuvedi
+        <span style="color: #3a86ff;">–</span>
+        <span style="color: #ff006e;">Artemis</span> Crackers
+    </h1>
+    <p style="
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #7a8ba8;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+    ">
+    Premium country crackers since 2010 &bull; Celebrate safely
+</p>
+</td>
+</tr>
+
+<!-- ============================================================
+BODY – OTP Section
+============================================================ -->
+<tr>
+    <td style="padding: 32px 40px 24px 40px;">
+
+        <!-- Greeting -->
+        <h2 style="
+        margin: 0 0 6px 0;
+        font-size: 22px;
+        font-weight: 600;
+        color: #0b1a33;
+        ">
+        Forgot Password?
+    </h2>
+    <p style="
+    margin: 0 0 18px 0;
+    font-size: 15px;
+    color: #4a5b74;
+    line-height: 1.6;
+    ">
+    We received a request to reset the password for your
+    <strong>Nattuvedi – Artemis</strong> account. Use the verification
+    code below to proceed.
+</p>
+
+<!-- OTP CARD -->
+<table cellpadding="0" cellspacing="0" border="0"
+style="
+width: 100%;
+background: #f8faff;
+border-radius: 12px;
+border: 1px solid #e6edf8;
+margin: 8px 0 18px 0;
+">
+<tr>
+    <td style="padding: 28px 20px; text-align: center;">
+        <p style="
+        margin: 0 0 10px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: #3a86ff;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        ">
+        Verification Code
+    </p>
+    <div style="
+    display: inline-block;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 14px 32px;
+    border: 1px solid #dce6f2;
+    box-shadow: 0 2px 6px rgba(58, 134, 255, 0.06);
+    ">
+    <span style="
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #0b1a33;
+    font-family: 'Courier New', monospace;
+    ">
+    ${otp}
+</span>
+</div>
+<p style="
+margin: 16px 0 0 0;
+font-size: 13px;
+color: #7a8ba8;
+">
+⏱ This code is valid for <strong style="color:#0b1a33;">10 minutes</strong>.
+</p>
+</td>
+</tr>
+</table>
+
+<!-- Security notice -->
+<table cellpadding="0" cellspacing="0" border="0"
+style="
+width: 100%;
+background: #fcf5f0;
+border-radius: 10px;
+border-left: 4px solid #ff6b6b;
+margin: 20px 0 6px 0;
+">
+<tr>
+    <td style="padding: 14px 18px;">
+        <p style="
+        margin: 0;
+        font-size: 13px;
+        color: #7a5a44;
+        line-height: 1.5;
+        ">
+        <span style="font-weight: 600;">🔒 Security tip:</span>
+        Never share this OTP with anyone. Nattuvedi – Artemis will
+        never ask for your code via phone, chat, or email.
+    </p>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<!-- ============================================================
+FOOTER – Nattuvedi Details (fully table‑based for email)
+============================================================ -->
+<tr>
+    <td style="padding: 0 40px 30px 40px;">
+
+        <!-- Divider -->
+        <hr style="
+        border: 0;
+        height: 1px;
+        background: #eef3f9;
+        margin: 0 0 22px 0;
+        " />
+
+        <!-- Footer content as a table -->
+        <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+
+            <!-- Row 1: Brand + About (Social icons removed) -->
+            <tr>
+                <td style="padding-bottom: 12px; text-align: center;">
+
+                    <!-- Brand -->
+                    <span style="
+                    font-weight: 800;
+                    color: #3a86ff;
+                    font-size: 18px;
+                    letter-spacing: 0.3px;
+                    ">
+                    🔥 Nattuvedi – Artemis Crackers
+                </span>
+                <br />
+
+                <!-- About -->
+                <span style="
+                color: #4a5b74;
+                font-size: 13px;
+                line-height: 1.5;
+                display: block;
+                margin: 4px 0 0 0;
+                ">
+                Premium Nattu Vedi country crackers &amp; Sivakasi crackers
+                since 2010. Making celebrations sparkle! 🎆
+            </span>
+        </td>
+    </tr>
+
+    <!-- Row 2: Contact & Safety -->
+    <tr>
+        <td style="padding: 6px 0 8px 0; text-align: center;">
+
+            <!-- Contact info -->
+            <span style="
+            color: #2d4059;
+            font-size: 13px;
+            display: inline-block;
+            line-height: 1.7;
+            ">
+            <i style="color:#3a86ff;">📞</i> +91 78688 29460 &nbsp;|&nbsp;
+            <i style="color:#3a86ff;">✉️</i> opensurfaces21@gmail.com &nbsp;|&nbsp;
+            <i style="color:#3a86ff;">📍</i> Singarapettai - 635307
+        </span>
+        <br />
+
+        <!-- Safety warning -->
+        <span style="
+        display: inline-block;
+        margin-top: 6px;
+        background: #fff0f0;
+        padding: 4px 14px;
+        border-radius: 20px;
+        color: #ff6b6b;
+        font-size: 12px;
+        font-weight: 600;
+        ">
+        ⚠️ 18+ Only • Celebrate Safely
+    </span>
+</td>
+</tr>
+
+<!-- Row 3: Full Address -->
+<tr>
+    <td style="padding: 4px 0 12px 0; text-align: center; color: #4a5b74; font-size: 13px;">
+        <i style="color:#3a86ff;">🏪</i> Dharmaraja nagar •
+        <i style="color:#3a86ff;">🏭</i> Singarapettai, Krishnagiri
+    </td>
+</tr>
+
+<!-- Row 4: Copyright & Legal -->
+<tr>
+    <td style="
+    border-top: 1px solid #eef3f9;
+    padding-top: 16px;
+    text-align: center;
+    color: #7a8ba8;
+    font-size: 12px;
+    line-height: 1.6;
+    ">
+    <span>
+        <i style="color:#3a86ff;">©</i> 2024 Nattuvedi – Artemis Crackers
+        &nbsp;•&nbsp; Made with <span style="color:#ff006e;">❤️</span>
+    </span>
+    <br />
+    <span style="display: inline-block; margin-top: 4px;">
+        <i style="color:#3a86ff;">🆔</i> Sale to minors prohibited
+    </span>
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+
+</table>
+
+<!-- ============================================================
+OUTSIDE META (visible in some clients)
+============================================================ -->
+<div style="
+text-align: center;
+font-size: 11px;
+color: #9aabbf;
+padding: 10px 20px 30px 20px;
+font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+">
+This email was sent to <span style="color: #4a5b74;">${email}</span>
+<br />
+If you received this by mistake, please disregard it.
+</div>
+
+</body>
+</html>
+    `
         });
 
         return true;
@@ -72,7 +370,7 @@ const forgotPasword = async function (req, res) {
         const { email } = req.body
         const findUser = await User.findOne({ email: email });
         if (!findUser) {
-            return res.render("user/forgotPassword",{error: "No account found with that email" })
+            return res.render("user/forgotPassword", { error: "No account found with that email" })
         }
         const otp = generateOtp();
         const emailSend = await sendVerificationEmail(email, otp);
@@ -131,7 +429,7 @@ const verifyForgototp = async function (req, res) {
         if (enderedOtp === req.session?.otp) {
             req.session.resetEmail = req.session.email;
             req.session.resetVerified = true;
-            return res.status(200).json({ success: true,  message: "OTP verified",redirectUrl: "/resetPassword"})
+            return res.status(200).json({ success: true, message: "OTP verified", redirectUrl: "/resetPassword" })
         } else {
             return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
         }
@@ -198,7 +496,7 @@ const resetPassword = async function (req, res) {
         delete req.session.resetVerified;
         delete req.session.userOtp;
         delete req.session.otpExpiry;
-        return res.status(200).json({ success: true,redirectUrl: "/login" })
+        return res.status(200).json({ success: true, redirectUrl: "/login" })
 
 
     } catch (error) {
