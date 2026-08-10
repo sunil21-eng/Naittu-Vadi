@@ -1041,7 +1041,7 @@
             color: #fff;
         }
 
-        /* Plain visible filter link lists (category / attribute / size / color) */
+        /* Plain visible filter link lists (category / attribute) */
         .filter-link-list {
             list-style: none;
             padding: 0;
@@ -1079,6 +1079,53 @@
             font-weight: 900;
             font-size: 0.7rem;
             margin-right: 7px;
+        }
+
+        /* Category -> Attribute nested tree (Attributes merged under each
+           Product Category, always visible, no selection-based hiding) */
+        .categories-tree .category-item {
+            margin-bottom: 10px;
+        }
+
+        .categories-tree .category-link {
+            font-weight: 600;
+        }
+
+        .attribute-sublist {
+            list-style: none;
+            margin: 8px 0 0 0;
+            padding-left: 16px;
+            border-left: 2px solid #eef0f3;
+        }
+
+        .attribute-sublist li {
+            margin-bottom: 8px;
+        }
+
+        .attribute-sublist li:last-child {
+            margin-bottom: 0;
+        }
+
+        .attribute-link {
+            font-size: 0.88rem;
+            color: #6c757d;
+        }
+
+        .attribute-link:before {
+            content: '\f105';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.7rem;
+            margin-right: 6px;
+            color: #b9bfc7;
+        }
+
+        .attribute-link.active {
+            color: var(--primary-color);
+        }
+
+        .attribute-link.active:before {
+            color: var(--primary-color);
         }
 
         .shop-content {
@@ -1193,15 +1240,6 @@
             </div>
         </div>
 
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="container">
-                <h1 class="display-4 fw-bold mb-4">Light Up Your Celebrations</h1>
-                <p class="lead mb-4">Discover our premium collection of safe and high-quality crackers for all your festive occasions</p>
-                <a href="#products" class="hero-btn">Shop Now</a>
-            </div>
-        </section>
-
         <!-- Main Content -->
         <div class="container">
 
@@ -1216,6 +1254,11 @@
                     var _matchedCat = categories.find(function(c) { return String(c._id) === String(currentFilters.category); });
                     selectedCategoryName = _matchedCat ? _matchedCat.name : currentFilters.category;
                 }
+
+                // Categories displayed alphabetically (A-Z) in the sidebar
+                var sortedCategories = categories.slice().sort(function(a, b) {
+                    return String(a.name || '').localeCompare(String(b.name || ''));
+                });
             %>
 
             <div class="shop-layout">
@@ -1228,7 +1271,7 @@
                     </div>
 
                     <!-- Active Filters -->
-                    <div class="filter-group" id="activeFiltersGroup" <%= (currentFilters.category || currentFilters.categoryAttribute || currentFilters.size || currentFilters.minPrice || currentFilters.maxPrice || currentFilters.color || currentFilters.search) ? '' : 'style="display:none;"' %>>
+                    <div class="filter-group" id="activeFiltersGroup" <%= (currentFilters.category || currentFilters.categoryAttribute || currentFilters.minPrice || currentFilters.maxPrice || currentFilters.search) ? '' : 'style="display:none;"' %>>
                         <div class="filter-group-title">Active Filters</div>
                         <div class="active-filters" id="activeFiltersBody">
                             <% if (currentFilters.category) { %>
@@ -1243,30 +1286,18 @@
                                         </span>
                                         <% } %>
 
-                                            <% if (currentFilters.size) { %>
+                                            <% if (currentFilters.minPrice || currentFilters.maxPrice) { %>
                                                 <span class="filter-badge">
-                                                    Size: <%= currentFilters.size %> <span class="close" onclick="removeFilter('size')">&times;</span>
+                                                    Price: ₹<%= currentFilters.minPrice || '0' %> - ₹<%= currentFilters.maxPrice || 'Any' %>
+                                                        <span class="close" onclick="removePriceFilter()">&times;</span>
                                                 </span>
                                                 <% } %>
 
-                                                    <% if (currentFilters.minPrice || currentFilters.maxPrice) { %>
+                                                    <% if (currentFilters.search) { %>
                                                         <span class="filter-badge">
-                                                            Price: ₹<%= currentFilters.minPrice || '0' %> - ₹<%= currentFilters.maxPrice || 'Any' %>
-                                                                <span class="close" onclick="removePriceFilter()">&times;</span>
+                                                            Search: <%= currentFilters.search %> <span class="close" onclick="removeFilter('search')">&times;</span>
                                                         </span>
                                                         <% } %>
-
-                                                            <% if (currentFilters.color) { %>
-                                                                <span class="filter-badge">
-                                                                    Color: <%= currentFilters.color %> <span class="close" onclick="removeFilter('color')">&times;</span>
-                                                                </span>
-                                                                <% } %>
-
-                                                                    <% if (currentFilters.search) { %>
-                                                                        <span class="filter-badge">
-                                                                            Search: <%= currentFilters.search %> <span class="close" onclick="removeFilter('search')">&times;</span>
-                                                                        </span>
-                                                                        <% } %>
                         </div>
                     </div>
 
@@ -1286,85 +1317,42 @@
                             </div>
                         </div>
 
-                        <!-- Category -->
+                        <!-- Category (alphabetically sorted A-Z) with its Attributes
+                             nested directly underneath it. Every category and every
+                             attribute stays visible at all times - nothing is
+                             hidden or shown based on the current selection. -->
                         <div class="filter-group">
                             <div class="filter-group-title">Product Categories</div>
-                            <ul class="filter-link-list" id="categoryList">
+                            <ul class="filter-link-list categories-tree" id="categoryList">
                                 <li>
                                     <a href="javascript:void(0)" class="filter-link <%= !currentFilters.category ? 'active' : '' %>" onclick="selectFilter('category', '', this)">All Categories</a>
                                 </li>
-                                <% categories.forEach(function(cat) { %>
-                                    <li>
-                                        <a href="javascript:void(0)" class="filter-link <%= String(currentFilters.category) === String(cat._id) ? 'active' : '' %>" onclick="selectFilter('category', '<%= cat._id %>', this)">
-                                            <%= cat.name %>
-                                        </a>
-                                    </li>
-                                    <% }); %>
-                            </ul>
-                        </div>
-
-                        <!-- Attribute -->
-                        <% if (categoryAttributes && categoryAttributes.length > 0) { %>
-                            <div class="filter-group">
-                                <div class="filter-group-title">Attributes</div>
-                                <ul class="filter-link-list" id="attributeList">
-                                    <li>
-                                        <a href="javascript:void(0)" class="filter-link <%= !currentFilters.categoryAttribute ? 'active' : '' %>" onclick="selectFilter('categoryAttribute', '', this)">All Attributes</a>
-                                    </li>
-                                    <% categoryAttributes.forEach(function(attr) { %>
-                                        <li>
-                                            <a href="javascript:void(0)" class="filter-link <%= currentFilters.categoryAttribute == attr ? 'active' : '' %>" onclick="selectFilter('categoryAttribute', '<%= attr %>', this)">
-                                                <%= attr %>
+                                <% sortedCategories.forEach(function(cat) { %>
+                                    <% var catAttrs = attributesByCategory[String(cat._id)] || []; %>
+                                        <li class="category-item">
+                                            <a href="javascript:void(0)" class="filter-link category-link <%= (String(currentFilters.category) === String(cat._id) && !currentFilters.categoryAttribute) ? 'active' : '' %>" onclick="selectCategory('<%= cat._id %>', this)">
+                                                <%= cat.name %>
                                             </a>
-                                        </li>
-                                        <% }); %>
-                                </ul>
-                            </div>
-                            <% } %>
 
-                                <!-- Size -->
-                                <% if (sizes && sizes.length > 0) { %>
-                                    <div class="filter-group">
-                                        <div class="filter-group-title">Size</div>
-                                        <ul class="filter-link-list" id="sizeList">
-                                            <li>
-                                                <a href="javascript:void(0)" class="filter-link <%= !currentFilters.size ? 'active' : '' %>" onclick="selectFilter('size', '', this)">All Sizes</a>
-                                            </li>
-                                            <% sizes.forEach(function(size) { %>
-                                                <li>
-                                                    <a href="javascript:void(0)" class="filter-link <%= currentFilters.size == size ? 'active' : '' %>" onclick="selectFilter('size', '<%= size %>', this)">
-                                                        <%= size %>
-                                                    </a>
-                                                </li>
-                                                <% }); %>
-                                        </ul>
-                                    </div>
-                                    <% } %>
-
-                                        <!-- Color -->
-                                        <% if (colors && colors.length > 0) { %>
-                                            <div class="filter-group">
-                                                <div class="filter-group-title">Color</div>
-                                                <ul class="filter-link-list" id="colorList">
-                                                    <li>
-                                                        <a href="javascript:void(0)" class="filter-link <%= !currentFilters.color ? 'active' : '' %>" onclick="selectFilter('color', '', this)">All Colors</a>
-                                                    </li>
-                                                    <% colors.forEach(function(color) { %>
+                                            <% if (catAttrs.length > 0) { %>
+                                                <ul class="filter-link-list attribute-sublist">
+                                                    <% catAttrs.forEach(function(attr) { %>
                                                         <li>
-                                                            <a href="javascript:void(0)" class="filter-link <%= currentFilters.color == color ? 'active' : '' %>" onclick="selectFilter('color', '<%= color %>', this)">
-                                                                <%= color %>
+                                                            <a href="javascript:void(0)" class="filter-link attribute-link <%= (String(currentFilters.category) === String(cat._id) && currentFilters.categoryAttribute === attr) ? 'active' : '' %>" onclick="selectCategoryAttribute('<%= cat._id %>', '<%= attr %>', this)">
+                                                                <%= attr %>
                                                             </a>
                                                         </li>
                                                         <% }); %>
                                                 </ul>
-                                            </div>
-                                            <% } %>
+                                                <% } %>
+                                        </li>
+                                        <% }); %>
+                            </ul>
+                        </div>
 
                         <!-- hidden inputs driving the filter state -->
                         <input type="hidden" id="category" name="category" value="<%= currentFilters.category %>">
                         <input type="hidden" id="categoryAttribute" name="categoryAttribute" value="<%= currentFilters.categoryAttribute %>">
-                        <input type="hidden" id="size" name="size" value="<%= currentFilters.size %>">
-                        <input type="hidden" id="color" name="color" value="<%= currentFilters.color %>">
                         <input type="hidden" id="minPrice" name="minPrice" value="<%= currentFilters.minPrice %>">
                         <input type="hidden" id="maxPrice" name="maxPrice" value="<%= currentFilters.maxPrice %>">
                         <input type="hidden" id="search" name="search" value="<%= currentFilters.search %>">
@@ -1397,7 +1385,9 @@
                                 </button>
                             </div>
 
+                            <!-- Default listing is oldest-first (createdAt ascending) -->
                             <select class="form-select" id="toolbarSortBy">
+                                <option value="oldest" <%=(!currentFilters.sortBy || currentFilters.sortBy=='oldest') ? 'selected' : '' %>>Oldest First</option>
                                 <option value="newest" <%=currentFilters.sortBy=='newest' ? 'selected' : '' %>>Newest First</option>
                                 <option value="price_low" <%=currentFilters.sortBy=='price_low' ? 'selected' : '' %>>Price: Low to High</option>
                                 <option value="price_high" <%=currentFilters.sortBy=='price_high' ? 'selected' : '' %>>Price: High to Low</option>
@@ -1500,45 +1490,38 @@
                                                     </div>
                                                     <% } %>
 
-                                                        <!-- Size Information -->
-                                                        <% if (product.size) { %>
-                                                            <div class="size-info">
-                                                                <small><strong>Size:</strong> <%= product.size %></small>
-                                                            </div>
-                                                            <% } %>
+                                                        <!-- Category and Attributes -->
+                                                        <div class="category-container">
+                                                            <% if (product.category && product.category.name) { %>
+                                                                <span class="category-badge">
+                                                                    <%= product.category.name %>
+                                                                </span>
+                                                                <% } %>
 
-                                                                <!-- Category and Attributes -->
-                                                                <div class="category-container">
-                                                                    <% if (product.category && product.category.name) { %>
-                                                                        <span class="category-badge">
-                                                                            <%= product.category.name %>
+                                                                    <% if (product.categoryAttribute) { %>
+                                                                        <span class="attribute-badge">
+                                                                            <%= product.categoryAttribute %>
                                                                         </span>
                                                                         <% } %>
 
-                                                                            <% if (product.categoryAttribute) { %>
-                                                                                <span class="attribute-badge">
-                                                                                    <%= product.categoryAttribute %>
-                                                                                </span>
+                                                                            <!-- Offer Tag (small indicator) -->
+                                                                            <% if (product.hasOffer && product.discountPercentage > 0) { %>
+                                                                                <span class="offer-tag">Special Offer</span>
                                                                                 <% } %>
+                                                        </div>
 
-                                                                                    <!-- Offer Tag (small indicator) -->
-                                                                                    <% if (product.hasOffer && product.discountPercentage > 0) { %>
-                                                                                        <span class="offer-tag">Special Offer</span>
-                                                                                        <% } %>
-                                                                </div>
-
-                                                                <!-- Action buttons -->
-                                                                <div class="action-buttons">
-                                                                    <% if (product.quantity > 0) { %>
-                                                                        <button class="btn btn-outline-primary btn-sm add-to-cart" data-product-id="<%= product._id %>" onclick="event.stopPropagation(); addToCart('<%= product._id %>', this)">
-                                                                            <i class="fas fa-shopping-cart me-1"></i>Add to Cart
-                                                                        </button>
-                                                                        <% } else { %>
-                                                                            <button class="btn btn-outline-secondary btn-sm" disabled>
-                                                                                <i class="fas fa-times-circle me-1"></i>Out of Stock
-                                                                            </button>
-                                                                            <% } %>
-                                                                </div>
+                                                        <!-- Action buttons -->
+                                                        <div class="action-buttons">
+                                                            <% if (product.quantity > 0) { %>
+                                                                <button class="btn btn-outline-primary btn-sm add-to-cart" data-product-id="<%= product._id %>" onclick="event.stopPropagation(); addToCart('<%= product._id %>', this)">
+                                                                    <i class="fas fa-shopping-cart me-1"></i>Add to Cart
+                                                                </button>
+                                                                <% } else { %>
+                                                                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                                                                        <i class="fas fa-times-circle me-1"></i>Out of Stock
+                                                                    </button>
+                                                                    <% } %>
+                                                        </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1783,20 +1766,16 @@
 
                 const category = document.getElementById('category').value;
                 const categoryAttribute = document.getElementById('categoryAttribute').value;
-                const size = document.getElementById('size').value;
                 const minPrice = document.getElementById('minPrice').value;
                 const maxPrice = document.getElementById('maxPrice').value;
-                const color = document.getElementById('color').value;
                 const search = document.getElementById('toolbarSearch') ? document.getElementById('toolbarSearch').value : document.getElementById('search').value;
                 const sortBy = document.getElementById('toolbarSortBy') ? document.getElementById('toolbarSortBy').value : document.getElementById('sortBy').value;
                 const limit = document.getElementById('toolbarLimit') ? document.getElementById('toolbarLimit').value : document.getElementById('limit').value;
 
                 if (category) params.set('category', category);
                 if (categoryAttribute) params.set('categoryAttribute', categoryAttribute);
-                if (size) params.set('size', size);
                 if (minPrice) params.set('minPrice', minPrice);
                 if (maxPrice) params.set('maxPrice', maxPrice);
-                if (color) params.set('color', color);
                 if (search) params.set('search', search);
                 if (sortBy) params.set('sortBy', sortBy);
                 if (limit) params.set('limit', limit);
@@ -1846,6 +1825,11 @@
                             currentGroup.innerHTML = newActiveFiltersGroup.innerHTML;
                             currentGroup.style.display = newActiveFiltersGroup.style.display === 'none' ? 'none' : '';
                         }
+                        // The Category/Attribute tree itself is not swapped -
+                        // it always shows every category and every attribute,
+                        // regardless of the current filter selection. Only its
+                        // active/highlighted link changes, handled separately
+                        // by selectCategory()/selectCategoryAttribute()/removeFilter().
 
                         if (pushHistory) {
                             window.history.pushState({}, '', url + '#products');
@@ -1915,19 +1899,53 @@
                 }, 500);
             }
 
-            // Select a category / attribute / size / color from the sidebar
-            // link list, highlight it, and apply immediately (no page reload)
+            // "All Categories" link - clears both category and attribute
             function selectFilter(filterName, value, el) {
                 const hiddenInput = document.getElementById(filterName);
                 if (hiddenInput) hiddenInput.value = value;
 
+                if (filterName === 'category') {
+                    const attrInput = document.getElementById('categoryAttribute');
+                    if (attrInput) attrInput.value = '';
+                }
+
                 if (el) {
-                    const list = el.closest('.filter-link-list');
-                    if (list) {
-                        list.querySelectorAll('.filter-link').forEach(a => a.classList.remove('active'));
+                    const tree = document.getElementById('categoryList');
+                    if (tree) {
+                        tree.querySelectorAll('.filter-link').forEach(a => a.classList.remove('active'));
                     }
                     el.classList.add('active');
                 }
+
+                applyFilters(true);
+            }
+
+            // Clicking a Category name filters by that category only
+            // (clears any previously selected attribute)
+            function selectCategory(categoryId, el) {
+                document.getElementById('category').value = categoryId;
+                document.getElementById('categoryAttribute').value = '';
+
+                const tree = document.getElementById('categoryList');
+                if (tree) {
+                    tree.querySelectorAll('.filter-link').forEach(a => a.classList.remove('active'));
+                }
+                if (el) el.classList.add('active');
+
+                applyFilters(true);
+            }
+
+            // Clicking an Attribute (nested under a Category) filters by
+            // both that category and that attribute together
+            function selectCategoryAttribute(categoryId, attr, el) {
+                document.getElementById('category').value = categoryId;
+                document.getElementById('categoryAttribute').value = attr;
+
+                const tree = document.getElementById('categoryList');
+                if (tree) {
+                    tree.querySelectorAll('.filter-link').forEach(a => a.classList.remove('active'));
+                }
+                if (el) el.classList.add('active');
 
                 applyFilters(true);
             }
@@ -1940,12 +1958,19 @@
                 const el = document.getElementById(filterName);
                 if (el) el.value = '';
 
-                // Reset "All ..." link to active in the matching sidebar list
-                const listMap = { category: 'categoryList', categoryAttribute: 'attributeList', size: 'sizeList', color: 'colorList' };
-                if (listMap[filterName]) {
-                    const list = document.getElementById(listMap[filterName]);
-                    if (list) {
-                        list.querySelectorAll('.filter-link').forEach((a, idx) => a.classList.toggle('active', idx === 0));
+                // Removing the category also clears the attribute (since
+                // attributes are nested under a category); removing just the
+                // attribute keeps the category selected.
+                if (filterName === 'category') {
+                    const attrInput = document.getElementById('categoryAttribute');
+                    if (attrInput) attrInput.value = '';
+                }
+
+                // Reset the highlighted link in the merged category/attribute tree
+                if (filterName === 'category' || filterName === 'categoryAttribute') {
+                    const tree = document.getElementById('categoryList');
+                    if (tree) {
+                        tree.querySelectorAll('.filter-link').forEach((a, idx) => a.classList.toggle('active', idx === 0));
                     }
                 }
 
@@ -1964,17 +1989,20 @@
             function clearAllFilters() {
                 document.getElementById('category').value = '';
                 document.getElementById('categoryAttribute').value = '';
-                document.getElementById('size').value = '';
                 document.getElementById('minPrice').value = '';
                 document.getElementById('maxPrice').value = '';
-                document.getElementById('color').value = '';
                 if (document.getElementById('toolbarSearch')) document.getElementById('toolbarSearch').value = '';
-                if (document.getElementById('toolbarSortBy')) document.getElementById('toolbarSortBy').value = 'newest';
+                if (document.getElementById('toolbarSortBy')) document.getElementById('toolbarSortBy').value = 'oldest';
                 if (document.getElementById('toolbarLimit')) document.getElementById('toolbarLimit').value = '12';
 
-                document.querySelectorAll('.filter-link-list').forEach(function(list) {
-                    list.querySelectorAll('.filter-link').forEach((a, idx) => a.classList.toggle('active', idx === 0));
-                });
+                // Clear every highlighted link, then re-activate only the
+                // top-level "All Categories" link in the merged tree
+                const tree = document.getElementById('categoryList');
+                if (tree) {
+                    tree.querySelectorAll('.filter-link').forEach(a => a.classList.remove('active'));
+                    const allCategoriesLink = tree.querySelector('.filter-link');
+                    if (allCategoriesLink) allCategoriesLink.classList.add('active');
+                }
 
                 if (priceSlider) priceSlider.set([0, 5000]);
 

@@ -404,8 +404,6 @@ const logout = async function (req, res) {
 
 
 
-
-
 const applyOffers = async (products) => {
     try {
         const currentDate = new Date();
@@ -501,28 +499,24 @@ const applyOffers = async (products) => {
 
 
 
-
 const loadHome = async function (req, res) {
     try {
         const user = req.session.user;
         console.log("session log", user);
-
+ 
         // Find only listed categories
         const listedCategories = await Category.find({ isListed: true }).select("_id");
-
+ 
         let filter = {
             isBlocked: false,
             category: { $in: listedCategories.map(c => c._id) }
         };
-
+ 
         if (req.query.category) {
             filter.category = req.query.category
         }
         if (req.query.categoryAttribute) {
             filter.categoryAttribute = new RegExp(req.query.categoryAttribute, "i")
-        }
-        if (req.query.size) {
-            filter.size = new RegExp(req.query.size, "i")
         }
         if (req.query.minPrice || req.query.maxPrice) {
             filter.salePrice = {};
@@ -533,25 +527,23 @@ const loadHome = async function (req, res) {
                 filter.salePrice.$lte = parseInt(req.query.maxPrice);
             }
         }
-
-        if (req.query.color) {
-            filter.color = new RegExp(req.query.color, "i")
-        }
+ 
         if (req.query.status && req.query.status !== 'all') {
             filter.status = req.query.status
         }
-
+ 
         if (req.query.search) {
             filter.$or = [
                 { productName: new RegExp(req.query.search, 'i') },
                 { description: new RegExp(req.query.search, 'i') }
             ];
         }
-
+ 
         let sortOptions = {};
-
-        const sortBy = req.query.sortBy || 'newest';
-
+ 
+        // Default listing is oldest-first (createdOn ascending)
+        const sortBy = req.query.sortBy || 'oldest';
+ 
         switch (sortBy) {
             case 'price_low':
                 sortOptions = { salePrice: 1 };
@@ -575,51 +567,76 @@ const loadHome = async function (req, res) {
                 sortOptions = { quantity: -1 };
                 break;
             default:
-                sortOptions = { createdAt: -1 } // Fixed: CreateAt -> createdAt
+                sortOptions = { createdOn: 1 } // Fallback also defaults to oldest-first
         }
-
+ 
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
-        const skip = (page - 1) * limit; // This was missing!
-
+        const skip = (page - 1) * limit;
+ 
         // Get products WITHOUT .lean() because applyOffers needs mongoose documents
         const products = await Product.find(filter)
             .populate('category', 'name attributes')
             .skip(skip)
             .limit(limit)
             .sort(sortOptions);
-        // Removed .lean() here
-
+ 
         // Apply offers to products
         const productsWithOffers = await applyOffers(products);
-
+ 
         const totalProducts = await Product.countDocuments(filter);
         const totalPages = Math.ceil(totalProducts / limit);
-
-        const categories = await Category.find({ isListed: true }).lean();
-
-        const allColor = await Product.distinct('color', { isBlocked: false });
-        const sizes = await Product.distinct('size', { isBlocked: false });
-        const categoryAttributes = await Product.distinct('categoryAttribute', { isBlocked: false });
-
+ 
+        // Categories, sorted alphabetically (A-Z) so the sidebar/dropdowns
+        // don't depend on the view to re-sort them.
+        const categories = await Category.find({ isListed: true })
+            .collation({ locale: 'en', strength: 2 })
+            .sort({ name: 1 })
+            .lean();
+ 
+        // Attributes for EVERY listed category, computed in a single
+        // aggregation, so the sidebar can nest attributes under each
+        // category and keep the whole tree visible at all times (no
+        // need to re-fetch/hide anything based on the current selection).
+        const attributesAgg = await Product.aggregate([
+            {
+                $match: {
+                    isBlocked: false,
+                    category: { $in: listedCategories.map(c => c._id) },
+                    categoryAttribute: { $nin: [null, ''] }
+                }
+            },
+            {
+                $group: {
+                    _id: "$category",
+                    attributes: { $addToSet: "$categoryAttribute" }
+                }
+            }
+        ]);
+ 
+        const attributesByCategory = {};
+        attributesAgg.forEach(function (entry) {
+            attributesByCategory[String(entry._id)] = entry.attributes.sort(function (a, b) {
+                return String(a).localeCompare(String(b));
+            });
+        });
+ 
         const priceRange = await Product.aggregate([
             { $match: { isBlocked: false } },
             { $group: { _id: null, minPrice: { $min: "$salePrice" }, maxPrice: { $max: "$salePrice" } } }
         ]);
-
+ 
         const currentFilters = {
             category: req.query.category || '',
             categoryAttribute: req.query.categoryAttribute || '',
-            size: req.query.size || '',
             minPrice: req.query.minPrice || '',
             maxPrice: req.query.maxPrice || '',
-            color: req.query.color || '',
             status: req.query.status || 'all',
             search: req.query.search || '',
             sortBy,
             limit
         }
-
+ 
         // Common data to pass to the view
         const viewData = {
             currentPage: page,
@@ -627,15 +644,13 @@ const loadHome = async function (req, res) {
             totalProduct: totalProducts,
             products: productsWithOffers,
             categories,
-            categoryAttributes,
-            sizes,
-            colors: allColor,
+            attributesByCategory,
             priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
             currentFilters,
             query: req.query
         };
-
-
+ 
+ 
         if (user) {
             const userData = await User.findById(user._id).lean();
             if (userData) {
@@ -643,37 +658,15 @@ const loadHome = async function (req, res) {
             }
             return res.render("user/home", {
                 ...viewData,
-                user: userData,
-                currentPage: page,
-                totalPage: totalPages,
-                totalProduct: totalProducts,
-                products: productsWithOffers, // Use products with offers
-                categories,
-                categoryAttributes,
-                sizes,
-                colors: allColor,
-                priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
-                currentFilters,
-                query: req.query
+                user: userData
             });
         } else {
             return res.render("user/home", {
                 ...viewData,
-                user: null,
-                currentPage: page,
-                totalPage: totalPages,
-                totalProduct: totalProducts,
-                products: productsWithOffers, // Use products with offers
-                categories,
-                categoryAttributes,
-                sizes,
-                colors: allColor,
-                priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
-                currentFilters,
-                query: req.query
+                user: null
             });
         }
-
+ 
     } catch (error) {
         console.error("shop page not found", error);
         return res.redirect("/");
