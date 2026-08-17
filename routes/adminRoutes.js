@@ -73,6 +73,7 @@ router.use('/addProduct', (error, req, res, next) => {
 router.get("/addProduct",adminAuth,productController.loadProduct);
 router.post('/addProduct',adminAuth, uploadProduct.array("images", 10), productController.addProduct);
 router.get("/productLists", adminAuth,productController.loadProductsList);
+router.post('/productLists/updateStock', adminAuth, productController.updateProductStock);
 router.get("/productLists/edit/:id",adminAuth, productController.loadEditProduct);
 router.post("/productLists/edit/:id",adminAuth,uploadProduct.array("images", 10), productController.editProduct);
 router.post('/productLists/toggleList',adminAuth, productController.toggleList);

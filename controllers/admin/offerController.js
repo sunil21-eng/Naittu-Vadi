@@ -5,7 +5,6 @@ const Product = require("../../models/productSchema");
 const loadOffer = async (req, res) => {
   try {
     const searchQuery = req.query.query || "";
-    console.log(searchQuery);
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
 
@@ -36,7 +35,7 @@ const loadOffer = async (req, res) => {
       pages: Array.from({ length: totalPages }, (_, i) => i + 1),
     });
   } catch (error) {
-    console.log(error);
+
   }
 };
 
@@ -46,14 +45,12 @@ const loadAddOffer = async (req, res) => {
     const products = await Product.find();
     res.render("admin/addoffer", { categories, products });
   } catch (error) {
-    console.log(error);
   }
 };
 
 
 const addOffer = async (req, res) => {
   try {
-    console.log(req.body);
 
     const {
       offerName,
@@ -152,14 +149,13 @@ const loadEditOffer = async (req, res) => {
     
     return res.render("admin/editoffer", { offer, categories, products });
   } catch (error) {
-    console.log("Error in loadEditOffer:", error);
+  
     res.redirect('/admin/offer?error=Error loading offer');
   }
 };
 
 const editOffer = async (req, res) => {
   try {
-    console.log("Request body:", req.body);
     
     const {
       offerName,

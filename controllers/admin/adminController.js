@@ -26,22 +26,21 @@ const login = async function (req, res) {
 
                if (passwordMatch) {
                     req.session.admin = { _id: admin._id, email: admin.email };
-                    console.log("Redirecting admin to /admin/dashboard");
+                    
                     res.redirect('/admin/dashboard')
                } else {
-                    console.log('password not match');
+                   
                     res.redirect('/admin/login')
                }
 
 
           } else {
-               console.log('no admin found');
+               
                return res.redirect('/admin/login')
           }
 
      } catch (error) {
 
-          console.log('login error:', error);
           return res.redirect('/admin/pageError')
 
      }
@@ -78,7 +77,6 @@ const logout = async function (req, res) {
         delete req.session.admin;  // only remove admin data
         return res.redirect('/admin/login');
     } catch (error) {
-        console.log("logout failed", error);
         return res.redirect('/admin/pageError');
     }
 

@@ -101,7 +101,6 @@ const editCategory = async function (req, res) {
         res.status(200).json({ success: true, message: "Category updated successfully" });
 
     } catch (error) {
-        console.log("error edit category", error);
         return res.status(500).json({ error: "Internal server error" })
     }
 

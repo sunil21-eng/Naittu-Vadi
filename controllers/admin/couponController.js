@@ -3,7 +3,6 @@ const Coupon = require("../../models/couponSchema");
 const loadCoupon = async (req, res) => {
   try {
     const searchQuery = req.query.query || "";
-    console.log(searchQuery);
     const page = parseInt(req.query.page) || 1;
     const limit = 5;
 
@@ -34,7 +33,7 @@ const loadCoupon = async (req, res) => {
       pages: Array.from({ length: totalPages }, (_, i) => i + 1),
     });
   } catch (error) {
-    console.log(error);
+    
   }
 };
 
@@ -42,7 +41,7 @@ const loadAddCoupon = async (req, res) => {
   try {
     return res.render("admin/addcoupon");
   } catch (error) {
-    console.log(error);
+    
   }
 };
 
@@ -75,7 +74,7 @@ const addCoupon = async (req, res) => {
 
     res.redirect("/admin/coupon");
   } catch (error) {
-    console.log(error);
+   
   }
 };
 
@@ -98,7 +97,7 @@ const editCoupon = async (req, res) => {
     };
     res.render("admin/editcoupon", { coupon });
   } catch (error) {
-    console.log(error);
+    
   }
 };
 

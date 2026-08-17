@@ -17,7 +17,7 @@ const loadSignup = async function (req, res) {
     try {
         return res.render('user/signup')
     } catch (error) {
-        console.log("home page not loading", error);
+        
         res.status(500).send("server Error")
     }
 };
@@ -57,9 +57,9 @@ async function sendEmailVerification(email, otp) {
 
         transport.verify((error, success) => {
             if (error) {
-                console.log("Transport verify error", error)
+                
             } else {
-                console.log("server is ready to take message", success)
+                
             }
         });
 
@@ -221,7 +221,7 @@ const signup = async function (req, res) {
             timer: "00:30",
             message: ""
         });
-        console.log("OTP send", otp)
+       
 
     } catch (error) {
 
@@ -296,7 +296,7 @@ const resend_otp = async function (req, res) {
         const emailSend = await sendEmailVerification(email, otp);
 
         if (emailSend) {
-            console.log("resend OTP Success", otp);
+           
             res.status(200).json({ success: true, message: "Resend OTP success" });
         } else {
             res.status(500).json({ success: false, message: "Resend OTP faild . please try again" });
@@ -334,37 +334,36 @@ const login = async function (req, res) {
         const findUser = await User.findOne({ email });
 
         if (!findUser) {
-            console.log('user not found ')
+           
             return res.render("user/user-login", { message: 'user not found' })
         }
 
         if (!findUser.isActive) {
-            console.log("user is blocked");
+           
             return res.render('user/user-login', { message: "user is blocked by admin" })
         }
-        console.log("login password", password);
-        console.log("stored hashpass", findUser.password);
+        
 
         if (!password || !findUser.password) {
-            console.log("Missing password values");
+           
             return res.render("user/user-login", { message: "Password missing" });
         }
 
         const passwordMatch = await bcrypt.compare(password, findUser.password);
 
         if (!passwordMatch) {
-            console.log("incorrect password")
+           
             return res.render("user/user-login", { message: "Password missing" });
         }
 
         req.session.user = { _id: findUser._id, email: findUser.email };
 
-        console.log('Login succuss');
+
         return res.redirect('/')
 
 
     } catch (error) {
-        console.log("Login error:", error)
+    
         return res.redirect('user/user-login', { message: "Login failed, try again later" });
     }
 }
@@ -376,29 +375,10 @@ const logout = async function (req, res) {
         delete req.session.user;
         return res.redirect('/login');
     } catch (error) {
-        console.log("Logout error", error);
+        
         return res.redirect('/pageNotFound');
     }
 
-
-
-    // try {
-
-    //     req.session.destroy(err =>{
-
-    //         if(err) {
-    //             console.log("logout error", err);
-    //             return res.render('/pageNotFound');
-    //         }
-    //         return res.redirect('/login');
-
-    //     })
-
-    // } catch (error) {
-
-    //     console.log("logout", error)
-    //     return res.render('/pageNotFound');
-    // };
 
 };
 
@@ -407,7 +387,6 @@ const logout = async function (req, res) {
 const applyOffers = async (products) => {
     try {
         const currentDate = new Date();
-        console.log("Current Date:", currentDate);
 
         const activeOffers = await Offer.find({
             status: true,
@@ -415,10 +394,10 @@ const applyOffers = async (products) => {
             endDate: { $gte: currentDate },
         });
 
-        console.log("Active Offers Found:", activeOffers.length);
+       
 
         if (activeOffers.length === 0) {
-            console.log("No active offers found");
+           
             return products.map(product => {
                 const productWithoutOffer = product.toObject();
                 productWithoutOffer.hasOffer = false;
@@ -426,12 +405,7 @@ const applyOffers = async (products) => {
             });
         }
 
-        console.log("Active Offers:", activeOffers.map(o => ({
-            name: o.offerName,
-            type: o.offerType,
-            discount: o.discount,
-            categoryIds: o.categoryId.map(id => id.toString())
-        })));
+        
 
         const productsWithOffers = products.map((product) => {
             const productWithOffer = product.toObject();
@@ -440,9 +414,6 @@ const applyOffers = async (products) => {
             const productId = product._id.toString();
             const productCategoryId = product.category?._id?.toString() || product.category?.toString();
 
-            console.log(`Checking product: ${product.productName}`);
-            console.log(`Product ID: ${productId}`);
-            console.log(`Product Category ID: ${productCategoryId}`);
 
             // Check if product has any applicable offers
             const applicableOffers = activeOffers.filter((offer) => {
@@ -455,7 +426,7 @@ const applyOffers = async (products) => {
                 return false;
             });
 
-            console.log(`Applicable offers for ${product.productName}:`, applicableOffers.length);
+          
 
             if (applicableOffers.length > 0) {
                 const maxDiscount = Math.max(
@@ -470,7 +441,7 @@ const applyOffers = async (products) => {
                 productWithOffer.discountPercentage = maxDiscount;
                 productWithOffer.hasOffer = true;
 
-                console.log(`Applied ${maxDiscount}% discount to ${product.productName}:`, {
+                (`Applied ${maxDiscount}% discount to ${product.productName}:`, {
                     originalPrice: product.salePrice,
                     discountedPrice: productWithOffer.discountedPrice,
                     finalPrice: discountedPrice
@@ -484,7 +455,7 @@ const applyOffers = async (products) => {
 
         // Log summary of products with offers
         const productsWithOffersCount = productsWithOffers.filter(p => p.hasOffer).length;
-        console.log(`Total products with offers: ${productsWithOffersCount} out of ${productsWithOffers.length}`);
+       
 
         return productsWithOffers;
     } catch (error) {
@@ -502,7 +473,6 @@ const applyOffers = async (products) => {
 const loadHome = async function (req, res) {
     try {
         const user = req.session.user;
-        console.log("session log", user);
  
         // Find only listed categories
         const listedCategories = await Category.find({ isListed: true }).select("_id");
@@ -732,7 +702,6 @@ const loadProduct = async function (req, res) {
         }
 
     } catch (error) {
-        console.log("Error occure in page loading:", error);
         return res.status(500).render("page-404", { error: "Something went wrong.Please try again" });
     }
 }
@@ -765,16 +734,7 @@ const getWishlist = async function (req, res) {
         if (wishlistProducts.length > 0) {
             wishlistProducts = await applyOffers(wishlistProducts);
 
-            // Optional: Log to verify offers are applied
-            console.log("Wishlist products with offers:",
-                wishlistProducts.map(p => ({
-                    name: p.productName,
-                    hasOffer: p.hasOffer,
-                    discount: p.discountPercentage,
-                    originalPrice: p.originalPrice,
-                    discountedPrice: p.discountedPrice
-                }))
-            );
+          
         }
 
         res.render("user/wishlist", {
@@ -784,7 +744,7 @@ const getWishlist = async function (req, res) {
         })
 
     } catch (error) {
-        console.log("getWishlist error:", error)
+       
         res.status(500).json({ success: false, message: "server error" })
     }
 }
@@ -848,7 +808,7 @@ const addToWishlist = async function (req, res) {
         });
 
     } catch (error) {
-        console.log("addToWishlist error:", error);
+       
         return res.status(500).json({
             success: false,
             message: "Something went wrong"
@@ -898,7 +858,7 @@ const removeFromWishlist = async function (req, res) {
         });
 
     } catch (error) {
-        console.log("removeFromWishlist error:", error);
+       
         res.status(500).json({ success: false, message: "Server error" });
     }
 }
@@ -967,23 +927,7 @@ const toggleWishlist = async (req, res) => {
 
 
 
-// const loadContact = async function (req, res) {
-//     try {
-//         let user = req.session?.user;
-//         if (user) {
-//             const userData = await User.findById(req.session?.user?._id)
-//             return res.render('user/contact', { user: userData })
-//         } else {
-//             return res.render('user/home', { user: null })
-//         }
 
-//     } catch (error) {
-
-//         console.log("loadContact", error);
-//         res.render('/')
-//     }
-
-// }
 const loadContact = async function (req, res) {
     try {
         let user = req.session?.user;
@@ -1017,7 +961,7 @@ const loadContact = async function (req, res) {
         }
 
     } catch (error) {
-        console.log("loadContact", error);
+        
         return res.redirect('/');
     }
 };
@@ -1055,7 +999,7 @@ const loadAbout = async function (req, res) {
         }
 
     } catch (error) {
-        console.log("loadabout", error);
+        
         return res.redirect('/');
     }
 };

@@ -33,7 +33,7 @@ const userProfile = async function (req, res) {
     if (!user) return res.render('user/login');
     return res.render('user/userProfile', { user });
   } catch (error) {
-    console.log("load userProfile:", error);
+  
     res.status(500).send("Error loading profile");
   }
 };
@@ -45,7 +45,7 @@ const editProfile = async function (req, res) {
     if (!user) return res.render('user/login');
     return res.render('user/editProfile', { user });
   } catch (error) {
-    console.log("load editProfile error:", error);
+    
     return res.status(500).send("Error loading edit profile");
   }
 };
@@ -129,7 +129,7 @@ const updateProfile = async function (req, res) {
         const oldPublicId = user.profileImage[0];
         if (oldPublicId && !oldPublicId.startsWith('/')) {
           await cloudinary.uploader.destroy(oldPublicId).catch(err =>
-            console.log('Error deleting old profile image:', err)
+            ('Error deleting old profile image:', err)
           );
         }
       }
@@ -146,7 +146,7 @@ const updateProfile = async function (req, res) {
       requiresOtp: false
     });
   } catch (error) {
-    console.log("updateProfile error:", error);
+    
     return res.status(500).send({ error: 'Server error' });
   }
 };
@@ -161,7 +161,7 @@ const deleteProfileImage = async function (req, res) {
       // Delete from Cloudinary (ignore old local paths starting with '/')
       if (imageId && !imageId.startsWith('/')) {
         await cloudinary.uploader.destroy(imageId).catch(err =>
-          console.log('Error deleting Cloudinary image:', err)
+          ('Error deleting Cloudinary image:', err)
         );
       }
       user.profileImage = [];
@@ -171,7 +171,7 @@ const deleteProfileImage = async function (req, res) {
       return res.json({ success: true, message: "No profile image to delete" });
     }
   } catch (error) {
-    console.log('Error deleting profile image:', error);
+    
     res.status(500).json({ error: 'Server error' });
   }
 };
@@ -201,7 +201,7 @@ const verifyProfileOtp = async (req, res) => {
       const oldPublicId = user.profileImage[0];
       if (oldPublicId && !oldPublicId.startsWith('/')) {
         await cloudinary.uploader.destroy(oldPublicId).catch(err =>
-          console.log('Error deleting old profile image:', err)
+          ('Error deleting old profile image:', err)
         );
       }
     }
@@ -400,7 +400,6 @@ const changePassword = async function (req, res) {
       }
     });
   } catch (error) {
-    console.log("changePassword:", error);
     res.redirect("/profile");
   }
 };
@@ -454,7 +453,7 @@ const getAddresses = async function (req, res) {
     const messages = { success: req.query.success || null, error: req.query.error || null };
     res.render('user/address', { user, addresses, title: 'Addresses - AllScouts', messages });
   } catch (error) {
-    console.log("loadgetAddresses error:", error);
+
     res.redirect('user/profile');
   }
 };
@@ -636,7 +635,7 @@ const deleteAddress = async function (req, res, next) {
     await userAddress.save();
     res.status(200).json({ success: true, message: 'Address deleted successfully', data: { deletedAddress: deletedAddressInfo, remainingAddressCount: userAddress.address.length } });
   } catch (error) {
-    console.log('Error deleting address:', error);
+
     next(error);
   }
 };
@@ -653,7 +652,7 @@ const getAddressForModal = async function (req, res) {
     if (!address) return res.status(404).json({ success: false, message: 'Address not found' });
     res.json({ success: true, address });
   } catch (error) {
-    console.log("", error);
+
     res.status(500).json({ success: false, message: 'Failed to fetch address' });
   }
 };
@@ -661,7 +660,7 @@ const getAddressForModal = async function (req, res) {
 // The old fix function is no longer necessary; we can keep it but it won't harm.
 const fixExistingProfileImages = async () => {
   // This can be kept for any remaining old local paths; no action needed.
-  console.log("fixExistingProfileImages is no longer required after Cloudinary migration.");
+ 
 };
 
 module.exports = {

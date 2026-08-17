@@ -54,11 +54,13 @@
             background-color: #2d3748;
         }
 
-        /* Search container styles */
-        .search-container {
+        /* Search and filter container */
+        .filter-container {
             margin-bottom: 20px;
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
             width: 100%;
         }
 
@@ -123,6 +125,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* Filter dropdowns */
+        .filter-dropdown {
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #ffffff;
+            color: #4a5568;
+            cursor: pointer;
+            min-width: 180px;
+            transition: border-color 0.2s;
+        }
+
+        .filter-dropdown:focus {
+            outline: none;
+            border-color: #1a202c;
+            box-shadow: 0 0 0 2px rgba(26, 32, 44, 0.2);
         }
 
         /* Table styles */
@@ -284,6 +305,50 @@
             background-color: #feebf0;
         }
 
+        /* Inline stock editing styles */
+        .stock-edit-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stock-input {
+            width: 70px;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .stock-input:focus {
+            outline: none;
+            border-color: #1a202c;
+            box-shadow: 0 0 0 2px rgba(26, 32, 44, 0.1);
+        }
+
+        .stock-save-btn {
+            background-color: #1a202c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .stock-save-btn:hover {
+            background-color: #2d3748;
+        }
+
+        .stock-save-btn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+
         /* Pagination styles */
         .pagination-container {
             display: flex;
@@ -294,6 +359,8 @@
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            flex-wrap: wrap;
+            gap: 4px;
         }
 
         .pagination-button {
@@ -442,7 +509,12 @@
                 align-self: flex-start;
             }
 
-            .search-box {
+            .filter-container {
+                gap: 12px;
+            }
+
+            .search-box,
+            .filter-dropdown {
                 width: 100%;
             }
 
@@ -546,8 +618,9 @@
             <a href="/admin/addProduct" class="add-product-button">Add New Product</a>
         </div>
         
-        <!-- Search Box - Left Aligned -->
-        <div class="search-container">
+        <!-- Search and Filter Controls -->
+        <div class="filter-container">
+            <!-- Search Box -->
             <div class="search-box">
                 <input 
                     type="text" 
@@ -560,6 +633,32 @@
                 </button>
                 <button id="search-btn" class="search-btn">🔍</button>
             </div>
+
+            <!-- Category Filter -->
+            <select id="category-filter" class="filter-dropdown">
+                <option value="">All Categories</option>
+                <% if (categories && categories.length) { %>
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat._id %>" <%= selectedCategory && selectedCategory.toString() === cat._id.toString() ? 'selected' : '' %>>
+                            <%= cat.name %>
+                        </option>
+                    <% }) %>
+                <% } %>
+            </select>
+
+            <!-- Category Attribute Filter -->
+            <select id="attribute-filter" class="filter-dropdown">
+                <option value="">All Attributes</option>
+                <% if (attributes && attributes.length) { %>
+                    <% attributes.forEach(attr => { 
+                        const attrValue = typeof attr === 'object' ? attr.name : attr;
+                    %>
+                        <option value="<%= attrValue %>" <%= selectedAttribute && selectedAttribute === attrValue ? 'selected' : '' %>>
+                            <%= attrValue %>
+                        </option>
+                    <% }) %>
+                <% } %>
+            </select>
         </div>
 
         <!-- Product Table Container -->
@@ -583,7 +682,8 @@
                     <% product.forEach((p, index)=> { %>
                         <tr id="product-<%= p._id %>">
                             <td>
-                                <%= (currentPage - 1) * 6 + index + 1 %>
+                                <!-- 20 products per page -->
+                                <%= (currentPage - 1) * 20 + index + 1 %>
                             </td>
                             <td>
                                 <!-- Using Cloudinary URL for product images -->
@@ -598,7 +698,21 @@
                             <td class="product-price"> ₹<%= p.salePrice %>
                             </td> 
                             <td class="product-stock">
-                                <%= p.quantity %>
+                                <div class="stock-edit-container">
+                                    <input 
+                                        type="number" 
+                                        id="stock-input-<%= p._id %>"
+                                        class="stock-input" 
+                                        value="<%= p.quantity %>" 
+                                        min="0" 
+                                        step="1"
+                                    >
+                                    <button 
+                                        class="stock-save-btn" 
+                                        onclick="updateStock('<%= p._id %>')"
+                                        title="Save stock"
+                                    >Save</button>
+                                </div>
                             </td>
                             <td>
                                 <span class="attribute-tag">
@@ -635,19 +749,19 @@
         <!-- Pagination Controls -->
         <div class="pagination-container">
             <!-- Previous button -->
-            <a href="/admin/productLists?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+            <a href="/admin/productLists?page=<%= currentPage - 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %><%= selectedCategory ? '&category=' + encodeURIComponent(selectedCategory) : '' %><%= selectedAttribute ? '&attribute=' + encodeURIComponent(selectedAttribute) : '' %>"
                 class="pagination-button <%= currentPage === 1 ? 'disabled' : '' %>">Previous</a>
 
             <!-- Page number buttons -->
             <% for (let i=1; i <=totalPages; i++) { %>
-                <a href="/admin/productLists?page=<%= i %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+                <a href="/admin/productLists?page=<%= i %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %><%= selectedCategory ? '&category=' + encodeURIComponent(selectedCategory) : '' %><%= selectedAttribute ? '&attribute=' + encodeURIComponent(selectedAttribute) : '' %>"
                     class="pagination-button <%= currentPage === i ? 'active-page' : '' %>">
                     <%= i %>
                 </a>
             <% } %>
 
             <!-- Next button -->
-            <a href="/admin/productLists?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+            <a href="/admin/productLists?page=<%= currentPage + 1 %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %><%= selectedCategory ? '&category=' + encodeURIComponent(selectedCategory) : '' %><%= selectedAttribute ? '&attribute=' + encodeURIComponent(selectedAttribute) : '' %>"
                 class="pagination-button <%= currentPage === totalPages ? 'disabled' : '' %>">Next</a>
         </div>
 
@@ -696,8 +810,6 @@
         // Function to handle product deletion
         async function deleteProduct(productId) {
             try {
-                // Construct the URL for the DELETE request.
-                // It's important that your backend has a route configured to handle this.
                 const response = await fetch(`/admin/productLists/${productId}`, {
                     method: 'DELETE',
                     headers: {
@@ -708,7 +820,6 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    // Find and remove the product row from the table
                     const productRow = document.getElementById(`product-${productId}`);
                     if (productRow) {
                         productRow.remove();
@@ -724,15 +835,13 @@
             }
         }
 
-        // This function now handles the dynamic toggling.
-        // It's important to keep your toggle logic separate from the delete logic.
+        // Toggle product listing (block/unblock)
         async function toggleProductListing(element) {
             const productId = element.dataset.productId;
             const isBlocked = element.dataset.isBlocked === 'true';
 
-            // Visually indicate loading state
             element.innerHTML = '<div class="spinner"></div>';
-            element.style.pointerEvents = 'none'; // Disable clicks during fetch
+            element.style.pointerEvents = 'none';
 
             try {
                 const response = await fetch('/admin/productLists/toggleList', {
@@ -742,21 +851,19 @@
                     },
                     body: JSON.stringify({
                         productId: productId,
-                        isListed: isBlocked // Invert the value for the API call
+                        isListed: isBlocked
                     })
                 });
 
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    const newIsBlocked = !isBlocked; // New `isBlocked` state
+                    const newIsBlocked = !isBlocked;
 
-                    // Update the DOM based on the new state
                     element.dataset.isBlocked = newIsBlocked;
                     element.classList.toggle('listed', !newIsBlocked);
                     element.classList.toggle('unlisted', newIsBlocked);
 
-                    // Update the text next to the toggle switch
                     const statusText = element.closest('.is-listed-section').querySelector('.status-text');
                     statusText.textContent = newIsBlocked ? 'Unlisted' : 'Listed';
 
@@ -769,61 +876,117 @@
                 console.error('Fetch error:', error);
                 showMessage('An error occurred. Please check your network connection.', 'error');
             } finally {
-                // Revert the visual state and re-enable clicks
                 element.innerHTML = '<span class="toggle-handle"></span>';
                 element.style.pointerEvents = 'auto';
             }
         }
 
-        // Search functionality
+        // New function: Update stock quantity
+        async function updateStock(productId) {
+            const inputElement = document.getElementById(`stock-input-${productId}`);
+            const saveBtn = inputElement?.nextElementSibling;
+
+            if (!inputElement || !saveBtn) return;
+
+            const newQuantity = parseInt(inputElement.value, 10);
+
+            // Validation
+            if (isNaN(newQuantity) || newQuantity < 0) {
+                showMessage('Stock quantity must be a non-negative integer.', 'error');
+                inputElement.value = inputElement.defaultValue; // reset to original
+                return;
+            }
+
+            // Disable input and button during request
+            inputElement.disabled = true;
+            saveBtn.disabled = true;
+            saveBtn.textContent = '...';
+
+            try {
+                const response = await fetch('/admin/productLists/updateStock', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        quantity: newQuantity
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage(result.message || 'Stock updated successfully', 'success');
+                    // Update the input value to the new stock (in case server rounded or changed)
+                    inputElement.value = result.newQuantity;
+                    inputElement.defaultValue = result.newQuantity;
+                } else {
+                    showMessage(result.message || 'Failed to update stock', 'error');
+                    // Reset to original value
+                    inputElement.value = inputElement.defaultValue;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showMessage('An error occurred while updating stock. Please try again.', 'error');
+                inputElement.value = inputElement.defaultValue;
+            } finally {
+                // Re-enable
+                inputElement.disabled = false;
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+            }
+        }
+
+        // Unified function to build the URL with current filters
+        function buildUrlWithFilters(page = 1) {
+            const params = new URLSearchParams();
+            const searchValue = document.getElementById('search-input').value.trim();
+            const categoryValue = document.getElementById('category-filter').value;
+            const attributeValue = document.getElementById('attribute-filter').value;
+
+            if (searchValue) params.set('search', searchValue);
+            if (categoryValue) params.set('category', categoryValue);
+            if (attributeValue) params.set('attribute', attributeValue);
+            params.set('page', page);
+
+            return `/admin/productLists?${params.toString()}`;
+        }
+
+        // Perform search with debounce
+        let searchTimeout;
+        function performSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                window.location.href = buildUrlWithFilters(1);
+            }, 500);
+        }
+
+        // Event listeners for filters and search
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('search-input');
             const clearSearchBtn = document.getElementById('clear-search');
             const searchBtn = document.getElementById('search-btn');
-            let searchTimeout;
-            
-            // Function to perform search
-            function performSearch() {
-                const searchValue = searchInput.value.trim();
-                const url = new URL(window.location.href);
-                
-                if (searchValue) {
-                    url.searchParams.set('search', searchValue);
-                    // Reset to first page when searching
-                    url.searchParams.set('page', 1);
-                } else {
-                    url.searchParams.delete('search');
-                }
-                
-                window.location.href = url.toString();
-            }
-            
-            // Event listener for search input with debouncing
+            const categoryFilter = document.getElementById('category-filter');
+            const attributeFilter = document.getElementById('attribute-filter');
+
+            // Search input debounce
             searchInput.addEventListener('input', () => {
-                // Show/hide clear button based on input
                 clearSearchBtn.style.display = searchInput.value ? 'block' : 'none';
-                
-                // Clear previous timeout
-                clearTimeout(searchTimeout);
-                
-                // Set new timeout for search execution (500ms delay)
-                searchTimeout = setTimeout(performSearch, 500);
+                performSearch();
             });
-            
-            // Event listener for clear button
+
             clearSearchBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 clearSearchBtn.style.display = 'none';
                 performSearch();
             });
-            
-            // Event listener for search button
+
             searchBtn.addEventListener('click', () => {
                 clearTimeout(searchTimeout);
                 performSearch();
             });
-            
-            // Allow pressing Enter to search immediately
+
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     clearTimeout(searchTimeout);
@@ -831,18 +994,24 @@
                 }
             });
 
-            // Check for success/error messages in the URL query parameters on page load
+            // Category filter change
+            categoryFilter.addEventListener('change', () => {
+                window.location.href = buildUrlWithFilters(1);
+            });
+
+            // Attribute filter change
+            attributeFilter.addEventListener('change', () => {
+                window.location.href = buildUrlWithFilters(1);
+            });
+
+            // Check for messages in URL query parameters
             const urlParams = new URLSearchParams(window.location.search);
             const successMessage = urlParams.get('success');
             const errorMessage = urlParams.get('error');
-            if (successMessage) {
-                showMessage(successMessage, 'success');
-            }
-            if (errorMessage) {
-                showMessage(errorMessage, 'error');
-            }
+            if (successMessage) showMessage(successMessage, 'success');
+            if (errorMessage) showMessage(errorMessage, 'error');
 
-            // Handle the delete confirmation button click
+            // Delete confirmation buttons
             document.getElementById('confirm-delete-btn').addEventListener('click', () => {
                 if (productIdToDelete) {
                     deleteProduct(productIdToDelete);
@@ -850,16 +1019,21 @@
                 hideDeleteConfirmation();
             });
 
-            // Handle the cancel button click
-            document.getElementById('cancel-delete-btn').addEventListener('click', () => {
-                hideDeleteConfirmation();
+            document.getElementById('cancel-delete-btn').addEventListener('click', hideDeleteConfirmation);
+
+            // Attach toggle listeners
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', () => toggleProductListing(toggle));
             });
 
-            // Attach event listeners dynamically to all toggle switches
-            const toggleSwitches = document.querySelectorAll('.toggle-switch');
-            toggleSwitches.forEach(toggle => {
-                toggle.addEventListener('click', () => {
-                    toggleProductListing(toggle);
+            // Attach keypress event for stock inputs (Enter key to save)
+            document.querySelectorAll('.stock-input').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const productId = input.id.replace('stock-input-', '');
+                        updateStock(productId);
+                    }
                 });
             });
         });

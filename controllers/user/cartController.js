@@ -73,7 +73,6 @@ const loadCart = async (req, res) => {
       return res.render("user/login");
     }
 
-    console.log("Loading cart page for user:", user._id);
 
     const cart = await Cart.findOne({ userId: user._id })
       .populate({
@@ -313,20 +312,16 @@ const updateCartQuantity = async (req, res) => {
       return res.status(400).json({ success: false, message: "Product unavailable" });
     }
 
-    const MAX_QTY = 5;
-    if (newQuantity > MAX_QTY) {
-      return res.status(400).json({
-        success: false,
-        message: `You can only add up to ${MAX_QTY} units of this product`
-      });
-    }
-
+    // ✅ KEEP: Stock availability check
     if (newQuantity > product.quantity) {
       return res.status(400).json({
         success: false,
         message: `Only ${product.quantity} units available in stock`
       });
     }
+
+    // ❌ REMOVED: Hard maximum per-product limit (MAX_QTY = 50)
+    // ❌ REMOVED: Any other per-product or per-user quantity cap
 
     let price;
     if (productWithOffer.hasOffer && productWithOffer.discountPercentage >= 100) {
@@ -382,7 +377,7 @@ const updateCartQuantity = async (req, res) => {
       price: price,
       itemSavings: itemSavings > 0 ? itemSavings : 0,
       isFree: cart.items[itemIndex].isFree,
-      cartData: cartData // Send full cart data for sync
+      cartData: cartData
     });
   } catch (error) {
     console.error("updateCartQuantity error:", error);

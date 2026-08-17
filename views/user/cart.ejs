@@ -893,7 +893,11 @@
                                         totalOriginalPrice += itemOriginalTotal;
                                         
                                         const canDecrease = item.quantity > 1;
-                                        const canIncrease = item.quantity < item.availableStock && !item.isBlocked;
+                                        // ============================================
+                                        // 🔥 CHANGE: Only blocked items have disabled + button.
+                                        // Stock check is done server-side and error is shown in toast.
+                                        // ============================================
+                                        const canIncrease = !item.isBlocked;
                                     %>
                                         <tr data-item-id="<%= item._id %>" data-product-id="<%= item.productId?._id %>" 
                                             data-available-stock="<%= item.availableStock %>" 
@@ -1282,7 +1286,6 @@
             const decrementBtn = row.querySelector('.decrement-btn');
             const incrementBtn = row.querySelector('.increment-btn');
             const quantityDisplay = row.querySelector('.quantity-display');
-            const availableStock = parseInt(row.getAttribute('data-available-stock') || '0');
             const isBlocked = row.getAttribute('data-is-blocked') === 'true';
 
             if (!quantityDisplay) return;
@@ -1298,9 +1301,12 @@
                 }
             }
 
-            // Update increment button
+            // ============================================
+            // 🔥 CHANGE: Increment button disabled ONLY when blocked.
+            // No stock check here – server will validate and show error.
+            // ============================================
             if (incrementBtn) {
-                if (currentQuantity >= availableStock || isBlocked || availableStock === 0) {
+                if (isBlocked) {
                     incrementBtn.disabled = true;
                 } else {
                     incrementBtn.disabled = false;
@@ -1508,11 +1514,6 @@
 
                         if (qtyDisplay) qtyDisplay.textContent = data.newQuantity;
 
-                        // Update row attributes for button state calculation
-                        if (data.availableStock !== undefined) {
-                            row.setAttribute('data-available-stock', data.availableStock);
-                        }
-
                         // Check if item is free
                         const isFree = row.querySelector('.free-price') !== null;
                         if (itemTotal) {
@@ -1554,6 +1555,7 @@
                         lastCartSync = localStorage.getItem('cartSync');
                     }
                 } else {
+                    // 🔥 ERROR HANDLING: Display backend error message (e.g., stock limit)
                     showToast(data.message || 'Failed to update quantity', 'danger');
                 }
             } catch (error) {

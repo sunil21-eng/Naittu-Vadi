@@ -16,7 +16,7 @@ const userAuth = async (req, res, next) => {
             return res.redirect("/login");
         }
     } catch (error) {
-        console.error("error in authendication middleware:", error);
+      
         res.status(500).send("Internal server error");
     }
 };
@@ -43,7 +43,7 @@ const checkUserStatus = async (req, res, next) => {
         if (!user.isActive) {
             // Destroy session
             req.session.destroy(err => {
-                if (err) console.log("Session destroy error:", err);
+                if (err)
                 // Redirect to login or blocked page
                 return res.redirect("/login?blocked=true");
             });
@@ -51,7 +51,7 @@ const checkUserStatus = async (req, res, next) => {
             next();
         }
     } catch (error) {
-        console.error(error);
+       
         next(error);
     }
 };

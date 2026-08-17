@@ -333,7 +333,6 @@ If you received this by mistake, please disregard it.
         return true;
 
     } catch (error) {
-        console.log("send mail error:", error);
         return false;
     }
 };
@@ -346,7 +345,6 @@ const securePassword = async function (password) {
         return hashPass;
 
     } catch (error) {
-        console.log("password hashig error:", error)
     }
 
 }
@@ -357,7 +355,7 @@ const loadForgot = async function (req, res) {
     try {
         res.render("user/forgotPassword")
     } catch (error) {
-        console.log('error to load forgot password:', error)
+
         return res.status(500).json({ success: false, error: "Internam server error" });
 
     }
@@ -383,10 +381,9 @@ const forgotPasword = async function (req, res) {
         req.session.email = email;
         req.session.otpExpiry = Date.now() + 10 * 60 * 1000
         res.render("user/forgotVerify-otp");
-        console.log("forgot reset otp:", otp);
 
     } catch (error) {
-        console.log("forgot password error:", error);
+
         return res.render('pageNotFound')
     }
 
@@ -411,7 +408,6 @@ const forgotResendOtp = async function (req, res) {
 
     } catch (error) {
 
-        console.log("error in resnd otp :", error)
         return res.status(404).json({ success: false, message: "internal server error" });
 
     }
@@ -421,7 +417,7 @@ const forgotResendOtp = async function (req, res) {
 const verifyForgototp = async function (req, res) {
     try {
         const enderedOtp = (req.body.otp || "").trim();
-        console.log(`userOtp in session:${req.session?.otp},
+        (`userOtp in session:${req.session?.otp},
             user input otp:${enderedOtp}`);
         if (!enderedOtp) {
             return res.status(404).json({ success: false, message: "OTP required" });
@@ -446,7 +442,7 @@ const getResetPassword = async function (req, res) {
         res.render("user/resetPassword");
 
     } catch (error) {
-        console.log("error to load reset password page:", error);
+        
         return res.render('/pageError')
     }
 
@@ -500,7 +496,7 @@ const resetPassword = async function (req, res) {
 
 
     } catch (error) {
-        console.log("error in reset password:", error)
+        
         return res.json({ success: false, redirectUrl: "/pageError" });
     }
 

@@ -21,11 +21,11 @@ const createOrder = async (req, res) => {
 
     const options = { amount: amountInPaise, currency: "INR", receipt, payment_capture: 1 };
     const order = await razorpay.orders.create(options);
+    
 
     req.session.walletOrder = { orderId: order.id, amount, userId };
     res.json({ success: true, order });
   } catch (error) {
-    console.error("Error creating Razorpay order:", error);
     res.status(500).json({ error: "Something went wrong", details: error.message });
   }
 };
@@ -89,7 +89,7 @@ const verifyPayment = async (req, res) => {
       newBalance: wallet.balance
     });
   } catch (error) {
-    console.error("Error verifying payment:", error);
+  
     res.status(500).json({ error: "Something went wrong" });
   }
 };
@@ -133,7 +133,7 @@ const transactionHistory = async (req, res) => {
       totalTransactions
     });
   } catch (error) {
-    console.error("Error fetching transactions:", error);
+   
     res.status(500).render("error", { message: "Error fetching transactions", status: 500 });
   }
 };
@@ -172,7 +172,7 @@ const loadWallet = async (req, res) => {
       totalPages
     });
   } catch (error) {
-    console.error("Error loading wallet:", error);
+   
     res.status(500).send("An error occurred while loading wallet");
   }
 };
@@ -186,7 +186,7 @@ const walletBalance = async (req, res) => {
     const wallet = await Wallet.findOne({ userId });
     res.json({ balance: wallet ? wallet.balance : 0 });
   } catch (error) {
-    console.error("Error fetching wallet balance:", error);
+   
     res.status(500).json({ error: "Could not retrieve wallet balance" });
   }
 };
@@ -216,7 +216,7 @@ const createWalletTransaction = async (userId, amount, transactionsMethod, order
     await wallet.save();
     return wallet;
   } catch (error) {
-    console.error("Error creating wallet transaction:", error);
+    
     throw error;
   }
 };

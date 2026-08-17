@@ -146,11 +146,17 @@ const addProduct = async function (req, res) {
 
 const loadProductsList = async function (req, res) {
   try {
-    const category = await Category.find({ isListed: true });
+    // Get all listed categories for the filter dropdown
+    const categories = await Category.find({ isListed: true }).lean();
+
+    // Pagination settings
     const page = parseInt(req.query.page) || 1;
-    const limit = 6;
+    const perPage = 20; // ✅ 20 products per page
+
+    // Build filter object
     let filter = {};
 
+    // Search filter
     const search = req.query.search?.trim();
     if (search) {
       filter.$or = [
@@ -159,40 +165,93 @@ const loadProductsList = async function (req, res) {
       ];
     }
 
+    // Category filter
+    const categoryFilter = req.query.category?.trim();
+    if (categoryFilter) {
+      filter.category = categoryFilter; // assuming category is stored as ObjectId
+    }
+
+    // Category attribute filter
+    const attributeFilter = req.query.attribute?.trim();
+    if (attributeFilter) {
+      filter.categoryAttribute = attributeFilter;
+    }
+
+    // Fetch products with filters, pagination, and sorting
     const productData = await Product.find(filter)
       .populate('category', 'name')
-      .skip((page - 1) * limit)
-      .limit(limit)
+      .skip((page - 1) * perPage)
+      .limit(perPage)
       .sort({ _id: -1 })
       .lean();
 
+    // Get total count for pagination
     const totalProduct = await Product.countDocuments(filter);
-    const totalPage = Math.ceil(totalProduct / limit);
+    const totalPages = Math.ceil(totalProduct / perPage);
 
+    // Get distinct category attributes for the filter dropdown
+    const attributes = (await Product.distinct('categoryAttribute')).filter(Boolean);
+
+    // Optional success/error messages from query parameters
     const errorMessage = req.query.error;
     const successMessage = req.query.success;
 
-    if (category) {
-      res.render('admin/products', {
-        category,
-        currentPage: page,
-        product: productData,
-        totalProducts: totalProduct,
-        totalPages: totalPage,
-        searchQuery: search || '',
-        success: successMessage,
-        error: errorMessage,
-        cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME // Pass to view
-      });
-    } else {
-      res.render('admin-error');
-    }
+    // Render the page
+    res.render('admin/products', {
+      categories,              // ✅ renamed from `category` to match frontend
+      attributes,              // ✅ list of distinct attribute values
+      currentPage: page,
+      product: productData,
+      totalProducts: totalProduct,
+      totalPages,
+      searchQuery: search || '',
+      selectedCategory: categoryFilter || '',   // ✅ for maintaining selected state
+      selectedAttribute: attributeFilter || '', // ✅ for maintaining selected state
+      success: successMessage,
+      error: errorMessage,
+      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME
+    });
   } catch (error) {
     console.error('Error loading product list:', error);
-    return res.status(400).json({ error: 'error to load product list page:' });
+    return res.status(500).json({ error: 'Failed to load product list page' });
   }
 };
 
+// Route: POST /admin/productLists/updateStock
+const updateProductStock = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+
+    if (!productId) {
+      return res.status(400).json({ success: false, message: "Product ID is required" });
+    }
+
+    // Validate quantity
+    const parsedQuantity = Number(quantity);
+    if (isNaN(parsedQuantity) || parsedQuantity < 0 || !Number.isInteger(parsedQuantity)) {
+      return res.status(400).json({ success: false, message: "Stock quantity must be a non-negative integer" });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { quantity: parsedQuantity },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Stock updated successfully",
+      newQuantity: product.quantity
+    });
+  } catch (error) {
+    console.error("Error updating stock:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 const loadEditProduct = async function (req, res) {
   try {
     const productID = req.params.id;
@@ -374,5 +433,6 @@ module.exports = {
   loadEditProduct,
   editProduct,
   toggleList,
-  deleteProduct
+  deleteProduct,
+  updateProductStock
 };
