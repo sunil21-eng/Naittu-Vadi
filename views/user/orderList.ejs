@@ -695,6 +695,13 @@
             border: 1px solid rgba(108, 117, 125, 0.2);
         }
 
+        .status-return-requested {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(243, 156, 18, 0.2);
+        }
+
+        /* Payment Status Styles */
         .payment-status {
             padding: 4px 6px;
             border-radius: 8px;
@@ -711,6 +718,7 @@
             border: 1px solid rgba(243, 156, 18, 0.2);
         }
 
+        .payment-paid,
         .payment-completed {
             background-color: rgba(42, 157, 143, 0.1);
             color: var(--success-color);
@@ -721,6 +729,22 @@
             background-color: rgba(230, 57, 70, 0.1);
             color: var(--danger-color);
             border: 1px solid rgba(230, 57, 70, 0.2);
+        }
+
+        .payment-refunded {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+
+        /* Payment Method Text */
+        .payment-method-text {
+            display: block;
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
         /* Pagination Styles */
@@ -1158,6 +1182,7 @@
                     <button class="filter-btn" data-filter="Delivered">Delivered</button>
                     <button class="filter-btn" data-filter="Cancelled">Cancelled</button>
                     <button class="filter-btn" data-filter="Returned">Returned</button>
+                    <button class="filter-btn" data-filter="Return Requested">Return Requested</button>
                 </div>
 
                 <!-- Orders Table -->
@@ -1516,8 +1541,16 @@
                     
                     html += '</div></td>';
                     html += '<td class="col-total"><div class="order-total-compact">₹' + ((order.finalAmount || order.orderAmount || totalSalePrice) || 0).toFixed(2) + '</div></td>';
-                    html += '<td class="col-status"><span class="status-badge status-' + ((order.orderStatus || 'pending').toLowerCase()) + '">' + (order.orderStatus || 'Pending') + '</span></td>';
-                    html += '<td class="col-payment"><span class="payment-status payment-' + ((order.paymentStatus || 'pending').toLowerCase()) + '">' + (order.paymentStatus || 'Pending') + '</span></td>';
+                    html += '<td class="col-status"><span class="status-badge status-' + ((order.orderStatus || 'pending').toLowerCase().replace(/\s+/g, '-')) + '">' + (order.orderStatus || 'Pending') + '</span></td>';
+                    
+                    // Payment cell with status and method
+                    var paymentStatus = (order.paymentStatus || 'pending').toLowerCase();
+                    var paymentMethod = (order.paymentMethod || 'COD').toUpperCase();
+                    html += '<td class="col-payment">';
+                    html += '<span class="payment-status payment-' + paymentStatus + '">' + (order.paymentStatus || 'Pending') + '</span>';
+                    html += '<span class="payment-method-text">' + paymentMethod + '</span>';
+                    html += '</td>';
+                    
                     html += '</tr>';
                 }
 

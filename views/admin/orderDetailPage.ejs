@@ -123,6 +123,7 @@
         .order-status-delivered { background-color: #2ecc71; color: white; }
         .order-status-cancelled { background-color: #e74c3c; color: white; }
         .order-status-returned { background-color: #9b59b6; color: white; }
+        .order-status-return-requested { background-color: #f39c12; color: white; }
 
         .payment-status-pending { background-color: #fed7d7; color: #c53030; }
         .payment-status-paid { background-color: #2ecc71; color: white; }
@@ -756,7 +757,7 @@
 
         <!-- Status Display -->
         <div class="status-display">
-            <span class="status-badge order-status-<%= order.orderStatus.toLowerCase() %>">
+            <span class="status-badge order-status-<%= order.orderStatus.toLowerCase().replace(/\s+/g, '-') %>">
                 <i class="fas fa-shopping-cart me-2"></i>Order: <%= order.orderStatus %>
             </span>
             <span class="status-badge payment-status-<%= order.paymentStatus.toLowerCase() %>">
@@ -783,6 +784,7 @@
                             <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                             <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                             <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
+                            <option value="Return Requested" <%= order.orderStatus === 'Return Requested' ? 'selected' : '' %>>Return Requested</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -825,7 +827,7 @@
                                 N/A
                             <% } %>
                         </p>
-                        <p><strong>Payment Method:</strong> <%= order.paymentMethod || 'N/A' %></p>
+                        <p><strong>Payment Method:</strong> <%= order.paymentMethod === 'Wallet' ? 'Wallet' : 'Cash on Delivery' %></p>
                     </div>
                 </div>
 
@@ -863,7 +865,7 @@
                 </div>
             </div>
 
-            <!-- Ordered Items Table (Read-only) -->
+            <!-- Ordered Items Table (Read-only) - Qty column moved next to Product -->
             <div class="items-section">
                 <h3><i class="fas fa-shopping-cart"></i> Ordered Items (<%= order.orderedItem ? order.orderedItem.length : 0 %>)</h3>
                 <div class="compact-table-container">
@@ -871,8 +873,8 @@
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Price</th>
                                 <th>Qty</th>
+                                <th>Price</th>
                                 <th>Size</th>
                                 <th>Total</th>
                             </tr>
@@ -884,7 +886,6 @@
                                         <td class="compact-product-cell">
                                             <div class="compact-product-info">
                                                 <% if (item.productId && item.productId.images && item.productId.images.length > 0) { %>
-                                                    <!-- Hardcoded Cloudinary cloud name -->
                                                     <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= item.productId.images[0] %>" 
                                                          alt="<%= item.productId.productName %>" 
                                                          class="compact-product-image"
@@ -897,8 +898,8 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>₹<%= item.productPrice.toFixed(2) %></td>
                                         <td><%= item.quantity %></td>
+                                        <td>₹<%= item.productPrice.toFixed(2) %></td>
                                         <td><%= item.size %></td>
                                         <td class="compact-total-cell">₹<%= item.totalProductPrice.toFixed(2) %></td>
                                     </tr>

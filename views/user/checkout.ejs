@@ -76,7 +76,6 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -594,12 +593,12 @@
                         <!-- Payment Method -->
                         <h4 class="section-title mt-5">Payment Method</h4>
                         <div class="mb-4">
-                            <div class="payment-method selected" onclick="selectPaymentMethod(this, 'Razorpay')">
+                            <div class="payment-method selected" onclick="selectPaymentMethod(this, 'COD')">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="paymentMethod" id="online" value="Razorpay" checked>
-                                    <label class="form-check-label fw-bold" for="online">Online Payment (Razorpay)</label>
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
+                                    <label class="form-check-label fw-bold" for="cod">Cash on Delivery (COD)</label>
                                 </div>
-                                <p class="mb-0 text-muted small mt-1">Pay securely with your credit/debit card or UPI</p>
+                                <p class="mb-0 text-muted small mt-1">Pay with cash when your order is delivered</p>
                             </div>
 
                             <div class="payment-method" id="walletPaymentMethod" onclick="selectWalletPayment(this)">
@@ -949,7 +948,6 @@
     <script>
         // Global variables
         let selectedAddressId = null;
-        let currentOrderId = null;
         let walletBalance = 0;
         // ===== ADD MINIMUM ORDER TOTAL FROM SERVER =====
         const orderTotal = parseFloat('<%= totalAmount %>') || 0;
@@ -961,7 +959,6 @@
             const defaultAddress = document.querySelector('.address-card.selected');
             if (defaultAddress) {
                 selectedAddressId = defaultAddress.getAttribute('data-address-id');
-                // Show courier branch info if available
                 updateCourierInfo(defaultAddress);
             } else {
                 const firstAddress = document.querySelector('.address-card');
@@ -1019,21 +1016,19 @@
 
         // Update wallet payment option based on balance
         function updateWalletPaymentOption() {
-            var totalAmount = orderTotal; // Use the global orderTotal variable
+            var totalAmount = orderTotal;
             var walletMethod = document.getElementById('walletPaymentMethod');
             var walletMessage = document.getElementById('walletMessage');
             var walletRadio = document.getElementById('wallet');
             var walletInfo = document.getElementById('walletInfo');
             
             if (walletBalance >= totalAmount) {
-                // Sufficient balance
                 walletMethod.classList.remove('disabled');
                 walletMethod.style.opacity = '1';
                 walletRadio.disabled = false;
                 walletMessage.innerHTML = '<span class="text-success"><i class="fas fa-check-circle me-1"></i>Sufficient balance for this order</span>';
                 walletInfo.innerHTML = '<span class="text-success">You can use your wallet balance to pay for this order</span>';
             } else {
-                // Insufficient balance
                 walletMethod.classList.add('disabled');
                 walletMethod.style.opacity = '0.6';
                 walletRadio.disabled = true;
@@ -1041,9 +1036,9 @@
                 walletMessage.innerHTML = '<span class="insufficient-balance"><i class="fas fa-exclamation-triangle me-1"></i>Insufficient balance. Need ₹' + shortage.toFixed(2) + ' more</span>';
                 walletInfo.innerHTML = '<span class="text-danger">Add money to your wallet or choose another payment method</span>';
                 
-                // If wallet was selected, switch to Online Payment
+                // If wallet was selected, switch to COD
                 if (walletRadio.checked) {
-                    document.querySelector('input[value="Razorpay"]').checked = true;
+                    document.getElementById('cod').checked = true;
                     document.querySelectorAll('.payment-method').forEach(function(payment) {
                         payment.classList.remove('selected');
                     });
@@ -1059,8 +1054,6 @@
             });
             element.classList.add('selected');
             selectedAddressId = addressId;
-            
-            // Update courier info
             updateCourierInfo(element);
         }
 
@@ -1075,7 +1068,7 @@
 
         // Special handling for wallet payment selection
         function selectWalletPayment(element) {
-            var totalAmount = orderTotal; // Use global variable
+            var totalAmount = orderTotal;
             if (walletBalance < totalAmount) {
                 alert('Insufficient wallet balance. Please choose another payment method or add money to your wallet.');
                 return;
@@ -1145,9 +1138,9 @@
             });
         }
 
-        // Enhanced place order function with wallet support
+        // Enhanced place order function for COD and Wallet
         async function placeOrder() {
-            // ===== MINIMUM ORDER CHECK (front-end guard) =====
+            // Minimum order check
             if (orderTotal < 1000) {
                 alert('Minimum order amount is ₹1,000. Please add more items to proceed.');
                 return;
@@ -1165,8 +1158,7 @@
 
             // Validate wallet balance for wallet payments
             if (paymentMethod === 'Wallet') {
-                var totalAmount = orderTotal;
-                if (walletBalance < totalAmount) {
+                if (walletBalance < orderTotal) {
                     alert('Insufficient wallet balance. Please choose another payment method.');
                     return;
                 }
@@ -1175,6 +1167,7 @@
             // Show loading overlay
             loadingOverlay.style.display = 'flex';
             placeOrderBtn.disabled = true;
+            loadingMessage.textContent = paymentMethod === 'Wallet' ? 'Processing wallet payment...' : 'Placing your order...';
 
             // Prepare order data
             var orderData = {
@@ -1186,216 +1179,35 @@
             console.log('Placing order with data:', orderData);
 
             try {
-                if (paymentMethod === 'Razorpay') {
-                    // For Razorpay, handle payment flow
-                    await handleRazorpayPayment(orderData);
-                } else if (paymentMethod === 'Wallet') {
-                    // For Wallet, place order directly
-                    await placeOrderDirect(orderData);
+                const response = await fetch('/placeOrder', {
+                    method: 'POST',
+                    credentials: "include",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Clear session coupon if applied
+                    if (orderData.couponApplied) {
+                        await fetch('/removeCoupon', { method: 'POST' });
+                    }
+                    // Redirect to success page
+                    window.location.href = '/orderSuccess/' + result.orderId;
+                } else {
+                    alert(result.error || 'Failed to place order');
+                    loadingOverlay.style.display = 'none';
+                    placeOrderBtn.disabled = false;
                 }
             } catch (error) {
-                console.error('Error in placeOrder:', error);
+                console.error('Error placing order:', error);
                 alert('Error placing order: ' + error.message);
                 loadingOverlay.style.display = 'none';
                 placeOrderBtn.disabled = false;
             }
-        }
-
-        // Handle direct order placement (Wallet)
-        async function placeOrderDirect(orderData) {
-            try {
-                loadingMessage.textContent = 'Placing your order...';
-
-                var response = await fetch('/placeOrder', {
-                    method: 'POST',
-                    credentials: "include",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData)
-                });
-
-                var result = await handleOrderResponse(response);
-
-                if (result.success) {
-                    // Clear session coupon
-                    await fetch('/removeCoupon', { method: 'POST' });
-                    window.location.href = '/orderSuccess/' + result.orderId;
-                } else {
-                    throw new Error(result.error || 'Failed to place order');
-                }
-            } catch (error) {
-                console.error('Error in placeOrderDirect:', error);
-                throw error;
-            }
-        }
-
-        // Handle Razorpay payment flow
-        async function handleRazorpayPayment(orderData) {
-            try {
-                // Step 1: Create order in database
-                loadingMessage.textContent = 'Creating your order...';
-
-                var createOrderResponse = await fetch('/placeOrder', {
-                    method: 'POST',
-                    credentials: "include",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData)
-                });
-
-                var orderResult = await handleOrderResponse(createOrderResponse);
-
-                if (!orderResult.success) {
-                    throw new Error(orderResult.error || 'Failed to create order');
-                }
-
-                currentOrderId = orderResult.orderId;
-                console.log('✅ Order created with ID:', currentOrderId);
-
-                // Step 2: Create Razorpay order
-                loadingMessage.textContent = 'Initializing payment...';
-
-                var razorpayResponse = await fetch('/create-razorpay-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        amount: orderTotal, // Use global variable
-                        orderId: currentOrderId
-                    })
-                });
-
-                var razorpayResult = await razorpayResponse.json();
-                console.log('🔍 Razorpay order creation response:', razorpayResult);
-
-                if (!razorpayResult.success) {
-                    // Update order status to failed
-                    await updatePaymentFailed(currentOrderId, razorpayResult.error);
-                    throw new Error(razorpayResult.error || 'Failed to create payment order');
-                }
-
-                console.log('✅ Razorpay order created:', razorpayResult.order);
-
-                // Step 3: Initialize Razorpay checkout
-                var options = {
-                    key: razorpayResult.order.key_id,
-                    amount: razorpayResult.order.amount,
-                    currency: razorpayResult.order.currency,
-                    name: 'Nattuvedi',
-                    description: 'Order Payment',
-                    order_id: razorpayResult.order.id,
-                    handler: async function (response) {
-                        console.log('💰 Razorpay payment response:', response);
-
-                        // Show loading during verification
-                        document.getElementById('loadingOverlay').style.display = 'flex';
-                        loadingMessage.textContent = 'Verifying payment...';
-
-                        try {
-                            // Verify payment
-                            var verifyResponse = await fetch('/verify-payment', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    razorpay_order_id: response.razorpay_order_id,
-                                    razorpay_payment_id: response.razorpay_payment_id,
-                                    razorpay_signature: response.razorpay_signature,
-                                    orderId: currentOrderId
-                                })
-                            });
-
-                            console.log('🔍 Verification response status:', verifyResponse.status);
-
-                            var verifyResult = await verifyResponse.json();
-                            console.log('✅ Verification result:', verifyResult);
-
-                            if (verifyResult.success) {
-                                console.log('🎉 Payment successful! Redirecting to success page...');
-                                // Clear session coupon
-                                await fetch('/removeCoupon', { method: 'POST' });
-                                window.location.href = '/orderSuccess/' + currentOrderId;
-                            } else {
-                                console.log('❌ Payment verification failed:', verifyResult.message);
-                                // Update payment status to failed
-                                await updatePaymentFailed(currentOrderId, verifyResult.message);
-                                window.location.href = '/orderFailure/' + currentOrderId + '?error=' + encodeURIComponent(verifyResult.message);
-                            }
-                        } catch (error) {
-                            console.error('💥 Payment verification error:', error);
-                            // Update payment status to failed
-                            await updatePaymentFailed(currentOrderId, error.message);
-                            window.location.href = '/orderFailure/' + currentOrderId + '?error=' + encodeURIComponent(error.message);
-                        } finally {
-                            document.getElementById('loadingOverlay').style.display = 'none';
-                        }
-                    },
-                    prefill: {
-                        name: '<%= user && user.name ? user.name : "Customer" %>',
-                        email: '<%= user && user.email ? user.email : "" %>',
-                        contact: '<%= user && user.phone ? user.phone : "" %>'
-                    },
-                    theme: {
-                        color: '#3498db'
-                    },
-                    modal: {
-                        ondismiss: async function () {
-                            console.log('❌ Payment modal dismissed by user');
-                            // Update payment status to failed
-                            await updatePaymentFailed(currentOrderId, 'Payment cancelled by user');
-                            window.location.href = '/orderFailure/' + currentOrderId + '?error=Payment cancelled';
-                        }
-                    }
-                };
-
-                // Hide loading overlay before showing Razorpay modal
-                document.getElementById('loadingOverlay').style.display = 'none';
-                document.getElementById('placeOrderBtn').disabled = false;
-
-                var rzp = new Razorpay(options);
-                rzp.open();
-
-            } catch (error) {
-                console.error('💥 Razorpay payment error:', error);
-                throw error;
-            }
-        }
-
-        // Update payment failed status
-        async function updatePaymentFailed(orderId, errorMessage) {
-            try {
-                await fetch('/payment-failed', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        orderId: orderId,
-                        error: errorMessage
-                    })
-                });
-            } catch (err) {
-                console.error('Error updating payment failed status:', err);
-            }
-        }
-
-        // Handle order response
-        async function handleOrderResponse(response) {
-            if (!response.ok) {
-                var text = await response.text();
-                var errorData;
-                try {
-                    errorData = JSON.parse(text);
-                } catch (e) {
-                    errorData = { error: text || 'Unknown error' };
-                }
-                throw new Error(errorData.error || 'HTTP error! status: ' + response.status);
-            }
-            return await response.json();
         }
 
         // Address management functions
@@ -1563,7 +1375,6 @@
                 isValid = false;
             }
 
-            // Courier branch validation (optional, just check length if provided)
             if (data.courierBranch && data.courierBranch.length > 100) {
                 document.getElementById('courierBranch').classList.add('is-invalid');
                 isValid = false;
@@ -1627,7 +1438,6 @@
                 }
             });
             
-            // Optional: Real-time validation for courier branch (just length)
             document.getElementById('courierBranch').addEventListener('blur', function() {
                 if (this.value && this.value.length > 100) {
                     this.classList.add('is-invalid');

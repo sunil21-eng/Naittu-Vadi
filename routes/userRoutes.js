@@ -86,21 +86,26 @@ router.post("/wallet/create-order", userAuth, walletController.createOrder);
 router.get("/wallet/transactions", userAuth, walletController.transactionHistory);
 
 
-router.get("/checkout",userAuth, orderController.getCheckoutPage)
-router.post("/addAddress" ,userAuth, orderController.addAddress)
-router.get('/getAddress/:addressId',userAuth, profileEditController.getAddressForModal);
+router.get("/checkout", userAuth, orderController.getCheckoutPage);
+router.post("/addAddress", userAuth, orderController.addAddress);
+router.get('/getAddress/:addressId', userAuth, profileEditController.getAddressForModal);
 
-router.post('/applyCoupon',userAuth,orderController.applyCoupon)
-router.post('/removeCoupon',userAuth, orderController.removeCoupon)
-router.post("/placeOrder" , userAuth,orderController.placeOrder)
-router.get("/orderSuccess/:orderId",userAuth, orderController.orderSuccessPage)
-router.post('/create-razorpay-order',userAuth, orderController.createRazorpayOrder);
-router.post('/verify-payment',userAuth, orderController.verifyPayment);
-router.get('/orderFailure/:orderId', userAuth,orderController.renderPaymentFailure)
-router.post('/payment-failed', userAuth,orderController.updatePaymentFailed)
+router.post('/applyCoupon', userAuth, orderController.applyCoupon);
+router.post('/removeCoupon', userAuth, orderController.removeCoupon);
+router.post("/placeOrder", userAuth, orderController.placeOrder);
+router.get("/orderSuccess/:orderId", userAuth, orderController.orderSuccessPage);
 
-
-
+//router.get("/checkout",userAuth, orderController.getCheckoutPage)
+//router.post("/addAddress" ,userAuth, orderController.addAddress)
+//router.get('/getAddress/:addressId',userAuth, profileEditController.getAddressForModal);
+//router.post('/applyCoupon',userAuth,orderController.applyCoupon)
+//router.post('/removeCoupon',userAuth, orderController.removeCoupon)
+//router.post("/placeOrder" , userAuth,orderController.placeOrder)
+//router.get("/orderSuccess/:orderId",userAuth, orderController.orderSuccessPage)
+//router.post('/create-razorpay-order',userAuth, orderController.createRazorpayOrder);
+//router.post('/verify-payment',userAuth, orderController.verifyPayment);
+//router.get('/orderFailure/:orderId', userAuth,orderController.renderPaymentFailure)
+//router.post('/payment-failed', userAuth,orderController.updatePaymentFailed)//
 
 // User orders
 router.get('/my-orders',userAuth, orderController.loadOrdersPage);
