@@ -541,7 +541,7 @@ const loadHome = async function (req, res) {
         }
  
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 12;
+        const limit = parseInt(req.query.limit) || 30; // ✅ Changed from 12 to 30
         const skip = (page - 1) * limit;
  
         // Get products WITHOUT .lean() because applyOffers needs mongoose documents

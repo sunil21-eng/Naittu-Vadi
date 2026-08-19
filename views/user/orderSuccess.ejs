@@ -516,6 +516,98 @@
 
         .status-paid { background: #d4edda; color: #155724; }
         .status-pending { background: #fff3cd; color: #856404; }
+
+        /* ===== NEW: COD Payment Instructions Styles ===== */
+        .cod-payment-section {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--warning-color);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+        }
+
+        .cod-payment-section h4 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .payment-detail-box {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            border: 2px dashed var(--warning-color);
+            margin-bottom: 1rem;
+        }
+
+        .payment-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .payment-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .payment-detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .payment-detail-value {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .pay-amount-highlight {
+            background: var(--accent-color);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            letter-spacing: 1px;
+        }
+
+        .pay-amount-highlight small {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .customer-service-call {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-radius: 10px;
+            padding: 1.25rem;
+            border-left: 4px solid var(--success-color);
+            margin-top: 1rem;
+        }
+
+        .customer-service-call h6 {
+            font-weight: 700;
+            color: var(--success-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .customer-service-call p {
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .customer-service-call strong {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -564,7 +656,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Payment Method</span>
-                        <span class="info-value text-capitalize"><%= order.paymentMethod || paymentMethod || 'N/A' %></span>
+                        <span class="info-value text-capitalize"><%= order.paymentMethod === 'Wallet' ? 'Wallet' : 'Cash on Delivery' %></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Payment Status</span>
@@ -579,6 +671,59 @@
                         <span class="info-value"><%= user && user.email ? user.email : (email || '') %></span>
                     </div>
                 </div>
+
+                <!-- ===== NEW: COD Payment Instructions (Only show for COD orders) ===== -->
+                <% if ((order.paymentMethod === 'COD' || paymentMethod === 'COD') && (order.paymentStatus !== 'Paid' && paymentStatus !== 'Paid')) { %>
+                <div class="cod-payment-section">
+                    <h4>
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        Payment Instructions - Cash on Delivery
+                    </h4>
+                    
+                    <div class="pay-amount-highlight">
+                        <small>PLEASE PAY</small>
+                        ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>
+                    </div>
+                    
+                    <p class="text-center fw-bold mb-3" style="font-size: 1.1rem;">
+                        Please complete your payment using <strong style="color: #4285F4;">Google Pay</strong> to confirm your order.
+                    </p>
+                    
+                    <div class="payment-detail-box">
+                        <h6 class="fw-bold text-center mb-3" style="color: var(--primary-color);">
+                            <i class="fab fa-google-pay me-2" style="color: #4285F4;"></i>
+                            Google Pay Details
+                        </h6>
+                        <div class="payment-detail-row">
+                            <span class="payment-detail-label">
+                                <i class="fas fa-mobile-alt me-2 text-primary"></i>GPay Number:
+                            </span>
+                            <span class="payment-detail-value">7092219895</span>
+                        </div>
+                        <div class="payment-detail-row">
+                            <span class="payment-detail-label">
+                                <i class="fas fa-user me-2 text-primary"></i>Account Name:
+                            </span>
+                            <span class="payment-detail-value">Sunilkumar</span>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-service-call">
+                        <h6>
+                            <i class="fas fa-phone-alt me-2"></i>
+                            Important Information
+                        </h6>
+                        <p>
+                            <i class="fas fa-check-circle me-2 text-success"></i>
+                            After completing the payment, you will receive a <strong>call from our customer service team</strong> to confirm the next steps.
+                        </p>
+                        <p class="mt-2">
+                            <i class="fas fa-headset me-2 text-warning"></i>
+                            Customer Service Contact: <strong>Sunilkumar - 7868829460</strong>
+                        </p>
+                    </div>
+                </div>
+                <% } %>
 
                 <!-- Enhanced Order Summary -->
                 <% if (orderSummary) { 
@@ -597,13 +742,11 @@
                             <i class="fas fa-receipt me-2"></i>Price Breakdown
                         </div>
                         <div class="summary-body">
-                            <!-- Original Subtotal (before any discounts) -->
                             <div class="summary-row">
                                 <span class="summary-label">Original Subtotal:</span>
                                 <span class="summary-value">₹<%= subtotal.toFixed(2) %></span>
                             </div>
                             
-                            <!-- Offer Savings (from product offers) -->
                             <% if (offerSavings > 0) { %>
                             <div class="summary-row">
                                 <span class="summary-label">
@@ -613,7 +756,6 @@
                             </div>
                             <% } %>
                             
-                            <!-- Coupon Discount -->
                             <% if (couponDiscount > 0) { %>
                             <div class="summary-row">
                                 <span class="summary-label">
@@ -623,13 +765,11 @@
                             </div>
                             <% } %>
                             
-                            <!-- Subtotal after offers -->
                             <div class="summary-row">
                                 <span class="summary-label fw-bold">Subtotal after Offers:</span>
                                 <span class="summary-value fw-bold">₹<%= (subtotal - offerSavings - couponDiscount).toFixed(2) %></span>
                             </div>
                             
-                            <!-- Shipping -->
                             <div class="summary-row">
                                 <span class="summary-label">Shipping:</span>
                                 <span class="summary-value">
@@ -641,7 +781,6 @@
                                 </span>
                             </div>
                             
-                            <!-- Total Savings Highlight -->
                             <% if (totalSavings > 0) { %>
                             <div class="summary-highlight">
                                 <div class="d-flex justify-content-between align-items-center">
@@ -656,7 +795,6 @@
                             </div>
                             <% } %>
                             
-                            <!-- Grand Total -->
                             <div class="summary-total-row d-flex justify-content-between align-items-center">
                                 <span class="fw-bold">Grand Total:</span>
                                 <span class="fw-bold text-success">₹<%= total.toFixed(2) %></span>
@@ -682,7 +820,6 @@
                             var itemSavings = (originalPrice - paidPrice) * item.quantity;
                             if (itemSavings > 0) totalItemsSavings += itemSavings;
                             
-                            // ✅ Updated: Cloudinary URL
                             var imagePath = '';
                             if (product.images && product.images.length > 0) {
                                 imagePath = 'https://res.cloudinary.com/dwne1v72e/image/upload/' + product.images[0];
@@ -864,7 +1001,7 @@
                         <i class="fas fa-headset fa-2x text-warning me-3"></i>
                         <div>
                             <h6 class="mb-1">Need Help?</h6>
-                            <p class="mb-0">Contact our customer support team at <strong>opensurfaces21@gmail.com</strong> or call <strong>+91-7868829460</strong></p>
+                            <p class="mb-0">Contact our customer support team at <strong>opensurfaces21@gmail.com</strong> or call <strong>+91-7878829460</strong></p>
                         </div>
                     </div>
                 </div>
@@ -929,6 +1066,7 @@
                 .action-buttons { display: none !important; }
                 .print-section { display: none !important; }
                 .order-summary-container { border: 1px solid #dee2e6 !important; }
+                .cod-payment-section { border: 2px solid #f39c12 !important; }
             }
         `;
         document.head.appendChild(style);

@@ -1397,9 +1397,9 @@
                             </select>
 
                             <select class="form-select" id="toolbarLimit">
-                                <option value="12" <%=currentFilters.limit==12 ? 'selected' : '' %>>12 Items</option>
-                                <option value="24" <%=currentFilters.limit==24 ? 'selected' : '' %>>24 Items</option>
-                                <option value="48" <%=currentFilters.limit==48 ? 'selected' : '' %>>48 Items</option>
+                                <option value="30" <%=currentFilters.limit==30 ? 'selected' : '' %>>30 Items</option>
+                                <option value="60" <%=currentFilters.limit==60 ? 'selected' : '' %>>60 Items</option>
+                                <option value="90" <%=currentFilters.limit==90 ? 'selected' : '' %>>90 Items</option>
                             </select>
                         </div>
                     </div>
@@ -1993,7 +1993,7 @@
                 document.getElementById('maxPrice').value = '';
                 if (document.getElementById('toolbarSearch')) document.getElementById('toolbarSearch').value = '';
                 if (document.getElementById('toolbarSortBy')) document.getElementById('toolbarSortBy').value = 'oldest';
-                if (document.getElementById('toolbarLimit')) document.getElementById('toolbarLimit').value = '12';
+                if (document.getElementById('toolbarLimit')) document.getElementById('toolbarLimit').value = '30';
 
                 // Clear every highlighted link, then re-activate only the
                 // top-level "All Categories" link in the merged tree
