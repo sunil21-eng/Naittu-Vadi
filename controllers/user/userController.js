@@ -470,23 +470,26 @@ const applyOffers = async (products) => {
 
 
 
+
 const loadHome = async function (req, res) {
     try {
         const user = req.session.user;
- 
+
         // Find only listed categories
         const listedCategories = await Category.find({ isListed: true }).select("_id");
- 
+
+        // Base filter: only non-blocked products belonging to listed categories
         let filter = {
             isBlocked: false,
             category: { $in: listedCategories.map(c => c._id) }
         };
- 
+
+        // Apply additional filters from query parameters
         if (req.query.category) {
-            filter.category = req.query.category
+            filter.category = req.query.category;
         }
         if (req.query.categoryAttribute) {
-            filter.categoryAttribute = new RegExp(req.query.categoryAttribute, "i")
+            filter.categoryAttribute = new RegExp(req.query.categoryAttribute, "i");
         }
         if (req.query.minPrice || req.query.maxPrice) {
             filter.salePrice = {};
@@ -497,23 +500,19 @@ const loadHome = async function (req, res) {
                 filter.salePrice.$lte = parseInt(req.query.maxPrice);
             }
         }
- 
         if (req.query.status && req.query.status !== 'all') {
-            filter.status = req.query.status
+            filter.status = req.query.status;
         }
- 
         if (req.query.search) {
             filter.$or = [
                 { productName: new RegExp(req.query.search, 'i') },
                 { description: new RegExp(req.query.search, 'i') }
             ];
         }
- 
+
+        // Sorting options (default: oldest first)
         let sortOptions = {};
- 
-        // Default listing is oldest-first (createdOn ascending)
         const sortBy = req.query.sortBy || 'oldest';
- 
         switch (sortBy) {
             case 'price_low':
                 sortOptions = { salePrice: 1 };
@@ -537,37 +536,58 @@ const loadHome = async function (req, res) {
                 sortOptions = { quantity: -1 };
                 break;
             default:
-                sortOptions = { createdOn: 1 } // Fallback also defaults to oldest-first
+                sortOptions = { createdOn: 1 };
         }
- 
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 30; // ✅ Changed from 12 to 30
-        const skip = (page - 1) * limit;
- 
-        // Get products WITHOUT .lean() because applyOffers needs mongoose documents
-        const products = await Product.find(filter)
+
+        // ✅ Detect if any product‑narrowing filter is active
+        const hasActiveFilter = !!(
+            req.query.category ||
+            req.query.categoryAttribute ||
+            req.query.minPrice ||
+            req.query.maxPrice ||
+            (req.query.status && req.query.status !== 'all') ||
+            req.query.search
+        );
+
+        // Pagination defaults
+        let page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 30;
+        let skip = (page - 1) * limit;
+
+        // ✅ If no filters are active, fetch ALL products and mark view as grouped
+        let isGroupedView = false;
+        if (!hasActiveFilter) {
+            isGroupedView = true;
+            page = 1;      // grouped view ignores page
+            limit = 0;     // 0 signals "no limit" for Mongoose
+            skip = 0;
+        }
+
+        // Build the query
+        let productQuery = Product.find(filter)
             .populate('category', 'name attributes')
-            .skip(skip)
-            .limit(limit)
             .sort(sortOptions);
- 
-        // Apply offers to products
+
+        // Apply skip/limit only when not grouped (grouped fetches all)
+        if (!isGroupedView) {
+            productQuery = productQuery.skip(skip).limit(limit);
+        }
+
+        // Execute query and apply offers
+        const products = await productQuery;
         const productsWithOffers = await applyOffers(products);
- 
+
+        // Total count for pagination (only meaningful when not grouped)
         const totalProducts = await Product.countDocuments(filter);
-        const totalPages = Math.ceil(totalProducts / limit);
- 
-        // Categories, sorted alphabetically (A-Z) so the sidebar/dropdowns
-        // don't depend on the view to re-sort them.
+        const totalPages = isGroupedView ? 1 : Math.ceil(totalProducts / limit);
+
+        // Fetch categories alphabetically (A-Z) for sidebar and grouped sections
         const categories = await Category.find({ isListed: true })
             .collation({ locale: 'en', strength: 2 })
             .sort({ name: 1 })
             .lean();
- 
-        // Attributes for EVERY listed category, computed in a single
-        // aggregation, so the sidebar can nest attributes under each
-        // category and keep the whole tree visible at all times (no
-        // need to re-fetch/hide anything based on the current selection).
+
+        // ✅ Attributes for EVERY listed category (for sidebar tree)
         const attributesAgg = await Product.aggregate([
             {
                 $match: {
@@ -583,19 +603,21 @@ const loadHome = async function (req, res) {
                 }
             }
         ]);
- 
+
         const attributesByCategory = {};
         attributesAgg.forEach(function (entry) {
             attributesByCategory[String(entry._id)] = entry.attributes.sort(function (a, b) {
                 return String(a).localeCompare(String(b));
             });
         });
- 
+
+        // ✅ Price range for slider
         const priceRange = await Product.aggregate([
             { $match: { isBlocked: false } },
             { $group: { _id: null, minPrice: { $min: "$salePrice" }, maxPrice: { $max: "$salePrice" } } }
         ]);
- 
+
+        // Build current filter state to pass to the view
         const currentFilters = {
             category: req.query.category || '',
             categoryAttribute: req.query.categoryAttribute || '',
@@ -604,10 +626,10 @@ const loadHome = async function (req, res) {
             status: req.query.status || 'all',
             search: req.query.search || '',
             sortBy,
-            limit
-        }
- 
-        // Common data to pass to the view
+            limit: isGroupedView ? 0 : limit,
+        };
+
+        // Prepare data object for rendering
         const viewData = {
             currentPage: page,
             totalPage: totalPages,
@@ -617,10 +639,11 @@ const loadHome = async function (req, res) {
             attributesByCategory,
             priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
             currentFilters,
-            query: req.query
+            query: req.query,
+            isGroupedView,               // ✅ Pass flag to view
         };
- 
- 
+
+        // Render the view with user data if logged in
         if (user) {
             const userData = await User.findById(user._id).lean();
             if (userData) {
@@ -636,12 +659,13 @@ const loadHome = async function (req, res) {
                 user: null
             });
         }
- 
+
     } catch (error) {
         console.error("shop page not found", error);
         return res.redirect("/");
     }
-}
+};
+
 
 
 
