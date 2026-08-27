@@ -1218,6 +1218,128 @@
         .category-title i {
             font-size: 1.3rem;
         }
+
+        /* ========== MOBILE-ONLY COMPACT FILTER DROPDOWNS ==========
+           Applies ONLY below 768px (phones). Tablet (768-991px) and
+           desktop (992px+) keep the original always-open sidebar
+           layout untouched - see the (min-width: 768px) reset block
+           further down which neutralizes the collapse behaviour there. */
+        @media (max-width: 767.98px) {
+            .filters-sidebar {
+                padding: 0;
+            }
+
+            .filters-sidebar-header {
+                padding: 10px 14px;
+            }
+
+            .filters-sidebar-header h4 {
+                font-size: 0.95rem;
+            }
+
+            .filters-sidebar-header .clear-link {
+                font-size: 0.78rem;
+            }
+
+            #activeFiltersGroup {
+                padding: 10px 14px;
+            }
+
+            #activeFiltersGroup .filter-group-title {
+                margin-bottom: 8px;
+            }
+
+            .filter-group {
+                padding: 0;
+            }
+
+            .filter-group-title.mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 12px 14px;
+                margin-bottom: 0;
+                cursor: pointer;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .filter-group-title.mobile-toggle .mobile-toggle-label {
+                display: flex;
+                align-items: baseline;
+                gap: 6px;
+                flex-wrap: wrap;
+                min-width: 0;
+            }
+
+            .filter-group-title.mobile-toggle .mobile-selected-hint {
+                font-weight: 400;
+                text-transform: none;
+                letter-spacing: normal;
+                color: var(--primary-color);
+                font-size: 0.75rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 150px;
+            }
+
+            .filter-group-title.mobile-toggle .mobile-toggle-icon {
+                font-size: 0.75rem;
+                color: #6c757d;
+                transition: transform 0.25s ease;
+                flex: 0 0 auto;
+            }
+
+            .filter-group.open .filter-group-title.mobile-toggle .mobile-toggle-icon {
+                transform: rotate(180deg);
+                color: var(--primary-color);
+            }
+
+            .filter-group-body {
+                max-height: 0;
+                overflow: hidden;
+                padding: 0 14px;
+                transition: max-height 0.28s ease, padding 0.28s ease;
+            }
+
+            .filter-group.open .filter-group-body {
+                max-height: 1200px;
+                padding: 0 14px 16px;
+            }
+
+            .price-slider-wrap {
+                padding: 4px 2px 2px;
+            }
+
+            #priceRangeSlider {
+                margin: 8px 4px 14px;
+            }
+
+            .categories-tree {
+                margin-top: 2px;
+            }
+        }
+
+        /* Reset: on tablet and desktop the collapse mechanics never apply,
+           regardless of the "open" class toggled by the mobile-only JS. */
+        @media (min-width: 768px) {
+            .filter-group-title.mobile-toggle {
+                cursor: default;
+            }
+
+            .filter-group-title.mobile-toggle .mobile-toggle-icon,
+            .filter-group-title.mobile-toggle .mobile-selected-hint {
+                display: none;
+            }
+
+            .filter-group-body {
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 0 !important;
+            }
+        }
     </style>
 </head>
 
@@ -1276,6 +1398,14 @@
             var sortedCategories = categories.slice().sort(function(a, b) {
                 return String(a.name || '').localeCompare(String(b.name || ''));
             });
+
+            // Whether each mobile dropdown should start expanded - only
+            // relevant on mobile (CSS neutralizes this on tablet/desktop).
+            // Opens automatically if that filter is already active, so the
+            // user's current selection is never hidden behind a collapsed
+            // dropdown on page load.
+            var priceGroupOpen = !!(currentFilters.minPrice || currentFilters.maxPrice);
+            var categoryGroupOpen = !!(currentFilters.category || currentFilters.categoryAttribute);
         %>
 
         <div class="shop-layout">
@@ -1318,49 +1448,70 @@
                 <form id="filterForm">
                     <input type="hidden" name="page" value="1">
 
-                    <!-- Price range slider -->
-                    <div class="filter-group">
-                        <div class="filter-group-title">Price</div>
-                        <div class="price-slider-wrap">
-                            <div class="price-range-display" id="priceRangeDisplay">
-                                Price: <strong>₹<span id="priceMinLabel"><%= currentFilters.minPrice || 0 %></span></strong>
-                                — <strong>₹<span id="priceMaxLabel"><%= currentFilters.maxPrice || 5000 %></span></strong>
+                    <!-- Price range slider - compact collapsible dropdown on mobile only -->
+                    <div class="filter-group <%= priceGroupOpen ? 'open' : '' %>" id="priceFilterGroup">
+                        <div class="filter-group-title mobile-toggle" onclick="toggleMobileFilterGroup(this)">
+                            <span class="mobile-toggle-label">
+                                <span>Price</span>
+                                <% if (priceGroupOpen) { %>
+                                    <span class="mobile-selected-hint">₹<%= currentFilters.minPrice || 0 %>–₹<%= currentFilters.maxPrice || 5000 %></span>
+                                <% } %>
+                            </span>
+                            <i class="fas fa-chevron-down mobile-toggle-icon"></i>
+                        </div>
+                        <div class="filter-group-body">
+                            <div class="price-slider-wrap">
+                                <div class="price-range-display" id="priceRangeDisplay">
+                                    Price: <strong>₹<span id="priceMinLabel"><%= currentFilters.minPrice || 0 %></span></strong>
+                                    — <strong>₹<span id="priceMaxLabel"><%= currentFilters.maxPrice || 5000 %></span></strong>
+                                </div>
+                                <div id="priceRangeSlider"></div>
+                                <button type="button" class="btn btn-apply-price" onclick="applyPriceFilter()">Filter</button>
                             </div>
-                            <div id="priceRangeSlider"></div>
-                            <button type="button" class="btn btn-apply-price" onclick="applyPriceFilter()">Filter</button>
                         </div>
                     </div>
 
                     <!-- Category (alphabetically sorted A-Z) with its Attributes
                          nested directly underneath it. Every category and every
                          attribute stays visible at all times - nothing is
-                         hidden or shown based on the current selection. -->
-                    <div class="filter-group">
-                        <div class="filter-group-title">Product Categories</div>
-                        <ul class="filter-link-list categories-tree" id="categoryList">
-                            <li>
-                                <a href="javascript:void(0)" class="filter-link <%= !currentFilters.category ? 'active' : '' %>" onclick="selectFilter('category', '', this)">All Categories</a>
-                            </li>
-                            <% sortedCategories.forEach(function(cat) { %>
-                                <% var catAttrs = attributesByCategory[String(cat._id)] || []; %>
-                                <li class="category-item">
-                                    <a href="javascript:void(0)" class="filter-link category-link <%= (String(currentFilters.category) === String(cat._id) && !currentFilters.categoryAttribute) ? 'active' : '' %>" onclick="selectCategory('<%= cat._id %>', this)">
-                                        <%= cat.name %>
-                                    </a>
-                                    <% if (catAttrs.length > 0) { %>
-                                        <ul class="filter-link-list attribute-sublist">
-                                            <% catAttrs.forEach(function(attr) { %>
-                                                <li>
-                                                    <a href="javascript:void(0)" class="filter-link attribute-link <%= (String(currentFilters.category) === String(cat._id) && currentFilters.categoryAttribute === attr) ? 'active' : '' %>" onclick="selectCategoryAttribute('<%= cat._id %>', '<%= attr %>', this)">
-                                                        <%= attr %>
-                                                    </a>
-                                                </li>
-                                            <% }); %>
-                                        </ul>
-                                    <% } %>
+                         hidden or shown based on the current selection.
+                         Compact collapsible dropdown on mobile only. -->
+                    <div class="filter-group <%= categoryGroupOpen ? 'open' : '' %>" id="categoryFilterGroup">
+                        <div class="filter-group-title mobile-toggle" onclick="toggleMobileFilterGroup(this)">
+                            <span class="mobile-toggle-label">
+                                <span>Product Categories</span>
+                                <% if (categoryGroupOpen && selectedCategoryName) { %>
+                                    <span class="mobile-selected-hint"><%= selectedCategoryName %><%= currentFilters.categoryAttribute ? (' · ' + currentFilters.categoryAttribute) : '' %></span>
+                                <% } %>
+                            </span>
+                            <i class="fas fa-chevron-down mobile-toggle-icon"></i>
+                        </div>
+                        <div class="filter-group-body">
+                            <ul class="filter-link-list categories-tree" id="categoryList">
+                                <li>
+                                    <a href="javascript:void(0)" class="filter-link <%= !currentFilters.category ? 'active' : '' %>" onclick="selectFilter('category', '', this)">All Categories</a>
                                 </li>
-                            <% }); %>
-                        </ul>
+                                <% sortedCategories.forEach(function(cat) { %>
+                                    <% var catAttrs = attributesByCategory[String(cat._id)] || []; %>
+                                    <li class="category-item">
+                                        <a href="javascript:void(0)" class="filter-link category-link <%= (String(currentFilters.category) === String(cat._id) && !currentFilters.categoryAttribute) ? 'active' : '' %>" onclick="selectCategory('<%= cat._id %>', this)">
+                                            <%= cat.name %>
+                                        </a>
+                                        <% if (catAttrs.length > 0) { %>
+                                            <ul class="filter-link-list attribute-sublist">
+                                                <% catAttrs.forEach(function(attr) { %>
+                                                    <li>
+                                                        <a href="javascript:void(0)" class="filter-link attribute-link <%= (String(currentFilters.category) === String(cat._id) && currentFilters.categoryAttribute === attr) ? 'active' : '' %>" onclick="selectCategoryAttribute('<%= cat._id %>', '<%= attr %>', this)">
+                                                            <%= attr %>
+                                                        </a>
+                                                    </li>
+                                                <% }); %>
+                                            </ul>
+                                        <% } %>
+                                    </li>
+                                <% }); %>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- hidden inputs driving the filter state -->
@@ -1837,6 +1988,20 @@
                     button.innerHTML = originalText;
                     button.disabled = false;
                 });
+        }
+
+        /* ==========================================================
+           MOBILE-ONLY FILTER DROPDOWN TOGGLE
+           Purely presentational - just adds/removes the "open" class
+           on the clicked filter-group. The CSS reset above 768px makes
+           this a no-op visually on tablet/desktop, so tapping the
+           header there has no effect on layout. Does not touch any
+           filter values or trigger a filter request by itself.
+           ========================================================== */
+        function toggleMobileFilterGroup(headerEl) {
+            const group = headerEl.closest('.filter-group');
+            if (!group) return;
+            group.classList.toggle('open');
         }
 
         /* ==========================================================

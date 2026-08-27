@@ -2,8 +2,8 @@ const User = require("../models/userSchema");
 
 const userAuth = async (req, res, next) => {
     try {
-        const sessionUserId = req.session.user?req.session.user._id:null;
-        const passportUserId = req.user?req.user._id:null;
+        const sessionUserId = req.session.user ? req.session.user._id : null;
+        const passportUserId = req.user ? req.user._id : null;
         const userId = sessionUserId || passportUserId;
         if (!userId) {
             return res.redirect("/login");
@@ -16,7 +16,7 @@ const userAuth = async (req, res, next) => {
             return res.redirect("/login");
         }
     } catch (error) {
-      
+
         res.status(500).send("Internal server error");
     }
 };
@@ -41,17 +41,17 @@ const checkUserStatus = async (req, res, next) => {
 
         // If user is blocked
         if (!user.isActive) {
-            // Destroy session
-            req.session.destroy(err => {
-                if (err)
-                // Redirect to login or blocked page
+            // Destroy session, then ALWAYS redirect - previously this only
+            // redirected when `destroy` returned an error, so the normal
+            // (no-error) case silently hung with no response at all.
+            req.session.destroy(() => {
                 return res.redirect("/login?blocked=true");
             });
         } else {
             next();
         }
     } catch (error) {
-       
+
         next(error);
     }
 };
