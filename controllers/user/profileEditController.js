@@ -1,7 +1,6 @@
 const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
 const cloudinary = require('cloudinary').v2;
 const mongoose = require('mongoose');
 
@@ -26,245 +25,32 @@ function uploadToCloudinary(buffer, folder) {
   });
 }
 
-const userProfile = async function (req, res) {
-  try {
-    const userId = req.session.user?._id || req.session.user;
-    const user = await User.findById(userId);
-    if (!user) return res.render('user/login');
-    return res.render('user/userProfile', { user });
-  } catch (error) {
-  
-    res.status(500).send("Error loading profile");
-  }
-};
-
-const editProfile = async function (req, res) {
-  try {
-    const userId = req.session.user?._id || req.session.user;
-    const user = await User.findById(userId);
-    if (!user) return res.render('user/login');
-    return res.render('user/editProfile', { user });
-  } catch (error) {
-    
-    return res.status(500).send("Error loading edit profile");
-  }
-};
-
-const updateProfile = async function (req, res) {
-  try {
-    const { firstName, lastName, email, phone, dob } = req.body;
-
-    if (!firstName || !/^[a-zA-Z]+$/.test(firstName)) {
-      return res.status(400).json({ error: 'Invalid first name' });
-    }
-    if (!lastName || !/^[a-zA-Z]+$/.test(lastName)) {
-      return res.status(400).json({ error: 'Invalid last name' });
-    }
-    if (phone && !/^[6-9]\d{9}$/.test(phone)) {
-      return res.status(400).json({ error: 'Invalid phone number' });
-    }
-    if (dob) {
-      const dobDate = new Date(dob);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (dobDate >= today) {
-        return res.status(400).json({ error: 'DOB must be in the past' });
-      }
-    }
-
-    const userId = req.session.user?._id || req.session.user;
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // ---------- EMAIL CHANGE – require OTP ----------
-    if (email && email !== user.email) {
-      const otp = generateOtp();
-      req.session.profileOtp = otp;
-      req.session.profileOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-      // Upload new image to Cloudinary (if a file was sent)
-      let cloudinaryPublicId = null;
-      if (req.file) {
-        try {
-          const result = await uploadToCloudinary(req.file.buffer, 'profileImages');
-          cloudinaryPublicId = result.public_id;
-        } catch (err) {
-          console.error('Cloudinary upload error:', err);
-          return res.status(500).json({ error: 'Image upload failed' });
-        }
-      }
-
-      req.session.pendingProfileData = {
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
-        phone: phone ? phone.trim() : null,
-        dob: dob || null,
-        profileImage: cloudinaryPublicId ? [cloudinaryPublicId] : []
-      };
-
-      const emailSent = await sendEmailVerification(email, otp);
-      if (!emailSent) {
-        return res.status(500).json({ error: 'Failed to send OTP email' });
-      }
-
-      return res.json({
-        success: true,
-        requiresOtp: true,
-        message: 'OTP sent to your new email address for verification'
-      });
-    }
-
-    // ---------- NO EMAIL CHANGE – update immediately ----------
-    user.firstName = firstName.trim();
-    user.lastName = lastName.trim();
-    user.phone = phone ? phone.trim() : null;
-    user.dob = dob || null;
-
-    if (req.file) {
-      // Delete old Cloudinary image if exists
-      if (user.profileImage && user.profileImage.length > 0) {
-        const oldPublicId = user.profileImage[0];
-        if (oldPublicId && !oldPublicId.startsWith('/')) {
-          await cloudinary.uploader.destroy(oldPublicId).catch(err =>
-            ('Error deleting old profile image:', err)
-          );
-        }
-      }
-      // Upload new image
-      const result = await uploadToCloudinary(req.file.buffer, 'profileImages');
-      user.profileImage = [result.public_id];
-    }
-
-    await user.save();
-
-    res.json({
-      success: true,
-      message: 'Profile updated successfully',
-      requiresOtp: false
-    });
-  } catch (error) {
-    
-    return res.status(500).send({ error: 'Server error' });
-  }
-};
-
-const deleteProfileImage = async function (req, res) {
-  try {
-    const user = await User.findById(req.session.user);
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    if (user.profileImage && user.profileImage.length > 0) {
-      const imageId = user.profileImage[0];
-      // Delete from Cloudinary (ignore old local paths starting with '/')
-      if (imageId && !imageId.startsWith('/')) {
-        await cloudinary.uploader.destroy(imageId).catch(err =>
-          ('Error deleting Cloudinary image:', err)
-        );
-      }
-      user.profileImage = [];
-      await user.save();
-      return res.json({ success: true, message: "Profile image deleted successfully" });
-    } else {
-      return res.json({ success: true, message: "No profile image to delete" });
-    }
-  } catch (error) {
-    
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
-const verifyProfileOtp = async (req, res) => {
-  try {
-    const { otp } = req.body;
-
-    if (!req.session.profileOtp || !req.session.profileOtpExpiry) {
-      return res.status(400).json({ error: "No OTP requested" });
-    }
-    if (Date.now() > req.session.profileOtpExpiry) {
-      return res.status(400).json({ error: "OTP expired" });
-    }
-    if (otp !== req.session.profileOtp) {
-      return res.status(400).json({ error: "Invalid OTP" });
-    }
-
-    const userId = req.session.user?._id || req.session.user;
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    const pending = req.session.pendingProfileData;
-
-    // If a new profile image is being set, delete the old one from Cloudinary
-    if (pending.profileImage && pending.profileImage.length > 0 && user.profileImage && user.profileImage.length > 0) {
-      const oldPublicId = user.profileImage[0];
-      if (oldPublicId && !oldPublicId.startsWith('/')) {
-        await cloudinary.uploader.destroy(oldPublicId).catch(err =>
-          ('Error deleting old profile image:', err)
-        );
-      }
-    }
-
-    // Apply all pending updates
-    Object.assign(user, pending);
-    await user.save();
-
-    // Clear session
-    req.session.profileOtp = null;
-    req.session.profileOtpExpiry = null;
-    req.session.pendingProfileData = null;
-
-    return res.json({ success: true, message: "Email verified & profile updated" });
-  } catch (error) {
-    console.error("verifyProfileOtp error:", error);
-    return res.status(500).json({ error: "Server error" });
-  }
-};
-
-const resendProfileOtp = async (req, res) => {
-  try {
-    if (!req.session.pendingProfileData) {
-      return res.status(400).json({ error: "No pending profile update" });
-    }
-    const otp = generateOtp();
-    req.session.profileOtp = otp;
-    req.session.profileOtpExpiry = Date.now() + 10 * 60 * 1000;
-    const emailSent = await sendEmailVerification(req.session.pendingProfileData.email, otp);
-    if (!emailSent) {
-      return res.status(500).json({ error: 'Failed to resend OTP email' });
-    }
-    return res.json({ success: true, message: 'New OTP sent to your email address' });
-  } catch (error) {
-    console.error("resendProfileOtp error:", error);
-    return res.status(500).json({ error: "Server error" });
-  }
-};
-
+// Generate OTP
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+// ---------- BREVO EMAIL SENDING (replaces nodemailer) ----------
 async function sendEmailVerification(toEmail, otp) {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      secure: false,
-      port: 587,
-      requireTLS: false,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD
-      }
-    });
+    if (!process.env.BREVO_API_KEY) {
+      console.error("BREVO_API_KEY is not configured");
+      return false;
+    }
+    if (!process.env.BREVO_FROM_EMAIL) {
+      console.error("BREVO_FROM_EMAIL is not configured");
+      return false;
+    }
 
-    
-const mailOptions = {
-    from: process.env.NODEMAILER_EMAIL,
-    to: toEmail,
-    subject: "Profile Update OTP Verification",
-    text: `Your Nattuvedi – Artemis profile update verification code is: ${otp}. This code is valid for 10 minutes. Never share it with anyone. If you didn't request this change, please contact our support immediately.`,
-    html: `
+    const data = {
+      sender: {
+        name: process.env.BREVO_FROM_NAME || "Nattuvedi - Artemis",
+        email: process.env.BREVO_FROM_EMAIL,
+      },
+      to: [{ email: toEmail }],
+      subject: "Profile Update OTP Verification",
+      textContent: `Your Nattuvedi – Artemis profile update verification code is: ${otp}. This code is valid for 10 minutes. Never share it with anyone. If you didn't request this change, please contact our support immediately.`,
+      htmlContent: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -374,18 +160,249 @@ const mailOptions = {
 
 </body>
 </html>
-    `
-};
+      `
+    };
 
-    await transporter.sendMail(mailOptions);
-    return true;
-  } catch (err) {
-    console.error("sendEmailVerification error:", err);
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("Brevo email sent successfully. Message ID:", result.messageId);
+      return true;
+    } else {
+      const errorBody = await response.json();
+      console.error("Brevo email error:", errorBody);
+      return false;
+    }
+  } catch (error) {
+    console.error("Brevo email error:", error.message);
     return false;
   }
 }
 
-// ---------- PASSWORD & ADDRESS FUNCTIONS (unchanged) ----------
+// ================= PROFILE CONTROLLER FUNCTIONS =================
+
+const userProfile = async function (req, res) {
+  try {
+    const userId = req.session.user?._id || req.session.user;
+    const user = await User.findById(userId);
+    if (!user) return res.render('user/login');
+    return res.render('user/userProfile', { user });
+  } catch (error) {
+    res.status(500).send("Error loading profile");
+  }
+};
+
+const editProfile = async function (req, res) {
+  try {
+    const userId = req.session.user?._id || req.session.user;
+    const user = await User.findById(userId);
+    if (!user) return res.render('user/login');
+    return res.render('user/editProfile', { user });
+  } catch (error) {
+    return res.status(500).send("Error loading edit profile");
+  }
+};
+
+const updateProfile = async function (req, res) {
+  try {
+    const { firstName, lastName, email, phone, dob } = req.body;
+
+    if (!firstName || !/^[a-zA-Z]+$/.test(firstName)) {
+      return res.status(400).json({ error: 'Invalid first name' });
+    }
+    if (!lastName || !/^[a-zA-Z]+$/.test(lastName)) {
+      return res.status(400).json({ error: 'Invalid last name' });
+    }
+    if (phone && !/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({ error: 'Invalid phone number' });
+    }
+    if (dob) {
+      const dobDate = new Date(dob);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (dobDate >= today) {
+        return res.status(400).json({ error: 'DOB must be in the past' });
+      }
+    }
+
+    const userId = req.session.user?._id || req.session.user;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // ---------- EMAIL CHANGE – require OTP ----------
+    if (email && email !== user.email) {
+      const otp = generateOtp();
+      req.session.profileOtp = otp;
+      req.session.profileOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+      // Upload new image to Cloudinary (if a file was sent)
+      let cloudinaryPublicId = null;
+      if (req.file) {
+        try {
+          const result = await uploadToCloudinary(req.file.buffer, 'profileImages');
+          cloudinaryPublicId = result.public_id;
+        } catch (err) {
+          console.error('Cloudinary upload error:', err);
+          return res.status(500).json({ error: 'Image upload failed' });
+        }
+      }
+
+      req.session.pendingProfileData = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: phone ? phone.trim() : null,
+        dob: dob || null,
+        profileImage: cloudinaryPublicId ? [cloudinaryPublicId] : []
+      };
+
+      const emailSent = await sendEmailVerification(email, otp);
+      if (!emailSent) {
+        return res.status(500).json({ error: 'Failed to send OTP email' });
+      }
+
+      return res.json({
+        success: true,
+        requiresOtp: true,
+        message: 'OTP sent to your new email address for verification'
+      });
+    }
+
+    // ---------- NO EMAIL CHANGE – update immediately ----------
+    user.firstName = firstName.trim();
+    user.lastName = lastName.trim();
+    user.phone = phone ? phone.trim() : null;
+    user.dob = dob || null;
+
+    if (req.file) {
+      // Delete old Cloudinary image if exists
+      if (user.profileImage && user.profileImage.length > 0) {
+        const oldPublicId = user.profileImage[0];
+        if (oldPublicId && !oldPublicId.startsWith('/')) {
+          await cloudinary.uploader.destroy(oldPublicId).catch(err =>
+            console.error('Error deleting old profile image:', err)
+          );
+        }
+      }
+      // Upload new image
+      const result = await uploadToCloudinary(req.file.buffer, 'profileImages');
+      user.profileImage = [result.public_id];
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      requiresOtp: false
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).send({ error: 'Server error' });
+  }
+};
+
+const deleteProfileImage = async function (req, res) {
+  try {
+    const user = await User.findById(req.session.user);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (user.profileImage && user.profileImage.length > 0) {
+      const imageId = user.profileImage[0];
+      // Delete from Cloudinary (ignore old local paths starting with '/')
+      if (imageId && !imageId.startsWith('/')) {
+        await cloudinary.uploader.destroy(imageId).catch(err =>
+          console.error('Error deleting Cloudinary image:', err)
+        );
+      }
+      user.profileImage = [];
+      await user.save();
+      return res.json({ success: true, message: "Profile image deleted successfully" });
+    } else {
+      return res.json({ success: true, message: "No profile image to delete" });
+    }
+  } catch (error) {
+    console.error('Delete profile image error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const verifyProfileOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    if (!req.session.profileOtp || !req.session.profileOtpExpiry) {
+      return res.status(400).json({ error: "No OTP requested" });
+    }
+    if (Date.now() > req.session.profileOtpExpiry) {
+      return res.status(400).json({ error: "OTP expired" });
+    }
+    if (otp !== req.session.profileOtp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    const userId = req.session.user?._id || req.session.user;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const pending = req.session.pendingProfileData;
+
+    // If a new profile image is being set, delete the old one from Cloudinary
+    if (pending.profileImage && pending.profileImage.length > 0 && user.profileImage && user.profileImage.length > 0) {
+      const oldPublicId = user.profileImage[0];
+      if (oldPublicId && !oldPublicId.startsWith('/')) {
+        await cloudinary.uploader.destroy(oldPublicId).catch(err =>
+          console.error('Error deleting old profile image:', err)
+        );
+      }
+    }
+
+    // Apply all pending updates
+    Object.assign(user, pending);
+    await user.save();
+
+    // Clear session
+    req.session.profileOtp = null;
+    req.session.profileOtpExpiry = null;
+    req.session.pendingProfileData = null;
+
+    return res.json({ success: true, message: "Email verified & profile updated" });
+  } catch (error) {
+    console.error("verifyProfileOtp error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+const resendProfileOtp = async (req, res) => {
+  try {
+    if (!req.session.pendingProfileData) {
+      return res.status(400).json({ error: "No pending profile update" });
+    }
+    const otp = generateOtp();
+    req.session.profileOtp = otp;
+    req.session.profileOtpExpiry = Date.now() + 10 * 60 * 1000;
+    const emailSent = await sendEmailVerification(req.session.pendingProfileData.email, otp);
+    if (!emailSent) {
+      return res.status(500).json({ error: 'Failed to resend OTP email' });
+    }
+    return res.json({ success: true, message: 'New OTP sent to your email address' });
+  } catch (error) {
+    console.error("resendProfileOtp error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+// ---------- PASSWORD FUNCTIONS (unchanged) ----------
 const changePassword = async function (req, res) {
   try {
     if (!req.session.user) return res.redirect("/user/login");
@@ -441,7 +458,7 @@ const updatePassword = async (req, res, next) => {
   }
 };
 
-// All address functions remain exactly as they were (only minor formatting changes)
+// ---------- ADDRESS FUNCTIONS (unchanged) ----------
 const getAddresses = async function (req, res) {
   try {
     const userId = req.session.user?._id || req.session.user;
@@ -453,7 +470,6 @@ const getAddresses = async function (req, res) {
     const messages = { success: req.query.success || null, error: req.query.error || null };
     res.render('user/address', { user, addresses, title: 'Addresses - AllScouts', messages });
   } catch (error) {
-
     res.redirect('user/profile');
   }
 };
@@ -635,7 +651,6 @@ const deleteAddress = async function (req, res, next) {
     await userAddress.save();
     res.status(200).json({ success: true, message: 'Address deleted successfully', data: { deletedAddress: deletedAddressInfo, remainingAddressCount: userAddress.address.length } });
   } catch (error) {
-
     next(error);
   }
 };
@@ -652,15 +667,13 @@ const getAddressForModal = async function (req, res) {
     if (!address) return res.status(404).json({ success: false, message: 'Address not found' });
     res.json({ success: true, address });
   } catch (error) {
-
     res.status(500).json({ success: false, message: 'Failed to fetch address' });
   }
 };
 
-// The old fix function is no longer necessary; we can keep it but it won't harm.
+// Kept for compatibility, no action needed.
 const fixExistingProfileImages = async () => {
-  // This can be kept for any remaining old local paths; no action needed.
- 
+  // Placeholder for any cleanup if required.
 };
 
 module.exports = {
