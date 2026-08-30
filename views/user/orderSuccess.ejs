@@ -84,38 +84,39 @@
             background: white;
         }
 
+        /* Reduced header padding and text size */
         .success-header {
             background: linear-gradient(135deg, var(--success-color), #219a52);
             color: white;
-            padding: 3rem 2rem;
+            padding: 1.5rem 1rem;               /* reduced from 3rem 2rem */
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
         .success-icon {
-            width: 80px;
-            height: 80px;
+            width: 60px;                          /* smaller icon */
+            height: 60px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2.5rem;
+            margin: 0 auto 0.75rem;
+            font-size: 1.8rem;
             animation: bounce 1s ease-in-out;
         }
 
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
         }
 
         .confetti {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             animation: confetti-fall 3s linear infinite;
@@ -123,11 +124,11 @@
 
         @keyframes confetti-fall {
             0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
+            100% { transform: translateY(400px) rotate(360deg); opacity: 0; }
         }
 
         .order-details {
-            padding: 2.5rem;
+            padding: 2rem;                         /* slightly reduced */
         }
 
         .detail-card {
@@ -161,259 +162,98 @@
         }
 
         /* Price Styles */
-        .current-price {
-            font-weight: 700;
-            color: var(--success-color);
-        }
-        
-        .original-price {
-            text-decoration: line-through;
-            color: #6c757d;
-            font-size: 0.85rem;
-            margin-left: 5px;
-        }
-        
-        .discount-badge {
-            background-color: var(--discount-color);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        
-        .free-badge {
-            background-color: var(--discount-color);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        
-        .offer-tag {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.6rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-left: 4px;
-        }
-        
-        .savings-amount {
-            color: var(--success-color);
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 2px;
-        }
+        .current-price { font-weight: 700; color: var(--success-color); }
+        .original-price { text-decoration: line-through; color: #6c757d; font-size: 0.85rem; margin-left: 5px; }
+        .discount-badge { background-color: var(--discount-color); color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; display: inline-block; }
+        .free-badge { background-color: var(--discount-color); color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.65rem; font-weight: 600; display: inline-block; }
+        .offer-tag { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; display: inline-block; margin-left: 4px; }
+        .savings-amount { color: var(--success-color); font-size: 0.75rem; font-weight: 600; margin-top: 2px; }
 
         /* Enhanced Order Summary Styles */
-        .order-summary-container {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
+        .order-summary-container { background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        .summary-header { background: var(--primary-color); color: white; padding: 10px 15px; font-weight: 600; font-size: 0.95rem; }
+        .summary-body { padding: 15px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label { font-size: 0.9rem; color: #666; }
+        .summary-value { font-weight: 500; font-size: 0.95rem; }
+        .summary-highlight { background: rgba(39, 174, 96, 0.1); padding: 10px; border-radius: 6px; margin: 10px 0; }
+        .summary-total-row { background: var(--light-gray); padding: 12px; border-radius: 6px; margin-top: 10px; font-weight: 700; font-size: 1.1rem; }
+        .text-success { color: var(--success-color) !important; }
+        .text-danger { color: var(--discount-color) !important; }
+        .badge-savings { background: var(--success-color); color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
 
-        .summary-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 10px 15px;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .summary-body {
-            padding: 15px;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed var(--border-color);
-        }
-
-        .summary-row:last-child {
-            border-bottom: none;
-        }
-
-        .summary-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .summary-value {
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        .summary-highlight {
-            background: rgba(39, 174, 96, 0.1);
-            padding: 10px;
-            border-radius: 6px;
-            margin: 10px 0;
-        }
-
-        .summary-total-row {
-            background: var(--light-gray);
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .text-success {
-            color: var(--success-color) !important;
-        }
-
-        .text-danger {
-            color: var(--discount-color) !important;
-        }
-
-        .badge-savings {
-            background: var(--success-color);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .btn-success-custom {
-            background: linear-gradient(135deg, var(--success-color), #219a52);
-            border: none;
-            padding: 1rem 2rem;
-            font-weight: 600;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-success-custom:hover {
-            background: linear-gradient(135deg, #219a52, var(--success-color));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-            color: white;
-        }
-
-        .btn-continue-shopping {
-            background: linear-gradient(135deg, var(--secondary-color), #2980b9);
-            border: none;
-            padding: 1rem 2rem;
-            font-weight: 600;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-continue-shopping:hover {
-            background: linear-gradient(135deg, #2980b9, var(--secondary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-            color: white;
-        }
-
+        .btn-success-custom,
+        .btn-continue-shopping,
         .btn-print-confirmation {
-            background: linear-gradient(135deg, var(--primary-color), #2c3e50);
-            border: none;
-            padding: 0.875rem 1.75rem;
-            font-weight: 600;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-print-confirmation:hover {
-            background: linear-gradient(135deg, #2c3e50, var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(44, 62, 80, 0.4);
+            text-decoration: none;
             color: white;
+            transition: all 0.3s ease;
         }
 
-        .timeline {
-            position: relative;
-            padding: 2rem 0;
-        }
+        .btn-success-custom { background: linear-gradient(135deg, var(--success-color), #219a52); padding: 1rem 2rem; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
+        .btn-success-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4); color: white; }
+        .btn-continue-shopping { background: linear-gradient(135deg, var(--secondary-color), #2980b9); padding: 1rem 2rem; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); }
+        .btn-continue-shopping:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4); color: white; }
+        .btn-print-confirmation { background: linear-gradient(135deg, var(--primary-color), #2c3e50); padding: 0.875rem 1.75rem; border-radius: 10px; font-weight: 600; box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3); }
+        .btn-print-confirmation:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(44, 62, 80, 0.4); color: white; }
 
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 30px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--success-color);
-        }
+        /* Timeline etc. (unchanged) */
+        .timeline { position: relative; padding: 2rem 0; }
+        .timeline::before { content: ''; position: absolute; left: 30px; top: 0; bottom: 0; width: 2px; background: var(--success-color); }
+        .timeline-item { display: flex; align-items: flex-start; margin-bottom: 2rem; position: relative; }
+        .timeline-icon { width: 60px; height: 60px; background: var(--success-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem; margin-right: 1.5rem; z-index: 2; flex-shrink: 0; }
+        .timeline-content { flex: 1; padding-top: 0.5rem; }
+        .email-notification { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; border-left: 4px solid var(--secondary-color); }
+        .print-section { border-top: 1px solid var(--border-color); padding-top: 2rem; margin-top: 2rem; text-align: center; }
+        .share-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .share-btn { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
+        .share-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .share-whatsapp { background: #25D366; }
+        .share-email { background: var(--secondary-color); }
+        .share-copy { background: var(--primary-color); }
+        .support-section { background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-radius: 12px; padding: 1.5rem; margin-top: 2rem; border-left: 4px solid var(--warning-color); }
+        .action-buttons { margin: 2rem 0; }
+        .order-items-summary { margin-top: 1rem; }
+        .order-item { display: flex; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .order-item:last-child { border-bottom: none; }
+        .item-image { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; margin-right: 1rem; border: 1px solid var(--border-color); }
+        .item-details { flex: 1; }
+        .item-name { font-weight: 600; margin-bottom: 0.25rem; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+        .item-meta { font-size: 0.8rem; color: #6c757d; }
+        .payment-status { padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
 
-        .timeline-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .timeline-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--success-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-            margin-right: 1.5rem;
-            z-index: 2;
-            flex-shrink: 0;
-        }
-
-        .timeline-content {
-            flex: 1;
-            padding-top: 0.5rem;
-        }
-
-        .email-notification {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        /* ===== COD Payment Instructions Styles (same as before) ===== */
+        .cod-payment-section {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
             border-radius: 12px;
             padding: 1.5rem;
-            margin: 2rem 0;
-            border-left: 4px solid var(--secondary-color);
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--warning-color);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
         }
+        .cod-payment-section h4 { color: var(--primary-color); font-weight: 700; margin-bottom: 1rem; }
+        .payment-detail-box { background: white; border-radius: 10px; padding: 1.25rem; border: 2px dashed var(--warning-color); margin-bottom: 1rem; }
+        .payment-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0; }
+        .payment-detail-row:last-child { border-bottom: none; }
+        .payment-detail-label { font-weight: 600; color: #666; font-size: 0.9rem; }
+        .payment-detail-value { font-weight: 700; color: var(--primary-color); font-size: 1.1rem; }
+        .pay-amount-highlight { background: var(--accent-color); color: white; padding: 1rem; border-radius: 10px; text-align: center; font-size: 1.5rem; font-weight: 700; margin: 1rem 0; letter-spacing: 1px; }
+        .pay-amount-highlight small { display: block; font-size: 0.8rem; font-weight: 500; margin-bottom: 0.5rem; letter-spacing: 0.5px; }
+        .customer-service-call { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-radius: 10px; padding: 1.25rem; border-left: 4px solid var(--success-color); margin-top: 1rem; }
+        .customer-service-call h6 { font-weight: 700; color: var(--success-color); margin-bottom: 0.5rem; }
+        .customer-service-call p { margin-bottom: 0.25rem; font-size: 0.9rem; }
+        .customer-service-call strong { color: var(--primary-color); font-size: 1.1rem; }
 
         @media (max-width: 768px) {
             body { padding-top: 70px; }
-            .success-header { padding: 2rem 1rem; }
+            .success-header { padding: 1rem 0.5rem; }
             .order-details { padding: 1.5rem; }
             .btn-success-custom,
             .btn-continue-shopping,
@@ -426,187 +266,12 @@
             .timeline-icon { width: 50px; height: 50px; margin-right: 1rem; }
         }
 
-        .print-section {
-            border-top: 1px solid var(--border-color);
-            padding-top: 2rem;
-            margin-top: 2rem;
-            text-align: center;
-        }
-
-        .share-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-        }
-
-        .share-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
-
-        .share-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .share-whatsapp { background: #25D366; }
-        .share-email { background: var(--secondary-color); }
-        .share-copy { background: var(--primary-color); }
-
-        .support-section {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 2rem;
-            border-left: 4px solid var(--warning-color);
-        }
-
-        .action-buttons { margin: 2rem 0; }
-
-        .order-items-summary { margin-top: 1rem; }
-
-        .order-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .order-item:last-child { border-bottom: none; }
-
-        .item-image {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-right: 1rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .item-details {
-            flex: 1;
-        }
-
-        .item-name {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .item-meta {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-
-        .payment-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-paid { background: #d4edda; color: #155724; }
-        .status-pending { background: #fff3cd; color: #856404; }
-
-        /* ===== NEW: COD Payment Instructions Styles ===== */
-        .cod-payment-section {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 2px solid var(--warning-color);
-            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
-        }
-
-        .cod-payment-section h4 {
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .payment-detail-box {
-            background: white;
-            border-radius: 10px;
-            padding: 1.25rem;
-            border: 2px dashed var(--warning-color);
-            margin-bottom: 1rem;
-        }
-
-        .payment-detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .payment-detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .payment-detail-label {
-            font-weight: 600;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .payment-detail-value {
-            font-weight: 700;
-            color: var(--primary-color);
-            font-size: 1.1rem;
-        }
-
-        .pay-amount-highlight {
-            background: var(--accent-color);
-            color: white;
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 1rem 0;
-            letter-spacing: 1px;
-        }
-
-        .pay-amount-highlight small {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.5px;
-        }
-
-        .customer-service-call {
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-            border-radius: 10px;
-            padding: 1.25rem;
-            border-left: 4px solid var(--success-color);
-            margin-top: 1rem;
-        }
-
-        .customer-service-call h6 {
-            font-weight: 700;
-            color: var(--success-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .customer-service-call p {
-            margin-bottom: 0.25rem;
-            font-size: 0.9rem;
-        }
-
-        .customer-service-call strong {
-            color: var(--primary-color);
-            font-size: 1.1rem;
+        @media print {
+            body { padding-top: 0 !important; background: white !important; }
+            .btn, .share-buttons, .timeline::before, .support-section, .action-buttons, .print-section { display: none !important; }
+            .success-header { background: #27ae60 !important; }
+            .order-summary-container { border: 1px solid #dee2e6 !important; }
+            .cod-payment-section { border: 2px solid #f39c12 !important; }
         }
     </style>
 </head>
@@ -614,29 +279,76 @@
     <!-- Success Content -->
     <div class="container success-container my-5">
         <div class="success-card">
-            <!-- Success Header -->
+            <!-- Reduced success header -->
             <div class="success-header">
-                <!-- Confetti Animation -->
                 <div class="confetti" style="left: 10%; animation-delay: 0s;"></div>
-                <div class="confetti" style="left: 20%; animation-delay: 0.5s;"></div>
                 <div class="confetti" style="left: 30%; animation-delay: 1s;"></div>
-                <div class="confetti" style="left: 40%; animation-delay: 1.5s;"></div>
                 <div class="confetti" style="left: 50%; animation-delay: 2s;"></div>
-                <div class="confetti" style="left: 60%; animation-delay: 2.5s;"></div>
-                <div class="confetti" style="left: 70%; animation-delay: 0.2s;"></div>
-                <div class="confetti" style="left: 80%; animation-delay: 0.7s;"></div>
-                <div class="confetti" style="left: 90%; animation-delay: 1.2s;"></div>
-                
+                <div class="confetti" style="left: 70%; animation-delay: 0.5s;"></div>
+                <div class="confetti" style="left: 90%; animation-delay: 1.5s;"></div>
+
                 <div class="success-icon">
                     <i class="fas fa-check"></i>
                 </div>
-                <h1 class="display-5 fw-bold mb-3">Order Confirmed!</h1>
-                <p class="lead mb-0">Thank you for your purchase. Your order has been successfully placed.</p>
+                <h2 class="fw-bold mb-2">Order Confirmed!</h2>
+                <p class="mb-0">Thank you for your purchase.</p>
             </div>
 
-            <!-- Order Details -->
+            <!-- Order Details Container -->
             <div class="order-details">
-                <!-- Order Information -->
+                <!-- ===== MOVED: COD Payment Instructions (immediately after header) ===== -->
+                <% if ((order.paymentMethod === 'COD' || paymentMethod === 'COD') && (order.paymentStatus !== 'Paid' && paymentStatus !== 'Paid')) { %>
+                <div class="cod-payment-section">
+                    <h4>
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        Payment Instructions - Pay before shipment
+                    </h4>
+                    
+                    <div class="pay-amount-highlight">
+                        <small>PLEASE PAY</small>
+                        ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>
+                    </div>
+                    
+                    <p class="text-center fw-bold mb-3" style="font-size: 1.05rem;">
+                        Please pay the above amount via <strong>UPI</strong> to confirm your order.
+                    </p>
+                    
+                    <div class="payment-detail-box">
+                        <h6 class="fw-bold text-center mb-3" style="color: var(--primary-color);">
+                            <i class="fas fa-mobile-alt me-2 text-primary"></i>UPI Payment Details
+                        </h6>
+                        <div class="payment-detail-row">
+                            <span class="payment-detail-label">
+                                <i class="fas fa-mobile-alt me-2 text-primary"></i>UPI ID / Number:
+                            </span>
+                            <span class="payment-detail-value">7092219895</span>
+                        </div>
+                        <div class="payment-detail-row">
+                            <span class="payment-detail-label">
+                                <i class="fab fa-whatsapp me-2 text-success"></i>Share Screenshot on WhatsApp:
+                            </span>
+                            <span class="payment-detail-value">7868829460</span>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-service-call">
+                        <h6>
+                            <i class="fas fa-phone-alt me-2"></i>
+                            Important Instructions
+                        </h6>
+                        <p>
+                            <i class="fas fa-check-circle me-2 text-success"></i>
+                            After payment, <strong>share the screenshot on WhatsApp 7868829460</strong> to confirm your order.
+                        </p>
+                        <p class="mt-2">
+                            <i class="fas fa-headset me-2 text-warning"></i>
+                            For any queries, contact: <strong>Sunilkumar - 7868829460</strong>
+                        </p>
+                    </div>
+                </div>
+                <% } %>
+
+                <!-- Order Information (appears before Order Summary) -->
                 <div class="detail-card">
                     <h4 class="mb-4"><i class="fas fa-receipt me-2"></i>Order Information</h4>
                     <div class="info-item">
@@ -656,7 +368,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Payment Method</span>
-                        <span class="info-value text-capitalize"><%= order.paymentMethod === 'Wallet' ? 'Wallet' : 'Cash on Delivery' %></span>
+                        <span class="info-value text-capitalize"><%= order.paymentMethod === 'Wallet' ? 'Wallet' : 'Pay before shipment' %></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Payment Status</span>
@@ -671,59 +383,6 @@
                         <span class="info-value"><%= user && user.email ? user.email : (email || '') %></span>
                     </div>
                 </div>
-
-                <!-- ===== NEW: COD Payment Instructions (Only show for COD orders) ===== -->
-                <% if ((order.paymentMethod === 'COD' || paymentMethod === 'COD') && (order.paymentStatus !== 'Paid' && paymentStatus !== 'Paid')) { %>
-                <div class="cod-payment-section">
-                    <h4>
-                        <i class="fas fa-money-bill-wave me-2"></i>
-                        Payment Instructions - Cash on Delivery
-                    </h4>
-                    
-                    <div class="pay-amount-highlight">
-                        <small>PLEASE PAY</small>
-                        ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>
-                    </div>
-                    
-                    <p class="text-center fw-bold mb-3" style="font-size: 1.1rem;">
-                        Please complete your payment using <strong style="color: #4285F4;">Google Pay</strong> to confirm your order.
-                    </p>
-                    
-                    <div class="payment-detail-box">
-                        <h6 class="fw-bold text-center mb-3" style="color: var(--primary-color);">
-                            <i class="fab fa-google-pay me-2" style="color: #4285F4;"></i>
-                            Google Pay Details
-                        </h6>
-                        <div class="payment-detail-row">
-                            <span class="payment-detail-label">
-                                <i class="fas fa-mobile-alt me-2 text-primary"></i>GPay Number:
-                            </span>
-                            <span class="payment-detail-value">7092219895</span>
-                        </div>
-                        <div class="payment-detail-row">
-                            <span class="payment-detail-label">
-                                <i class="fas fa-user me-2 text-primary"></i>Account Name:
-                            </span>
-                            <span class="payment-detail-value">Sunilkumar</span>
-                        </div>
-                    </div>
-                    
-                    <div class="customer-service-call">
-                        <h6>
-                            <i class="fas fa-phone-alt me-2"></i>
-                            Important Information
-                        </h6>
-                        <p>
-                            <i class="fas fa-check-circle me-2 text-success"></i>
-                            After completing the payment, you will receive a <strong>call from our customer service team</strong> to confirm the next steps.
-                        </p>
-                        <p class="mt-2">
-                            <i class="fas fa-headset me-2 text-warning"></i>
-                            Customer Service Contact: <strong>Sunilkumar - 7868829460</strong>
-                        </p>
-                    </div>
-                </div>
-                <% } %>
 
                 <!-- Enhanced Order Summary -->
                 <% if (orderSummary) { 
@@ -1055,21 +714,6 @@
             var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
             window.location.href = url;
         }
-
-        // Print styles
-        var style = document.createElement('style');
-        style.innerHTML = `
-            @media print {
-                body { padding-top: 0 !important; background: white !important; }
-                .btn, .share-buttons, .timeline::before, .support-section { display: none !important; }
-                .success-header { background: #27ae60 !important; -webkit-print-color-adjust: exact; }
-                .action-buttons { display: none !important; }
-                .print-section { display: none !important; }
-                .order-summary-container { border: 1px solid #dee2e6 !important; }
-                .cod-payment-section { border: 2px solid #f39c12 !important; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>

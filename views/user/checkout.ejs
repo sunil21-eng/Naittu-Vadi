@@ -343,25 +343,6 @@
             padding: 1rem;
         }
 
-        .wallet-section {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border-radius: 8px;
-            padding: 1rem;
-            border: 1px solid #ffeaa7;
-            margin-bottom: 1rem;
-        }
-
-        .wallet-balance {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--warning-color);
-        }
-
-        .insufficient-balance {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
         .form-control:focus {
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
@@ -596,25 +577,13 @@
                             <div class="payment-method selected" onclick="selectPaymentMethod(this, 'COD')">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
-                                    <label class="form-check-label fw-bold" for="cod">Cash on Delivery (COD)</label>
+                                    <label class="form-check-label fw-bold" for="cod">Pay before shipment</label>
                                 </div>
-                                <p class="mb-0 text-muted small mt-1">Pay with cash when your order is delivered</p>
+                                <p class="mb-0 text-muted small mt-1">
+                                    Place the order & pay the amount into UPI <strong>7092219895</strong> & share the screenshot in WhatsApp <strong>7868829460</strong>.
+                                </p>
                             </div>
-
-                            <div class="payment-method" id="walletPaymentMethod" onclick="selectWalletPayment(this)">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="Wallet">
-                                    <label class="form-check-label fw-bold" for="wallet">
-                                        Wallet Payment 
-                                        <span class="wallet-balance ms-2" id="walletBalanceDisplay">
-                                            <i class="fas fa-wallet me-1"></i>
-                                            Loading...
-                                        </span>
-                                    </label>
-                                </div>
-                                <p class="mb-0 text-muted small mt-1">Pay using your wallet balance</p>
-                                <div id="walletMessage" class="mt-2 small"></div>
-                            </div>
+                            <!-- Wallet payment method removed -->
                         </div>
                     </div>
                 </div>
@@ -715,17 +684,7 @@
                             <% } %>
                         </div>
 
-                        <!-- Wallet Balance Section -->
-                        <div class="wallet-section">
-                            <h6 class="fw-bold mb-2">
-                                <i class="fas fa-wallet me-2"></i>Wallet Balance
-                            </h6>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">Available Balance:</span>
-                                <span class="wallet-balance" id="walletBalance">Loading...</span>
-                            </div>
-                            <div id="walletInfo" class="mt-2 small"></div>
-                        </div>
+                        <!-- Wallet Balance Section removed -->
 
                         <!-- Courier Delivery Info -->
                         <div class="alert alert-light border py-2 mb-3" id="deliveryInfo">
@@ -807,11 +766,11 @@
                                 </div>
                                 <a href="/cart" class="btn btn-warning w-100">Review Cart</a>
                             <% } else if (cartItems && cartItems.length > 0) { %>
-                                <!-- ===== MINIMUM ORDER CHECK ===== -->
-                                <% if (totalAmount < 1000) { %>
+                                <!-- ===== MINIMUM ORDER CHECK (₹2000) ===== -->
+                                <% if (totalAmount < 2000) { %>
                                     <div class="alert alert-danger text-center">
                                         <i class="fas fa-exclamation-circle me-2"></i>
-                                        Minimum order amount is ₹1,000. Please add more items to proceed.
+                                        Minimum order amount is ₹2,000. Please add more items to proceed.
                                     </div>
                                     <button class="btn btn-place-order w-100 py-3 fw-bold" disabled>
                                         <i class="fas fa-shopping-bag me-2"></i>PLACE ORDER
@@ -948,14 +907,11 @@
     <script>
         // Global variables
         let selectedAddressId = null;
-        let walletBalance = 0;
-        // ===== ADD MINIMUM ORDER TOTAL FROM SERVER =====
+        // ===== MINIMUM ORDER TOTAL FROM SERVER =====
         const orderTotal = parseFloat('<%= totalAmount %>') || 0;
 
-        // Load wallet balance on page load
+        // Initialize selected address on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadWalletBalance();
-            
             const defaultAddress = document.querySelector('.address-card.selected');
             if (defaultAddress) {
                 selectedAddressId = defaultAddress.getAttribute('data-address-id');
@@ -987,66 +943,6 @@
             }
         }
 
-        // Load wallet balance from your backend
-        async function loadWalletBalance() {
-            try {
-                const response = await fetch('/wallet/balance');
-                const result = await response.json();
-                
-                if (result.balance !== undefined) {
-                    walletBalance = result.balance;
-                    document.getElementById('walletBalance').textContent = '₹' + walletBalance.toFixed(2);
-                    document.getElementById('walletBalanceDisplay').innerHTML = 
-                        '<i class="fas fa-wallet me-1"></i>₹' + walletBalance.toFixed(2);
-                    
-                    updateWalletPaymentOption();
-                } else {
-                    console.error('Error loading wallet balance:', result.error);
-                    document.getElementById('walletBalance').textContent = '₹0.00';
-                    document.getElementById('walletBalanceDisplay').innerHTML = 
-                        '<i class="fas fa-wallet me-1"></i>₹0.00';
-                }
-            } catch (error) {
-                console.error('Error loading wallet balance:', error);
-                document.getElementById('walletBalance').textContent = '₹0.00';
-                document.getElementById('walletBalanceDisplay').innerHTML = 
-                    '<i class="fas fa-wallet me-1"></i>₹0.00';
-            }
-        }
-
-        // Update wallet payment option based on balance
-        function updateWalletPaymentOption() {
-            var totalAmount = orderTotal;
-            var walletMethod = document.getElementById('walletPaymentMethod');
-            var walletMessage = document.getElementById('walletMessage');
-            var walletRadio = document.getElementById('wallet');
-            var walletInfo = document.getElementById('walletInfo');
-            
-            if (walletBalance >= totalAmount) {
-                walletMethod.classList.remove('disabled');
-                walletMethod.style.opacity = '1';
-                walletRadio.disabled = false;
-                walletMessage.innerHTML = '<span class="text-success"><i class="fas fa-check-circle me-1"></i>Sufficient balance for this order</span>';
-                walletInfo.innerHTML = '<span class="text-success">You can use your wallet balance to pay for this order</span>';
-            } else {
-                walletMethod.classList.add('disabled');
-                walletMethod.style.opacity = '0.6';
-                walletRadio.disabled = true;
-                var shortage = totalAmount - walletBalance;
-                walletMessage.innerHTML = '<span class="insufficient-balance"><i class="fas fa-exclamation-triangle me-1"></i>Insufficient balance. Need ₹' + shortage.toFixed(2) + ' more</span>';
-                walletInfo.innerHTML = '<span class="text-danger">Add money to your wallet or choose another payment method</span>';
-                
-                // If wallet was selected, switch to COD
-                if (walletRadio.checked) {
-                    document.getElementById('cod').checked = true;
-                    document.querySelectorAll('.payment-method').forEach(function(payment) {
-                        payment.classList.remove('selected');
-                    });
-                    document.querySelector('.payment-method:first-child').classList.add('selected');
-                }
-            }
-        }
-
         // Address selection
         function selectAddress(element, addressId) {
             document.querySelectorAll('.address-card').forEach(function(card) {
@@ -1057,23 +953,13 @@
             updateCourierInfo(element);
         }
 
-        // Payment method selection
+        // Payment method selection (only COD available)
         function selectPaymentMethod(element, method) {
             document.querySelectorAll('.payment-method').forEach(function(payment) {
                 payment.classList.remove('selected');
             });
             element.classList.add('selected');
             document.querySelector('input[value="' + method + '"]').checked = true;
-        }
-
-        // Special handling for wallet payment selection
-        function selectWalletPayment(element) {
-            var totalAmount = orderTotal;
-            if (walletBalance < totalAmount) {
-                alert('Insufficient wallet balance. Please choose another payment method or add money to your wallet.');
-                return;
-            }
-            selectPaymentMethod(element, 'Wallet');
         }
 
         // Apply coupon function
@@ -1138,11 +1024,11 @@
             });
         }
 
-        // Enhanced place order function for COD and Wallet
+        // Enhanced place order function for COD
         async function placeOrder() {
             // Minimum order check
-            if (orderTotal < 1000) {
-                alert('Minimum order amount is ₹1,000. Please add more items to proceed.');
+            if (orderTotal < 2000) {
+                alert('Minimum order amount is ₹2,000. Please add more items to proceed.');
                 return;
             }
 
@@ -1156,18 +1042,10 @@
             var loadingOverlay = document.getElementById('loadingOverlay');
             var loadingMessage = document.getElementById('loadingMessage');
 
-            // Validate wallet balance for wallet payments
-            if (paymentMethod === 'Wallet') {
-                if (walletBalance < orderTotal) {
-                    alert('Insufficient wallet balance. Please choose another payment method.');
-                    return;
-                }
-            }
-
             // Show loading overlay
             loadingOverlay.style.display = 'flex';
             placeOrderBtn.disabled = true;
-            loadingMessage.textContent = paymentMethod === 'Wallet' ? 'Processing wallet payment...' : 'Placing your order...';
+            loadingMessage.textContent = 'Placing your order...';
 
             // Prepare order data
             var orderData = {

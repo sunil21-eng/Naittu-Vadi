@@ -51,12 +51,7 @@
     </script>
 
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
@@ -66,10 +61,6 @@
             min-height: 100vh;
             line-height: 1.6;
         }
-
-        /* Header styles moved to partial – keep only what’s needed here */
-
-        /* Main Container */
         .main-container {
             display: flex;
             justify-content: center;
@@ -77,17 +68,15 @@
             padding: 2rem 1rem;
             flex: 1;
         }
-
         .form-wrapper {
             width: 100%;
             max-width: 450px;
             padding: 2.5rem;
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             background: white;
             border: 1px solid #e2e8f0;
         }
-
         h2 {
             margin-bottom: 1.5rem;
             font-size: 1.8rem;
@@ -95,17 +84,8 @@
             color: #1e293b;
             font-weight: 600;
         }
-
-        /* Form Styling */
-        .form-group {
-            margin-bottom: 1.2rem;
-            position: relative;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"] {
+        .form-group { margin-bottom: 1.2rem; position: relative; }
+        input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
             width: 100%;
             padding: 1rem 1.2rem;
             border-radius: 10px;
@@ -114,26 +94,14 @@
             transition: border-color 0.3s;
             background-color: #f8fafc;
         }
-
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus,
-        input[type="tel"]:focus {
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus {
             outline: none;
             border-color: #4a5fe8;
-            box-shadow: 0 0 0 3px rgba(74, 95, 232, 0.15);
+            box-shadow: 0 0 0 3px rgba(74,95,232,0.15);
             background-color: #fff;
         }
-
-        .name-fields {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .password-toggle {
-            position: relative;
-        }
-
+        .name-fields { display: flex; gap: 1rem; }
+        .password-toggle { position: relative; }
         .password-toggle .toggle-icon {
             position: absolute;
             right: 15px;
@@ -152,12 +120,7 @@
             border: none;
             transition: color 0.2s;
         }
-
-        .password-toggle .toggle-icon:hover {
-            color: #4a5fe8;
-        }
-
-        /* Checkbox */
+        .password-toggle .toggle-icon:hover { color: #4a5fe8; }
         .checkbox-container {
             display: flex;
             align-items: flex-start;
@@ -166,23 +129,9 @@
             font-size: 0.9rem;
             color: #64748b;
         }
-
-        .checkbox-container input[type="checkbox"] {
-            margin-top: 0.2rem;
-            accent-color: #4a5fe8;
-        }
-
-        .checkbox-container a {
-            color: #4a5fe8;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .checkbox-container a:hover {
-            text-decoration: underline;
-        }
-
-        /* Button */
+        .checkbox-container input[type="checkbox"] { margin-top: 0.2rem; accent-color: #4a5fe8; }
+        .checkbox-container a { color: #4a5fe8; text-decoration: none; font-weight: 500; }
+        .checkbox-container a:hover { text-decoration: underline; }
         .btn-primary {
             width: 100%;
             padding: 1rem;
@@ -195,45 +144,18 @@
             cursor: pointer;
             transition: background-color 0.3s, transform 0.1s;
         }
-
-        .btn-primary:hover {
-            background-color: #3a4ed1;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-        }
-
-        /* Signin Text */
+        .btn-primary:hover { background-color: #3a4ed1; }
+        .btn-primary:active { transform: scale(0.98); }
         .signin-text {
             margin-top: 1.5rem;
             font-size: 0.9rem;
             text-align: center;
             color: #64748b;
         }
-
-        .signin-text a {
-            color: #4a5fe8;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .signin-text a:hover {
-            text-decoration: underline;
-        }
-
-        /* Error Styling */
-        .error {
-            color: #e74c3c;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            display: block;
-        }
-
-        input.error {
-            border-color: #e74c3c;
-        }
-
+        .signin-text a { color: #4a5fe8; text-decoration: none; font-weight: 500; }
+        .signin-text a:hover { text-decoration: underline; }
+        .error { color: #e74c3c; font-size: 0.8rem; margin-top: 5px; display: block; }
+        input.error { border-color: #e74c3c; }
         .alert {
             padding: 0.75rem 1rem;
             margin-bottom: 1.5rem;
@@ -241,14 +163,7 @@
             font-size: 0.9rem;
             text-align: center;
         }
-
-        .alert-danger {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        /* Google Sign In Button */
+        .alert-danger { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
         .google-signin {
             display: flex;
             justify-content: center;
@@ -266,55 +181,16 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        
-        .google-signin:hover {
-            background-color: #f8fafc;
-        }
-        
-        .google-icon {
-            width: 20px;
-            height: 20px;
-        }
-        
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.5rem 0;
-            color: #64748b;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background-color: #e2e8f0;
-        }
-        
-        .divider-text {
-            padding: 0 1rem;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
+        .google-signin:hover { background-color: #f8fafc; }
+        .google-icon { width: 20px; height: 20px; }
+        .divider { display: flex; align-items: center; margin: 1.5rem 0; color: #64748b; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background-color: #e2e8f0; }
+        .divider-text { padding: 0 1rem; font-size: 0.9rem; }
         @media (max-width: 480px) {
-            .form-wrapper {
-                padding: 1.8rem;
-                box-shadow: none;
-                border: none;
-            }
-            
-            .name-fields {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            h2 {
-                font-size: 1.6rem;
-            }
+            .form-wrapper { padding: 1.8rem; box-shadow: none; border: none; }
+            .name-fields { flex-direction: column; gap: 0; }
+            h2 { font-size: 1.6rem; }
         }
-        
-        /* Password strength indicator */
         .password-strength {
             height: 5px;
             margin-top: 8px;
@@ -322,37 +198,14 @@
             background-color: #e2e8f0;
             overflow: hidden;
         }
-        
-        .password-strength-bar {
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s, background-color 0.3s;
-        }
-        
-        .strength-weak {
-            background-color: #e74c3c;
-            width: 33%;
-        }
-        
-        .strength-medium {
-            background-color: #f39c12;
-            width: 66%;
-        }
-        
-        .strength-strong {
-            background-color: #2ecc71;
-            width: 100%;
-        }
-        
-        .password-strength-text {
-            font-size: 0.8rem;
-            margin-top: 5px;
-            color: #64748b;
-        }
+        .password-strength-bar { height: 100%; width: 0%; transition: width 0.3s, background-color 0.3s; }
+        .strength-weak { background-color: #e74c3c; width: 33%; }
+        .strength-medium { background-color: #f39c12; width: 66%; }
+        .strength-strong { background-color: #2ecc71; width: 100%; }
+        .password-strength-text { font-size: 0.8rem; margin-top: 5px; color: #64748b; }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 </head>
-
 <body>
     <!-- Header -->
     <%- include('../partials/user/header') %>
@@ -375,7 +228,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <input type="tel" name="phone" id="phone" placeholder="Phone Number" required>
+                    <input type="tel" name="phone" id="phone" placeholder="Phone Number (e.g., +91 98765 43210)" required>
                     <div class="error" id="phone-error"></div>
                 </div>
                 
@@ -496,14 +349,12 @@
                 
                 if (isFirstNameValid && isLastNameValid && isPhoneValid && 
                     isEmailValid && isPasswordValid && isConfirmPasswordValid && isTermsValid) {
-                    // If validation passes, submit the form
                     this.submit();
                 }
             });
             
             function validateFirstName() {
                 const firstName = firstNameInput.value.trim();
-                
                 if (firstName === '') {
                     showError(firstNameInput, firstNameError, 'First name is required');
                     return false;
@@ -518,7 +369,6 @@
             
             function validateLastName() {
                 const lastName = lastNameInput.value.trim();
-                
                 if (lastName === '') {
                     showError(lastNameInput, lastNameError, 'Last name is required');
                     return false;
@@ -531,20 +381,24 @@
                 }
             }
             
+            // User‑friendly phone validation
             function validatePhone() {
                 const phone = phoneInput.value.trim();
-                const phoneRegex = /^(\+?1-?)?(\([2-9]\d{2}\)|[2-9]\d{2})-?[2-9]\d{2}-?\d{4}$/;
-                
                 if (phone === '') {
                     showError(phoneInput, phoneError, 'Phone number is required');
                     return false;
-                } else if (!phoneRegex.test(phone.replace(/\s+/g, ""))) {
-                    showError(phoneInput, phoneError, 'Please enter a valid phone number');
-                    return false;
-                } else {
-                    clearError(phoneInput, phoneError);
-                    return true;
                 }
+                
+                // Remove all non‑digit characters (spaces, dashes, parentheses)
+                const digitsOnly = phone.replace(/\D/g, '');
+                
+                if (digitsOnly.length < 10 || digitsOnly.length > 12) {
+                    showError(phoneInput, phoneError, 'Please enter a valid mobile number (10‑12 digits). You can include +91 or 0 prefix.');
+                    return false;
+                }
+                
+                clearError(phoneInput, phoneError);
+                return true;
             }
             
             function validateEmail() {
@@ -584,14 +438,12 @@
                 let message = '';
                 
                 if (password.length > 0) {
-                    // Check password strength
                     if (password.length >= 8) strength++;
                     if (password.match(/[a-z]+/)) strength++;
                     if (password.match(/[A-Z]+/)) strength++;
                     if (password.match(/[0-9]+/)) strength++;
                     if (password.match(/[!@#$%^&*(),.?":{}|<>]+/)) strength++;
                     
-                    // Update strength bar and text
                     if (strength < 2) {
                         passwordStrengthBar.className = 'password-strength-bar strength-weak';
                         message = 'Weak password';
@@ -646,10 +498,8 @@
                 errorElement.textContent = '';
             }
             
-            // Check if there are server-side error messages
             const alertDiv = document.querySelector('.alert-danger');
             if (alertDiv) {
-                // If there's a server error, focus on the first field
                 firstNameInput.focus();
             }
         });

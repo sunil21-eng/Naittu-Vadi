@@ -62,13 +62,12 @@
         body {
             background-color: #f8f9fa;
             display: flex;
-            flex-direction: column;         /* Allow header & footer to stack */
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
         }
         
-        /* Renamed container to avoid Bootstrap conflicts */
         .otp-verify-container {
             background-color: white;
             border-radius: 8px;
@@ -76,7 +75,7 @@
             width: 100%;
             max-width: 400px;
             padding: 40px;
-            margin: auto;                  /* Center vertically after header */
+            margin: auto;
         }
         
         .logo {
@@ -131,7 +130,6 @@
             box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
         }
         
-        /* Renamed button class to avoid Bootstrap .btn conflicts */
         .verify-otp-btn {
             width: 100%;
             padding: 12px;
@@ -301,9 +299,11 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Show success message and redirect after a visible delay
-                    showSuccessMessage(data.message || 'OTP verified successfully! Redirecting...');
-                    // Delay increased to 2 seconds so user can definitely read the message
+                    // Show the exact success message requested
+                    showSuccessMessage('Your account created successfully. Please login.');
+                    // Disable form to prevent further interactions
+                    disableForm();
+                    // Redirect after 2 seconds
                     setTimeout(() => {
                         window.location.href = data.redirectUrl || '/login';
                     }, 2000);
@@ -385,10 +385,13 @@
             successMessageEl.textContent = text;
             successMessageEl.className = 'message success';
             successMessageEl.style.display = 'block';
-            
-            setTimeout(() => {
-                successMessageEl.style.display = 'none';
-            }, 5000);
+            // No auto-hide needed because we redirect, but we'll keep it visible until navigation
+        }
+        
+        function disableForm() {
+            const form = document.getElementById('verifyOtpForm');
+            form.querySelectorAll('input').forEach(input => input.disabled = true);
+            form.querySelector('button').disabled = true;
         }
         
         // ---------- Initialisation ----------
