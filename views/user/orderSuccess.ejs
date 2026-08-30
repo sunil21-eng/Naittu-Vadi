@@ -88,14 +88,14 @@
         .success-header {
             background: linear-gradient(135deg, var(--success-color), #219a52);
             color: white;
-            padding: 1.5rem 1rem;               /* reduced from 3rem 2rem */
+            padding: 1.5rem 1rem;
             text-align: center;
             position: relative;
             overflow: hidden;
         }
 
         .success-icon {
-            width: 60px;                          /* smaller icon */
+            width: 60px;
             height: 60px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
@@ -128,7 +128,7 @@
         }
 
         .order-details {
-            padding: 2rem;                         /* slightly reduced */
+            padding: 2rem;
         }
 
         .detail-card {
@@ -296,8 +296,8 @@
 
             <!-- Order Details Container -->
             <div class="order-details">
-                <!-- ===== MOVED: COD Payment Instructions (immediately after header) ===== -->
-                <% if ((order.paymentMethod === 'COD' || paymentMethod === 'COD') && (order.paymentStatus !== 'Paid' && paymentStatus !== 'Paid')) { %>
+                <!-- ===== Payment Instructions directly under header ===== -->
+                <% if ((order.paymentMethod === 'PayBeforeShipment' || paymentMethod === 'PayBeforeShipment') && (order.paymentStatus !== 'Paid' && paymentStatus !== 'Paid')) { %>
                 <div class="cod-payment-section">
                     <h4>
                         <i class="fas fa-money-bill-wave me-2"></i>
@@ -321,13 +321,13 @@
                             <span class="payment-detail-label">
                                 <i class="fas fa-mobile-alt me-2 text-primary"></i>UPI ID / Number:
                             </span>
-                            <span class="payment-detail-value">7092219895</span>
+                            <a href="upi://pay?pa=7092219895&pn=Nattuvedi" class="payment-detail-value text-decoration-none">7092219895</a>
                         </div>
                         <div class="payment-detail-row">
                             <span class="payment-detail-label">
                                 <i class="fab fa-whatsapp me-2 text-success"></i>Share Screenshot on WhatsApp:
                             </span>
-                            <span class="payment-detail-value">7868829460</span>
+                            <a href="https://wa.me/917868829460" target="_blank" class="payment-detail-value text-decoration-none">7868829460</a>
                         </div>
                     </div>
                     

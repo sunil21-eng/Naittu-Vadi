@@ -805,7 +805,13 @@
                             <div class="row small">
                                 <div class="col-6 text-muted">Payment Method:</div>
                                 <div class="col-6">
-                                    <%= order.paymentMethod === 'Wallet' ? 'Wallet' : 'Cash on Delivery' %>
+                                    <% if (order.paymentMethod === 'Wallet') { %>
+                                        Wallet
+                                    <% } else if (order.paymentMethod === 'PayBeforeShipment') { %>
+                                        Pay before shipment
+                                    <% } else { %>
+                                        <%= order.paymentMethod %>
+                                    <% } %>
                                 </div>
                                 <div class="col-6 text-muted">Payment Status:</div>
                                 <div class="col-6">

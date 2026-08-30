@@ -310,7 +310,7 @@ const getCheckoutPage = async (req, res) => {
   }
 };
 
-// Place Order - COD / Wallet only (no online payment gateway)
+// Place Order - PayBeforeShipment / Wallet only (no online payment gateway)
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user?._id;
@@ -318,12 +318,12 @@ const placeOrder = async (req, res) => {
 
     if (!userId) return res.status(401).json({ success: false, error: "Unauthorized user" });
 
-    // Only COD and Wallet are supported now - no payment gateway
-    const allowedMethods = ["COD", "Wallet"];
+    // Only PayBeforeShipment and Wallet are supported now - no payment gateway
+    const allowedMethods = ["PayBeforeShipment", "Wallet"];
     if (!allowedMethods.includes(paymentMethod)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid payment method. Only Cash on Delivery and Wallet are supported."
+        error: "Invalid payment method. Only Pay before shipment and Wallet are supported."
       });
     }
 
@@ -426,7 +426,7 @@ const placeOrder = async (req, res) => {
     const orderNumber = "ORD-" + Date.now();
 
     // Set payment status based on payment method
-    // COD: payment is collected offline (cash / separate link handled by customer care) -> stays Pending
+    // PayBeforeShipment: payment is collected offline (UPI + screenshot via WhatsApp) -> stays Pending
     // Wallet: deducted immediately -> Paid
     let paymentStatus = "Pending";
     if (paymentMethod === "Wallet") {
@@ -483,9 +483,9 @@ const placeOrder = async (req, res) => {
       await Cart.findOneAndDelete({ userId });
     }
 
-    // For COD, the order is created but stock/payment is settled offline
+    // For PayBeforeShipment, the order is created but stock/payment is settled offline
     // by customer care once cash is collected (e.g. via a separate collection link/process).
-    if (paymentMethod === "COD") {
+    if (paymentMethod === "PayBeforeShipment") {
       await Cart.findOneAndDelete({ userId });
     }
 

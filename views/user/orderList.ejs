@@ -737,16 +737,6 @@
             border: 1px solid rgba(108, 117, 125, 0.2);
         }
 
-        /* Payment Method Text */
-        .payment-method-text {
-            display: block;
-            font-size: 0.7rem;
-            color: #6c757d;
-            margin-top: 3px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
         /* Pagination Styles */
         .pagination-container {
             display: flex;
@@ -1543,12 +1533,11 @@
                     html += '<td class="col-total"><div class="order-total-compact">₹' + ((order.finalAmount || order.orderAmount || totalSalePrice) || 0).toFixed(2) + '</div></td>';
                     html += '<td class="col-status"><span class="status-badge status-' + ((order.orderStatus || 'pending').toLowerCase().replace(/\s+/g, '-')) + '">' + (order.orderStatus || 'Pending') + '</span></td>';
                     
-                    // Payment cell with status and method
+                    // Payment cell with status only (payment method removed)
                     var paymentStatus = (order.paymentStatus || 'pending').toLowerCase();
-                    var paymentMethod = (order.paymentMethod || 'COD').toUpperCase();
                     html += '<td class="col-payment">';
                     html += '<span class="payment-status payment-' + paymentStatus + '">' + (order.paymentStatus || 'Pending') + '</span>';
-                    html += '<span class="payment-method-text">' + paymentMethod + '</span>';
+                    // Payment method text removed from here
                     html += '</td>';
                     
                     html += '</tr>';
@@ -1610,7 +1599,6 @@
                 if (page < 1 || page > totalPages || page === currentPage) return;
                 currentPage = page;
                 loadOrders();
-                // Scroll to top of table
                 var tableContainer = document.querySelector('.orders-table-container');
                 if (tableContainer) {
                     tableContainer.scrollIntoView({
@@ -1627,13 +1615,9 @@
                 }
 
                 var imagePath = product.images[0];
-
-                // If already a full URL (Cloudinary or other), return as-is
                 if (imagePath && imagePath.startsWith('http')) {
                     return imagePath;
                 }
-
-                // Build Cloudinary URL using your cloud name
                 return 'https://res.cloudinary.com/dwne1v72e/image/upload/' + imagePath;
             }
 
@@ -1735,7 +1719,6 @@
                 if (toastContainer) {
                     toastContainer.insertAdjacentHTML('beforeend', toastHTML);
 
-                    // Auto remove after 5 seconds
                     setTimeout(function() {
                         var toastElement = document.getElementById(toastId);
                         if (toastElement) {
@@ -1746,6 +1729,5 @@
             }
         </script>
 </body>
-
 </html>
 <%- include('../partials/user/footer') %>

@@ -827,7 +827,16 @@
                                 N/A
                             <% } %>
                         </p>
-                        <p><strong>Payment Method:</strong> <%= order.paymentMethod === 'Wallet' ? 'Wallet' : 'Cash on Delivery' %></p>
+                        <!-- Updated payment method display -->
+                        <p><strong>Payment Method:</strong> 
+                            <% if (order.paymentMethod === 'Wallet') { %>
+                                Wallet
+                            <% } else if (order.paymentMethod === 'PayBeforeShipment') { %>
+                                Pay before shipment
+                            <% } else { %>
+                                <%= order.paymentMethod %>
+                            <% } %>
+                        </p>
                     </div>
                 </div>
 

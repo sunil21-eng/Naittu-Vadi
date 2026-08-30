@@ -262,48 +262,6 @@
             color: #2b6cb0;
         }
 
-        .return-requested {
-            background-color: #fefcbf;
-            color: #744210;
-        }
-
-        .return-approved {
-            background-color: #c6f6d5;
-            color: #276749;
-        }
-
-        .return-rejected {
-            background-color: #fed7d7;
-            color: #c53030;
-        }
-
-        .return-none {
-            background-color: #e2e8f0;
-            color: #4a5568;
-        }
-
-        /* Actions links */
-        .action-link {
-            text-decoration: none;
-            font-weight: 500;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: all 200ms ease-in-out;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .action-ship {
-            color: #38a169;
-        }
-
-        .action-ship:hover {
-            color: #2f855a;
-            background-color: #f0fff4;
-        }
-
         /* Pagination styles */
         .pagination-container {
             display: flex;
@@ -492,22 +450,6 @@
             background-color: #e2e8f0;
         }
 
-        /* Prevent action buttons from triggering row click */
-        .action-cell {
-            cursor: default;
-        }
-
-        .action-cell * {
-            cursor: pointer;
-        }
-
-        /* No actions message */
-        .no-actions {
-            color: #718096;
-            font-style: italic;
-            font-size: 14px;
-        }
-
         /* ----- Responsive adjustments for mobile (no HTML changes) ----- */
         @media screen and (max-width: 768px) {
             body {
@@ -563,7 +505,7 @@
             }
 
             .order-table {
-                min-width: 1000px; /* ensures horizontal scroll */
+                min-width: 800px; /* adjusted for fewer columns */
             }
 
             .order-table th,
@@ -608,7 +550,7 @@
             }
 
             .order-table {
-                min-width: 900px;
+                min-width: 700px;
             }
 
             .pagination-button {
@@ -712,8 +654,6 @@
                         <th>AMOUNT</th>
                         <th>ORDER STATUS</th>
                         <th>PAYMENT STATUS</th>
-                        <th>RETURN STATUS</th>
-                        <th>ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -753,28 +693,11 @@
                                         <%= order.paymentStatus || 'Pending' %>
                                     </span>
                                 </td>
-                                <td>
-                                    <span class="status-badge 
-                                        <%= order.returnStatus === 'Requested' ? 'return-requested' : 
-                                            order.returnStatus === 'Approved' ? 'return-approved' :
-                                            order.returnStatus === 'Rejected' ? 'return-rejected' : 'return-none' %>">
-                                        <%= order.returnStatus || 'None' %>
-                                    </span>
-                                </td>
-                                <td class="action-cell">
-                                    <% if (order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed') { %>
-                                        <button class="action-link action-ship" onclick="updateOrderStatus('<%= order._id %>', 'Shipped')">Ship</button>
-                                    <% } else if (order.orderStatus === 'Shipped') { %>
-                                        <button class="action-link action-deliver" onclick="updateOrderStatus('<%= order._id %>', 'Delivered')">Deliver</button>
-                                    <% } else { %>
-                                        <span class="no-actions">No actions</span>
-                                    <% } %>
-                                </td>
                             </tr>
                         <% }); %>
                     <% } else { %>
                         <tr>
-                            <td colspan="9" class="text-center py-4">
+                            <td colspan="7" class="text-center py-4">
                                 <i class="fas fa-shopping-cart fa-2x mb-3 text-muted"></i>
                                 <p class="text-muted">No orders found</p>
                             </td>
@@ -805,7 +728,7 @@
             </div>
         <% } %>
 
-        <!-- Custom Modal for Status Update Confirmation -->
+        <!-- Custom Modal for Status Update Confirmation (kept for potential use elsewhere) -->
         <div id="status-modal" class="modal">
             <div class="modal-content">
                 <p class="modal-message" id="status-modal-message">Are you sure you want to update this order status?</p>
@@ -818,7 +741,7 @@
     </main>
 
     <script>
-        // Store orderId and status for update
+        // Store orderId and status for update (unused in list but kept for potential use)
         let orderIdToUpdate = null;
         let newStatusToUpdate = null;
 
@@ -874,7 +797,6 @@
 
                 if (data.success) {
                     showMessage('Order status updated successfully', 'success');
-                    // Reload the page after a short delay to show the updated status
                     setTimeout(() => {
                         location.reload();
                     }, 1500);
@@ -897,7 +819,6 @@
             const statusFilter = document.getElementById('statusFilter');
             let searchTimeout;
             
-            // Function to perform search
             function performSearch() {
                 const searchValue = searchInput.value.trim();
                 const statusValue = statusFilter.value;
@@ -906,7 +827,6 @@
                 if (searchValue) url += `search=${encodeURIComponent(searchValue)}&`;
                 if (statusValue) url += `status=${encodeURIComponent(statusValue)}`;
                 
-                // Remove trailing & if present
                 if (url.endsWith('&')) {
                     url = url.slice(0, -1);
                 }
@@ -914,37 +834,27 @@
                 window.location.href = url;
             }
             
-            // Event listener for search input with debouncing
             searchInput.addEventListener('input', () => {
-                // Show/hide clear button based on input
                 clearSearchBtn.style.display = searchInput.value ? 'block' : 'none';
-                
-                // Clear previous timeout
                 clearTimeout(searchTimeout);
-                
-                // Set new timeout for search execution (500ms delay)
                 searchTimeout = setTimeout(performSearch, 500);
             });
             
-            // Event listener for clear button
             clearSearchBtn.addEventListener('click', () => {
                 searchInput.value = '';
                 clearSearchBtn.style.display = 'none';
                 performSearch();
             });
             
-            // Event listener for search button
             searchBtn.addEventListener('click', () => {
                 clearTimeout(searchTimeout);
                 performSearch();
             });
             
-            // Event listener for status filter
             statusFilter.addEventListener('change', () => {
                 performSearch();
             });
             
-            // Allow pressing Enter to search immediately
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     clearTimeout(searchTimeout);
@@ -952,26 +862,17 @@
                 }
             });
 
-            // Check for success/error messages in the URL query parameters on page load
+            // Check for success/error messages in URL
             const urlParams = new URLSearchParams(window.location.search);
             const successMessage = urlParams.get('success');
             const errorMessage = urlParams.get('error');
-            if (successMessage) {
-                showMessage(successMessage, 'success');
-            }
-            if (errorMessage) {
-                showMessage(errorMessage, 'error');
-            }
+            if (successMessage) showMessage(successMessage, 'success');
+            if (errorMessage) showMessage(errorMessage, 'error');
 
-            // Handle row click to redirect to order details
+            // Handle row click to redirect to order details (no action cells now)
             const orderRows = document.querySelectorAll('.order-row');
             orderRows.forEach(row => {
-                row.addEventListener('click', (e) => {
-                    // Don't redirect if the click was on an action button
-                    if (e.target.closest('.action-cell') || e.target.closest('.action-link')) {
-                        return;
-                    }
-                    
+                row.addEventListener('click', () => {
                     const orderId = row.getAttribute('data-order-id');
                     if (orderId) {
                         window.location.href = `/admin/orders/${orderId}`;
@@ -979,12 +880,11 @@
                 });
             });
 
-            // Handle the status confirmation button click
+            // Modal event listeners (kept for potential use)
             document.getElementById('confirm-status-btn').addEventListener('click', () => {
                 performStatusUpdate();
             });
 
-            // Handle the cancel button click
             document.getElementById('cancel-status-btn').addEventListener('click', () => {
                 hideStatusConfirmation();
             });
