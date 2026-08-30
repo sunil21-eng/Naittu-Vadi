@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin - Customers</title>
     <style>
+        /* ── reset & base ── */
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -13,25 +17,22 @@
             display: flex;
         }
 
-        /* Main Content Area */
+        /* ── main content ── */
         main {
             flex-grow: 1;
             padding: 2rem;
         }
-
         .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
-
         .content-title {
             font-size: 2rem;
             font-weight: bold;
             margin: 0;
         }
-
         .btn-primary {
             background-color: #4a60e0;
             color: #fff;
@@ -41,30 +42,35 @@
             font-weight: bold;
             display: inline-flex;
             align-items: center;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background-color: #3a4fc7;
         }
 
+        /* ── cards ── */
         .card {
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             margin-bottom: 1rem;
         }
-
         .card-header {
             padding: 1.5rem;
             border-bottom: 1px solid #eee;
         }
-
         .card-body {
             padding: 1.5rem;
         }
 
+        /* ── grid / form layout ── */
         .row {
             display: flex;
             flex-wrap: wrap;
             margin: -0.5rem;
+            align-items: center;
         }
-
         .col-lg-4,
         .col-md-6,
         .col-lg-2,
@@ -72,7 +78,6 @@
         .col-6 {
             padding: 0.5rem;
         }
-
         .me-auto {
             margin-right: auto;
         }
@@ -86,28 +91,42 @@
             background-color: #fff;
             font-size: 0.9rem;
         }
+        .form-control:focus {
+            border-color: #4a60e0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 96, 224, 0.15);
+        }
 
+        /* ── table ── */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.9rem;
         }
-
         th,
         td {
             text-align: left;
             padding: 1rem 0.5rem;
             border-bottom: 1px solid #eee;
         }
-
         th {
             color: #888;
+            font-weight: 600;
+        }
+        .align-middle {
+            vertical-align: middle;
+        }
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
         }
 
-        .text-end {
-            text-align: right;
-        }
-
+        /* ── badges ── */
         .badge {
             display: inline-block;
             padding: 0.5rem 1rem;
@@ -115,17 +134,16 @@
             font-weight: bold;
             font-size: 0.8rem;
         }
-
         .alert-success {
             background-color: #d1e7dd;
             color: #198754;
         }
-
         .alert-danger {
             background-color: #f8d7da;
             color: #dc3545;
         }
 
+        /* ── buttons ── */
         .btn {
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
@@ -134,57 +152,56 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            border: none;
+            transition: background-color 0.15s;
+            font-size: 0.9rem;
         }
-
         .btn-secondary {
             background-color: #6c757d;
             color: #fff;
-            border: 1px solid #6c757d;
         }
-
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
         .btn-success {
             background-color: #28a745;
             color: #fff;
-            border: 1px solid #28a745;
         }
-
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
         .btn-danger {
             background-color: #dc3545;
             color: #fff;
-            border: 1px solid #dc3545;
         }
-
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
         .btn-warning {
             background-color: #ffc107;
             color: #212529;
-            border: 1px solid #ffc107;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
         }
 
-        .btn-success a,
-        .btn-danger a {
-            color: #fff;
-            font-size: 10px;
-            text-decoration: none;
-        }
-
-        /* Pagination styles to match the provided design */
+        /* ── pagination ── */
         .pagination-area {
-            margin-top: 1rem;
-            margin-bottom: 3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
         }
-
         .pagination {
             display: flex;
             justify-content: flex-start;
             list-style: none;
             padding: 0;
             margin: 0;
+            flex-wrap: wrap;
+            gap: 0.25rem;
         }
-
         .page-item {
-            margin-right: 0.25rem;
+            display: inline-block;
         }
-
         .page-link {
             display: block;
             padding: 0.5rem 1rem;
@@ -192,15 +209,35 @@
             border-radius: 4px;
             color: #666;
             text-decoration: none;
+            transition: background-color 0.15s, border-color 0.15s;
+            font-size: 0.9rem;
+            min-width: 40px;
+            text-align: center;
         }
-
+        .page-link:hover {
+            background-color: #f0f0f0;
+            border-color: #bbb;
+        }
         .page-item.active .page-link {
             background-color: #4a60e0;
             color: #fff;
             border-color: #4a60e0;
         }
+        .page-item.active .page-link:hover {
+            background-color: #3a4fc7;
+        }
+        .page-item.disabled .page-link {
+            color: #ccc;
+            pointer-events: none;
+            border-color: #eee;
+        }
+        .pagination-info {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0.75rem;
+        }
 
-        /* Modal styles */
+        /* ── modal ── */
         .modal {
             display: none;
             position: fixed;
@@ -211,84 +248,70 @@
             height: 100%;
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
         }
-
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
+            margin: auto;
+            padding: 24px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 400px;
-            max-width: 80%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            width: 420px;
+            max-width: 92%;
         }
-
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
-
         .modal-title {
             font-size: 1.25rem;
             font-weight: bold;
             margin: 0;
         }
-
         .close {
             color: #aaa;
-            float: right;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            line-height: 1;
         }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+        .close:hover {
+            color: #000;
         }
-
         .modal-body {
             margin-bottom: 20px;
         }
-
         .modal-footer {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
 
-        /* ----- Responsive adjustments for mobile (no HTML changes) ----- */
+        /* ── responsive ── */
         @media screen and (max-width: 768px) {
             body {
                 flex-direction: column;
             }
-
             main {
                 padding: 1rem;
             }
-
             .content-title {
                 font-size: 1.5rem;
             }
-
             .card-header {
                 padding: 1rem;
             }
-
             .card-body {
                 padding: 1rem;
             }
-
-            /* Form controls: stack and full width */
             .row {
                 margin: -0.25rem;
             }
-
             .col-lg-4,
             .col-md-6,
             .col-lg-2,
@@ -297,62 +320,42 @@
                 width: 100%;
                 padding: 0.25rem;
             }
-
             .me-auto {
                 margin-right: 0;
             }
-
             .btn {
                 width: 100%;
                 padding: 0.6rem 1rem;
                 font-size: 0.9rem;
             }
-
-            /* Table scrollable */
-            .table-responsive {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
             table {
-                min-width: 600px; /* Ensures horizontal scroll on small screens */
+                min-width: 500px;
             }
-
-            th, td {
+            th,
+            td {
                 padding: 0.75rem 0.5rem;
                 font-size: 0.85rem;
             }
-
             .badge {
                 padding: 0.4rem 0.8rem;
                 font-size: 0.75rem;
             }
-
             .pagination {
                 justify-content: center;
-                flex-wrap: wrap;
             }
-
             .page-link {
                 padding: 0.4rem 0.8rem;
                 font-size: 0.85rem;
             }
-
             .modal-content {
-                width: 90%;
+                width: 92%;
+                padding: 16px;
                 margin: 20% auto;
-                padding: 15px;
             }
-
-            .modal-title {
-                font-size: 1.1rem;
-            }
-
             .modal-footer {
                 flex-direction: column;
                 gap: 8px;
             }
-
             .modal-footer .btn {
                 width: 100%;
             }
@@ -364,54 +367,82 @@
                 align-items: flex-start;
                 gap: 0.5rem;
             }
-
             .content-title {
                 font-size: 1.3rem;
             }
-
             .btn-primary {
                 width: 100%;
                 justify-content: center;
             }
-
             table {
-                min-width: 500px;
+                min-width: 400px;
             }
-
             .pagination {
-                gap: 0.2rem;
+                gap: 0.15rem;
             }
-
             .page-link {
                 padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+                min-width: 34px;
             }
         }
     </style>
 </head>
 <body>
-    <%-include("../partials/admin/navigation.ejs")%>
-    <!-- The main content area -->
+
+    <!-- sidebar partial (make sure the path is correct) -->
+    <%- include("../partials/admin/navigation.ejs") %>
+
+    <!-- ─── MAIN ─── -->
     <main>
         <section class="content-main">
+            <!-- header -->
             <div class="content-header">
                 <h2 class="content-title">Customers</h2>
                 <div>
+                    <!-- optional additional actions -->
                 </div>
             </div>
+
+            <!-- card -->
             <div class="card mb-4">
                 <header class="card-header">
+                    <!-- search + action buttons -->
+                    <!-- 
+                        The controller should pass:
+                        - data (array of customers)
+                        - currentPage (number)
+                        - totalPages (number)
+                        - search (string, optional)
+                    -->
                     <form action="/admin/user" method="GET" class="row gx-3" id="customer-form">
+                        <!-- hidden: keep current page so search returns to same page -->
+                        <input type="hidden" name="page" value="<%= typeof currentPage !== 'undefined' ? currentPage : 1 %>" />
+
+                        <!-- search input -->
                         <div class="col-lg-4 col-md-6 me-auto">
-                            <input type="text" placeholder="Search customers by name or email" name="search"
-                                class="form-control">
+                            <input
+                            type="text"
+                            placeholder="Search by name or email"
+                            name="search"
+                            class="form-control"
+                            value="<%= typeof search !== 'undefined' ? search : '' %>"
+                            />
                         </div>
+
+                        <!-- search button -->
                         <div class="col-lg-2 col-md-3 col-6">
                             <button type="submit" class="btn btn-primary">Search</button>
                         </div>
+
+                        <!-- clear button -->
                         <div class="col-lg-2 col-md-3 col-6">
-                            <button type="button" class="btn btn-secondary"
-                                onclick="document.querySelector('input[name=search]').value = ''; this.form.submit();">Clear</button>
+                            <button type="button" class="btn btn-secondary" id="clear-btn">
+                                Clear
+                            </button>
                         </div>
+
+                        <!-- bulk actions -->
                         <div class="col-lg-2 col-md-3 col-6">
                             <button type="button" class="btn btn-danger" id="block-btn">Block</button>
                         </div>
@@ -422,7 +453,8 @@
                             <button type="button" class="btn btn-warning" id="delete-btn">Delete</button>
                         </div>
                     </form>
-                </header> <!-- card-header end// -->
+                </header>
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -436,220 +468,252 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (data.length> 0) { %>
-                                    <% data.forEach(customer=> { %>
+                                <% 
+                                    // Safely access data; if not defined, use empty array
+                                    const customers = typeof data !== 'undefined' && Array.isArray(data) ? data : [];
+                                    if (customers.length > 0) { 
+                                        customers.forEach(customer => { 
+                                %>
                                         <tr>
-                                            <td class="align-middle"><input type="checkbox" name="customerSelect"
-                                                    value="<%= customer._id %>" class="form-check-input"></td>
-                                            <td>
-                                                <%= customer._id %>
+                                            <td class="align-middle">
+                                                <input
+                                                type="checkbox"
+                                                name="customerSelect"
+                                                value="<%= customer._id %>"
+                                                class="form-check-input"
+                                                />
                                             </td>
+                                            <td><%= customer._id %></td>
+                                            <td><%= customer.firstName || '' %></td>
+                                            <td><%= customer.email || '' %></td>
                                             <td>
-                                                <%= customer.firstName %>
-                                            </td>
-                                            <td>
-                                                <%= customer.email %>
-                                            </td>
-                                            <td>
-                                                <% if (customer.isActive===true) { %>
+                                                <% if (customer.isActive === true) { %>
                                                     <span class="badge rounded-pill alert-success">Active</span>
-                                                    <% } else { %>
-                                                        <span class="badge rounded-pill alert-danger">Blocked</span>
-                                                        <% } %>
+                                                <% } else { %>
+                                                    <span class="badge rounded-pill alert-danger">Blocked</span>
+                                                <% } %>
                                             </td>
                                         </tr>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <tr>
-                                                    <td colspan="5">No customers found.</td>
-                                                </tr>
-                                                <% } %>
+                                <% 
+                                        });
+                                    } else { 
+                                %>
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding:2rem 0; color:#888;">
+                                            No customers found.
+                                        </td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
-                </div> <!-- card-body end// -->
-            </div> <!-- card end// -->
-            <div class="pagination-area mt-15 mb-50">
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-start">
-                        <% for (let i=1; i <=totalPages; i++) { %>
-                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                <a class="page-link" href="?page=<%= i %>">
-                                    <%= i %>
-                                </a>
-                            </li>
-                            <% } %>
-                    </ul>
-                </nav>
+                </div>
             </div>
-        </section> <!-- content-main end// -->
-    </main>
-    
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Confirm Deletion</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete the selected customers? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+
+            <!-- ─── PAGINATION ─── -->
+            <% 
+                // Safely get pagination variables
+                const total = typeof totalPages !== 'undefined' ? totalPages : 1;
+                const current = typeof currentPage !== 'undefined' ? currentPage : 1;
+                const searchQuery = typeof search !== 'undefined' ? search : '';
+                const hasSearch = searchQuery && searchQuery.length > 0;
+            %>
+            <% if (total > 1) { %>
+                <div class="pagination-area">
+                    <nav aria-label="Customer pagination">
+                        <ul class="pagination justify-content-start">
+                            <!-- Previous -->
+                            <li class="page-item <%= current <= 1 ? 'disabled' : '' %>">
+                                <a class="page-link"
+                                href="?page=<%= current - 1 %><%= hasSearch ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+                                aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+
+                        <!-- Page numbers -->
+                        <% for (let i = 1; i <= total; i++) { %>
+                            <li class="page-item <%= i === current ? 'active' : '' %>">
+                                <a class="page-link"
+                                href="?page=<%= i %><%= hasSearch ? '&search=' + encodeURIComponent(searchQuery) : '' %>">
+                                <%= i %>
+                            </a>
+                        </li>
+                        <% } %>
+
+                        <!-- Next -->
+                        <li class="page-item <%= current >= total ? 'disabled' : '' %>">
+                            <a class="page-link"
+                            href="?page=<%= current + 1 %><%= hasSearch ? '&search=' + encodeURIComponent(searchQuery) : '' %>"
+                            aria-label="Next">
+                            &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="pagination-info">
+                Page <%= current %> of <%= total %>
+                <% if (hasSearch) { %>&bull; filtered by &ldquo;<%= searchQuery %>&rdquo;<% } %>
             </div>
         </div>
+        <% } else if (total === 1) { %>
+            <!-- only one page – show info but no pagination links -->
+            <div class="pagination-info" style="margin-top:1rem; color:#888;">
+                Page 1 of 1
+                <% if (hasSearch) { %>&bull; filtered by &ldquo;<%= searchQuery %>&rdquo;<% } %>
+            </div>
+        <% } %>
+
+    </section>
+</main>
+
+<!-- ─── DELETE MODAL ─── -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirm Deletion</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete the selected customers? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+        </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const blockBtn = document.getElementById('block-btn');
-            const unblockBtn = document.getElementById('unblock-btn');
-            const deleteBtn = document.getElementById('delete-btn');
-            const modal = document.getElementById('deleteModal');
-            const closeModal = document.querySelector('.close');
-            const cancelDelete = document.getElementById('cancelDelete');
-            const confirmDelete = document.getElementById('confirmDelete');
+<!-- ─── JAVASCRIPT ─── -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
 
-            // Function to get all selected customer IDs
-            function getSelectedCustomerIds() {
-                const checkboxes = document.querySelectorAll('input[name="customerSelect"]:checked');
-                const selectedIds = Array.from(checkboxes).map(checkbox => checkbox.value);
-                return selectedIds;
+        // ---- DOM refs ----
+        const blockBtn = document.getElementById('block-btn');
+        const unblockBtn = document.getElementById('unblock-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const clearBtn = document.getElementById('clear-btn');
+
+        const modal = document.getElementById('deleteModal');
+        const closeModal = document.querySelector('.close');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+
+        const form = document.getElementById('customer-form');
+        const searchInput = document.querySelector('input[name="search"]');
+
+        // ---- helpers ----
+        function getSelectedIds() {
+            const checks = document.querySelectorAll('input[name="customerSelect"]:checked');
+            return Array.from(checks).map(cb => cb.value);
+        }
+
+        // ---- clear button: reset search + page, submit ----
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                if (searchInput) searchInput.value = '';
+                const pageInput = form.querySelector('input[name="page"]');
+                if (pageInput) pageInput.value = '1';
+                form.submit();
+            });
+        }
+
+        // ---- block / unblock ----
+        async function handleBulkAction(action) {
+            const ids = getSelectedIds();
+            if (ids.length === 0) {
+                alert('Please select at least one customer.');
+                return;
             }
 
-            // Function to handle the block/unblock action
-            async function handleAction(action) {
-                const selectedIds = getSelectedCustomerIds();
+            try {
+                const res = await fetch('/admin/customers/action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, customerIds: ids })
+                });
 
-                if (selectedIds.length === 0) {
-                    alert('Please select at least one customer.');
-                    return;
+                if (res.ok) {
+                    alert(`Successfully ${action}ed the selected customers.`);
+                    window.location.reload();
+                } else {
+                    let msg = 'An unknown error occurred.';
+                    try {
+                        const err = await res.json();
+                        msg = err.message || msg;
+                    } catch (_) { /* ignore */ }
+                    alert(`Failed to ${action} customers: ${msg}`);
                 }
-
-                try {
-                    const response = await fetch('/admin/customers/action', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            action: action,
-                            customerIds: selectedIds
-                        })
-                    });
-
-                    if (response.ok) {
-                        alert(`Successfully ${action}ed the selected customers.`);
-                        window.location.reload(); // Reload the page to show the updated status
-                    } else {
-                        // Attempt to parse JSON error message
-                        let errorMessage = 'An unknown error occurred.';
-                        try {
-                            const errorData = await response.json();
-                            errorMessage = errorData.message || errorMessage;
-                        } catch (e) {
-                            // If parsing fails, use the response status text
-                            errorMessage = `Server responded with status ${response.status}: ${response.statusText}`;
-                        }
-                        alert(`Failed to ${action} customers: ${errorMessage}`);
-                    }
-                } catch (error) {
-                    console.error('Network Error:', error);
-                    alert('A network error occurred. Please check your connection and the server logs.');
-                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error. Please check your connection and try again.');
             }
+        }
 
-            // Function to handle delete action
-            async function handleDelete() {
-                const selectedIds = getSelectedCustomerIds();
+        if (blockBtn) blockBtn.addEventListener('click', () => handleBulkAction('block'));
+        if (unblockBtn) unblockBtn.addEventListener('click', () => handleBulkAction('unblock'));
 
-                if (selectedIds.length === 0) {
+        // ---- delete ----
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function() {
+                const ids = getSelectedIds();
+                if (ids.length === 0) {
                     alert('Please select at least one customer to delete.');
                     return;
                 }
+                modal.style.display = 'flex';
+            });
+        }
+
+        // ---- modal controls ----
+        function closeModalHandler() {
+            modal.style.display = 'none';
+        }
+
+        if (closeModal) closeModal.addEventListener('click', closeModalHandler);
+        if (cancelDelete) cancelDelete.addEventListener('click', closeModalHandler);
+
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) closeModalHandler();
+        });
+
+        // ---- confirm delete ----
+        if (confirmDelete) {
+            confirmDelete.addEventListener('click', async function() {
+                closeModalHandler();
+                const ids = getSelectedIds();
+                if (ids.length === 0) {
+                    alert('No customers selected.');
+                    return;
+                }
 
                 try {
-                    const response = await fetch('/admin/customers/delete', {
+                    const res = await fetch('/admin/customers/delete', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            customerIds: selectedIds
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ customerIds: ids })
                     });
 
-                    if (response.ok) {
+                    if (res.ok) {
                         alert('Successfully deleted the selected customers.');
-                        window.location.reload(); // Reload the page to show the updated list
+                        window.location.reload();
                     } else {
-                        // Attempt to parse JSON error message
-                        let errorMessage = 'An unknown error occurred.';
+                        let msg = 'An unknown error occurred.';
                         try {
-                            const errorData = await response.json();
-                            errorMessage = errorData.message || errorMessage;
-                        } catch (e) {
-                            // If parsing fails, use the response status text
-                            errorMessage = `Server responded with status ${response.status}: ${response.statusText}`;
-                        }
-                        alert(`Failed to delete customers: ${errorMessage}`);
+                            const err = await res.json();
+                            msg = err.message || msg;
+                        } catch (_) { /* ignore */ }
+                        alert(`Failed to delete customers: ${msg}`);
                     }
-                } catch (error) {
-                    console.error('Network Error:', error);
-                    alert('A network error occurred. Please check your connection and the server logs.');
-                }
-            }
-
-            // Event listeners for the buttons
-            if (blockBtn) {
-                blockBtn.addEventListener('click', () => handleAction('block'));
-            }
-
-            if (unblockBtn) {
-                unblockBtn.addEventListener('click', () => handleAction('unblock'));
-            }
-
-            // Delete button event listener
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', () => {
-                    const selectedIds = getSelectedCustomerIds();
-                    if (selectedIds.length === 0) {
-                        alert('Please select at least one customer to delete.');
-                        return;
-                    }
-                    modal.style.display = 'block';
-                });
-            }
-
-            // Modal event listeners
-            if (closeModal) {
-                closeModal.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                });
-            }
-
-            if (cancelDelete) {
-                cancelDelete.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                });
-            }
-
-            if (confirmDelete) {
-                confirmDelete.addEventListener('click', () => {
-                    modal.style.display = 'none';
-                    handleDelete();
-                });
-            }
-
-            // Close modal when clicking outside of it
-            window.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
+                } catch (err) {
+                    console.error(err);
+                    alert('Network error. Please check your connection and try again.');
                 }
             });
-        });
-    </script>
+        }
+
+    });
+</script>
+
 </body>
 </html>

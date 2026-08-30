@@ -55,13 +55,9 @@ async function sendEmailVerification(email, otp) {
             }
         });
 
-        transport.verify((error, success) => {
-            if (error) {
-                
-            } else {
-                
-            }
-        });
+       // Test connection first
+        await transport.verify();
+        console.log("SMTP connection successful");
 
         const info = await transport.sendMail({
     from: process.env.NODEMAILER_EMAIL,
@@ -180,11 +176,12 @@ async function sendEmailVerification(email, otp) {
     `
 });
 
+ console.log("Email sent:", info.response);
 
         return info.accepted.length > 0
 
     } catch (error) {
-        console.error("Error , sending mail", error);
+        console.error("Detailed error:", error)
         return false;
     }
 

@@ -2,58 +2,55 @@ const User = require('../../models/userSchema');
 
 
 const customerInfo = async function (req, res) {
-
     try {
-
+        // 1. Get search term from query string
         let search = "";
-
         if (req.query.search) {
-            search = req.query.search
+            search = req.query.search;
         }
 
+        // 2. Get current page (default 1)
         let page = 1;
         if (req.query.page) {
             page = parseInt(req.query.page);
         }
 
-        let limit = 6;
+        const limit = 6; // items per page
 
-        const userData = await User.find({
+        // 3. Build the filter object for customers (non‑admin)
+        const filter = {
             isAdmin: false,
             $or: [
                 { firstName: { $regex: ".*" + search + ".*", $options: "i" } },
                 { email: { $regex: ".*" + search + ".*", $options: "i" } }
             ]
-        })
+        };
+
+        // 4. Fetch customers for the current page (sorted newest first)
+        const userData = await User.find(filter)
             .sort({ createdOn: -1 })
             .limit(limit)
             .skip((page - 1) * limit)
-            .exec()
+            .exec();
 
+        // 5. Count total matching documents (for pagination)
+        const count = await User.countDocuments(filter);
 
-        const count = await User.countDocuments({
-            isActive: false,
-            $or: [
-                { firstName: { $regex: ".*" + search + ".*", $options: "i" } },
-                { email: { $regex: ".*" + search + ".*", $options: "i" } }
-            ]
-        })
+        const totalPages = Math.ceil(count / limit);
 
-        const totalpage = Math.ceil(count / limit);
-
-
+        // 6. Render the view, passing ALL needed variables
         res.render("admin/customer-accounts", {
             data: userData,
             currentPage: page,
-            totalPages: totalpage
-        })
+            totalPages: totalPages,
+            search: search   // <-- now passed to the EJS template
+        });
 
     } catch (error) {
-
         console.error("Error loading customer info", error);
         res.redirect('/admin/pageError');
     }
-}
+};
 
 const blockCustomer = async function (req, res) {
 
