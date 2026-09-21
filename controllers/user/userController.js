@@ -405,31 +405,202 @@ const applyOffers = async (products) => {
     }
 };
 
+// const loadHome = async function (req, res) {
+//     try {
+//         const user = req.session.user;
+
+//         const listedCategories = await Category.find({ isListed: true }).select("_id");
+
+//         let filter = {
+//             isBlocked: false,
+//             category: { $in: listedCategories.map(c => c._id) }
+//         };
+
+//         if (req.query.category) {
+//             filter.category = req.query.category;
+//         }
+//         if (req.query.categoryAttribute) {
+//             filter.categoryAttribute = new RegExp(req.query.categoryAttribute, "i");
+//         }
+//         if (req.query.minPrice || req.query.maxPrice) {
+//             filter.salePrice = {};
+//             if (req.query.minPrice) {
+//                 filter.salePrice.$gte = parseInt(req.query.minPrice);
+//             }
+//             if (req.query.maxPrice) {
+//                 filter.salePrice.$lte = parseInt(req.query.maxPrice);
+//             }
+//         }
+//         if (req.query.status && req.query.status !== 'all') {
+//             filter.status = req.query.status;
+//         }
+//         if (req.query.search) {
+//             filter.$or = [
+//                 { productName: new RegExp(req.query.search, 'i') },
+//                 { description: new RegExp(req.query.search, 'i') }
+//             ];
+//         }
+
+//         let sortOptions = {};
+//         const sortBy = req.query.sortBy || 'oldest';
+//         switch (sortBy) {
+//             case 'price_low': sortOptions = { salePrice: 1 }; break;
+//             case 'price_high': sortOptions = { salePrice: -1 }; break;
+//             case 'name_asc': sortOptions = { productName: 1 }; break;
+//             case 'name_desc': sortOptions = { productName: -1 }; break;
+//             case 'newest': sortOptions = { createdOn: -1 }; break;
+//             case 'oldest': sortOptions = { createdOn: 1 }; break;
+//             case 'popularity': sortOptions = { quantity: -1 }; break;
+//             default: sortOptions = { createdOn: 1 };
+//         }
+
+//         const hasActiveFilter = !!(
+//             req.query.category ||
+//             req.query.categoryAttribute ||
+//             req.query.minPrice ||
+//             req.query.maxPrice ||
+//             (req.query.status && req.query.status !== 'all') ||
+//             req.query.search
+//         );
+
+//         let page = parseInt(req.query.page) || 1;
+//         let limit = parseInt(req.query.limit) || 30;
+//         let skip = (page - 1) * limit;
+
+//         let isGroupedView = false;
+//         if (!hasActiveFilter) {
+//             isGroupedView = true;
+//             page = 1;
+//             limit = 0;
+//             skip = 0;
+//         }
+
+//         let productQuery = Product.find(filter)
+//             .populate('category', 'name attributes')
+//             .sort(sortOptions);
+
+//         if (!isGroupedView) {
+//             productQuery = productQuery.skip(skip).limit(limit);
+//         }
+
+//         const products = await productQuery;
+//         const productsWithOffers = await applyOffers(products);
+
+//         const totalProducts = await Product.countDocuments(filter);
+//         const totalPages = isGroupedView ? 1 : Math.ceil(totalProducts / limit);
+
+//         const categories = await Category.find({ isListed: true })
+//             .collation({ locale: 'en', strength: 2 })
+//             .sort({ name: 1 })
+//             .lean();
+
+//         const attributesAgg = await Product.aggregate([
+//             {
+//                 $match: {
+//                     isBlocked: false,
+//                     category: { $in: listedCategories.map(c => c._id) },
+//                     categoryAttribute: { $nin: [null, ''] }
+//                 }
+//             },
+//             {
+//                 $group: {
+//                     _id: "$category",
+//                     attributes: { $addToSet: "$categoryAttribute" }
+//                 }
+//             }
+//         ]);
+
+//         const attributesByCategory = {};
+//         attributesAgg.forEach(function (entry) {
+//             attributesByCategory[String(entry._id)] = entry.attributes.sort(function (a, b) {
+//                 return String(a).localeCompare(String(b));
+//             });
+//         });
+
+//         const priceRange = await Product.aggregate([
+//             { $match: { isBlocked: false } },
+//             { $group: { _id: null, minPrice: { $min: "$salePrice" }, maxPrice: { $max: "$salePrice" } } }
+//         ]);
+
+//         const currentFilters = {
+//             category: req.query.category || '',
+//             categoryAttribute: req.query.categoryAttribute || '',
+//             minPrice: req.query.minPrice || '',
+//             maxPrice: req.query.maxPrice || '',
+//             status: req.query.status || 'all',
+//             search: req.query.search || '',
+//             sortBy,
+//             limit: isGroupedView ? 0 : limit,
+//         };
+
+//         const viewData = {
+//             currentPage: page,
+//             totalPage: totalPages,
+//             totalProduct: totalProducts,
+//             products: productsWithOffers,
+//             categories,
+//             attributesByCategory,
+//             priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
+//             currentFilters,
+//             query: req.query,
+//             isGroupedView,
+//         };
+
+//         if (user) {
+//             const userData = await User.findById(user._id).lean();
+//             if (userData) {
+//                 userData.name = userData.name || `${userData.firstName} ${userData.lastName}`;
+//             }
+//             return res.render("user/home", {
+//                 ...viewData,
+//                 user: userData
+//             });
+//         } else {
+//             return res.render("user/home", {
+//                 ...viewData,
+//                 user: null
+//             });
+//         }
+
+//     } catch (error) {
+//         console.error("shop page not found", error);
+//         return res.redirect("/");
+//     }
+// };
+
+const DEFAULT_LIMIT  = 30;
+const ALLOWED_LIMITS = [30, 60, 90];
 const loadHome = async function (req, res) {
     try {
         const user = req.session.user;
 
-        const listedCategories = await Category.find({ isListed: true }).select("_id");
+        // Categories sorted A→Z, case-insensitive. Fetched first because the
+        // grouped view needs this exact order to rank products by category.
+        const categories = await Category.find({ isListed: true })
+            .collation({ locale: 'en', strength: 2 })
+            .sort({ name: 1 })
+            .lean();
 
+        const listedCategoryIds = categories.map(c => c._id);
+
+        // ---------------- FILTER (unchanged semantics) ----------------
         let filter = {
             isBlocked: false,
-            category: { $in: listedCategories.map(c => c._id) }
+            category: { $in: listedCategoryIds }
         };
 
-        if (req.query.category) {
-            filter.category = req.query.category;
+        if (req.query.category && mongoose.Types.ObjectId.isValid(req.query.category)) {
+            // Cast explicitly: the aggregation pipeline below does NOT auto-cast
+            // strings to ObjectId the way Product.find() does.
+            filter.category = new mongoose.Types.ObjectId(req.query.category);
         }
         if (req.query.categoryAttribute) {
             filter.categoryAttribute = new RegExp(req.query.categoryAttribute, "i");
         }
         if (req.query.minPrice || req.query.maxPrice) {
             filter.salePrice = {};
-            if (req.query.minPrice) {
-                filter.salePrice.$gte = parseInt(req.query.minPrice);
-            }
-            if (req.query.maxPrice) {
-                filter.salePrice.$lte = parseInt(req.query.maxPrice);
-            }
+            if (req.query.minPrice) filter.salePrice.$gte = parseInt(req.query.minPrice);
+            if (req.query.maxPrice) filter.salePrice.$lte = parseInt(req.query.maxPrice);
         }
         if (req.query.status && req.query.status !== 'all') {
             filter.status = req.query.status;
@@ -437,21 +608,22 @@ const loadHome = async function (req, res) {
         if (req.query.search) {
             filter.$or = [
                 { productName: new RegExp(req.query.search, 'i') },
-                { description: new RegExp(req.query.search, 'i') }
+                { description:  new RegExp(req.query.search, 'i') }
             ];
         }
 
+        // ---------------- SORT (unchanged) ----------------
         let sortOptions = {};
         const sortBy = req.query.sortBy || 'oldest';
         switch (sortBy) {
-            case 'price_low': sortOptions = { salePrice: 1 }; break;
-            case 'price_high': sortOptions = { salePrice: -1 }; break;
-            case 'name_asc': sortOptions = { productName: 1 }; break;
-            case 'name_desc': sortOptions = { productName: -1 }; break;
-            case 'newest': sortOptions = { createdOn: -1 }; break;
-            case 'oldest': sortOptions = { createdOn: 1 }; break;
-            case 'popularity': sortOptions = { quantity: -1 }; break;
-            default: sortOptions = { createdOn: 1 };
+            case 'price_low':  sortOptions = { salePrice: 1 };    break;
+            case 'price_high': sortOptions = { salePrice: -1 };   break;
+            case 'name_asc':   sortOptions = { productName: 1 };  break;
+            case 'name_desc':  sortOptions = { productName: -1 }; break;
+            case 'newest':     sortOptions = { createdOn: -1 };   break;
+            case 'oldest':     sortOptions = { createdOn: 1 };    break;
+            case 'popularity': sortOptions = { quantity: -1 };    break;
+            default:           sortOptions = { createdOn: 1 };
         }
 
         const hasActiveFilter = !!(
@@ -463,42 +635,75 @@ const loadHome = async function (req, res) {
             req.query.search
         );
 
-        let page = parseInt(req.query.page) || 1;
-        let limit = parseInt(req.query.limit) || 30;
-        let skip = (page - 1) * limit;
-
-        let isGroupedView = false;
-        if (!hasActiveFilter) {
-            isGroupedView = true;
-            page = 1;
-            limit = 0;
-            skip = 0;
-        }
-
-        let productQuery = Product.find(filter)
-            .populate('category', 'name attributes')
-            .sort(sortOptions);
-
-        if (!isGroupedView) {
-            productQuery = productQuery.skip(skip).limit(limit);
-        }
-
-        const products = await productQuery;
-        const productsWithOffers = await applyOffers(products);
+        const isGroupedView = !hasActiveFilter;
+        
+        // ---------------- PAGINATION (the fix) ----------------
+        // limit is now a REAL limit in every view, including the grouped
+        // default homepage. It is whitelisted so ?limit=5000 cannot be used
+        // to pull the whole catalogue (and the whole image set) in one request.
+        let limit = parseInt(req.query.limit, 10) || DEFAULT_LIMIT;
+        if (!ALLOWED_LIMITS.includes(limit)) limit = DEFAULT_LIMIT;
 
         const totalProducts = await Product.countDocuments(filter);
-        const totalPages = isGroupedView ? 1 : Math.ceil(totalProducts / limit);
+        const totalPages    = Math.max(Math.ceil(totalProducts / limit), 1);
 
-        const categories = await Category.find({ isListed: true })
-            .collation({ locale: 'en', strength: 2 })
-            .sort({ name: 1 })
-            .lean();
+        let page = parseInt(req.query.page, 10) || 1;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;   // clamp: no empty pages
 
+        const skip = (page - 1) * limit;
+
+        // ---------------- FETCH ONE PAGE ----------------
+        let products;
+
+        if (isGroupedView) {
+            // Grouped/default view: order by category A→Z first, then by the
+            // chosen sort within each category, THEN skip/limit. Done as an
+            // aggregation because the ordering depends on category.name, which
+            // lives in another collection.
+            //
+            // $indexOfArray against the already-A→Z-sorted category id list is
+            // cheaper than a $lookup — no join, just a position lookup.
+            const pipeline = [
+                { $match: filter },
+                { $addFields: { __catRank: { $indexOfArray: [listedCategoryIds, '$category'] } } },
+                { $sort: Object.assign({ __catRank: 1 }, sortOptions, { _id: 1 }) },
+                { $skip: skip },
+                { $limit: limit },
+                { $project: { _id: 1 } }
+            ];
+
+            const ordered = await Product.aggregate(pipeline);
+            const pageIds = ordered.map(d => d._id);
+
+            // Re-fetch as real Mongoose documents so populate() and
+            // applyOffers() behave exactly as they always have.
+            // Only `limit` documents — 30, not 200.
+            const docs = await Product.find({ _id: { $in: pageIds } })
+                .populate('category', 'name attributes');
+
+            // $in does not preserve order, so restore the aggregation's order.
+            const byId = new Map(docs.map(d => [String(d._id), d]));
+            products = pageIds.map(id => byId.get(String(id))).filter(Boolean);
+
+        } else {
+            // Filtered/flat view: plain find + skip + limit, as before.
+            products = await Product.find(filter)
+                .populate('category', 'name attributes')
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limit);
+        }
+
+        // Unchanged — now runs over `limit` products instead of ~200.
+        const productsWithOffers = await applyOffers(products);
+
+        // ---------------- SIDEBAR DATA (unchanged) ----------------
         const attributesAgg = await Product.aggregate([
             {
                 $match: {
                     isBlocked: false,
-                    category: { $in: listedCategories.map(c => c._id) },
+                    category: { $in: listedCategoryIds },
                     categoryAttribute: { $nin: [null, ''] }
                 }
             },
@@ -530,20 +735,24 @@ const loadHome = async function (req, res) {
             status: req.query.status || 'all',
             search: req.query.search || '',
             sortBy,
-            limit: isGroupedView ? 0 : limit,
+            // Was `isGroupedView ? 0 : limit`. It must now be the real limit:
+            // the view divides by it for the "Showing X–Y of Z" counter, and
+            // the toolbar <select> matches against it.
+            limit
         };
 
         const viewData = {
             currentPage: page,
             totalPage: totalPages,
-            totalProduct: totalProducts,
+            totalProduct: totalProducts,    // kept for any other view/partial
+            totalProducts: totalProducts,   // required by the updated home.ejs
             products: productsWithOffers,
             categories,
             attributesByCategory,
             priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
             currentFilters,
             query: req.query,
-            isGroupedView,
+            isGroupedView
         };
 
         if (user) {
@@ -551,15 +760,9 @@ const loadHome = async function (req, res) {
             if (userData) {
                 userData.name = userData.name || `${userData.firstName} ${userData.lastName}`;
             }
-            return res.render("user/home", {
-                ...viewData,
-                user: userData
-            });
+            return res.render("user/home", { ...viewData, user: userData });
         } else {
-            return res.render("user/home", {
-                ...viewData,
-                user: null
-            });
+            return res.render("user/home", { ...viewData, user: null });
         }
 
     } catch (error) {

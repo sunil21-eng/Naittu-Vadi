@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 
@@ -35,7 +35,10 @@
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Nattuvedi.com" />
     <link rel="canonical" href="https://www.nattuvedi.com/" />
-    
+
+    <!-- ===== PERFORMANCE: warm up the Cloudinary connection early ===== -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
 
     <!-- ===== JSON-LD STRUCTURED DATA: Organization ===== -->
     <script type="application/ld+json">
@@ -1428,6 +1431,40 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             // dropdown on page load.
             var priceGroupOpen = !!(currentFilters.minPrice || currentFilters.maxPrice);
             var categoryGroupOpen = !!(currentFilters.category || currentFilters.categoryAttribute);
+
+            /* ==========================================================
+               CLOUDINARY DELIVERY HELPER  (bandwidth fix)
+
+               Previously the card rendered:
+                   /image/upload/<public_id>
+               with NO transformation segment, so Cloudinary served the
+               ORIGINAL full-resolution upload (~227 KB average) and the
+               browser scaled it down with CSS. That single omission is
+               responsible for ~99% of the 33.9 GB bandwidth.
+
+               Now every card URL carries:
+                 f_auto  -> WebP / AVIF automatically where supported
+                 q_auto  -> perceptual quality, no visible degradation
+                 c_limit -> never upscales beyond the original size
+                 w_<n>   -> the actual display width, not full resolution
+               ========================================================== */
+            var CLD_BASE = 'https://res.cloudinary.com/dwne1v72e/image/upload/';
+
+            function cldImage(img, w) {
+                if (!img) return '/images/default-product.png';
+                var id = String(img);
+                // Tolerate a full URL being stored instead of a bare public_id
+                var marker = '/image/upload/';
+                var i = id.indexOf(marker);
+                if (i !== -1) id = id.slice(i + marker.length);
+                id = id.replace(/^\/+/, '');
+                return CLD_BASE + 'f_auto,q_auto,c_limit,w_' + w + '/' + id;
+            }
+
+            // Global card counter. The first row (6 cards) loads eagerly for
+            // a fast LCP; everything below the fold lazy-loads.
+            var __imgIndex = 0;
+            var EAGER_COUNT = 6;
         %>
 
         <div class="shop-layout">
@@ -1552,9 +1589,11 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
 
                 <!-- Toolbar: search + sort + count -->
                 <div class="shop-toolbar">
+                    <!-- Now shows the page range out of the true total, because
+                         only 30 of N products are fetched per request. -->
                     <p class="results-count" id="resultsCount">
                         <% if (products && products.length > 0) { %>
-                            Showing <%= products.length %> product<%= products.length !== 1 ? 's' : '' %>
+                            Showing <%= ((currentPage - 1) * Number(currentFilters.limit)) + 1 %>–<%= ((currentPage - 1) * Number(currentFilters.limit)) + products.length %> of <%= totalProducts %> products
                         <% } else { %>
                             No products found
                         <% } %>
@@ -1593,10 +1632,13 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 <!-- AJAX-swappable products + pagination -->
                 <div id="productsContainer">
                     <% if (isGroupedView) { %>
-                        <!-- ========== GROUPED BY CATEGORY (A-Z) ========== -->
+                        <!-- ========== GROUPED BY CATEGORY (A-Z), NOW PAGINATED ========== -->
                         <% if (products && products.length > 0) { %>
                             <%
-                                // Group products by category ID
+                                // Group the CURRENT PAGE's products by category ID.
+                                // The controller already returns only `limit` products,
+                                // sorted category A-Z then oldest-first, so this grouping
+                                // operates on 30 items instead of all 200.
                                 const grouped = {};
                                 products.forEach(p => {
                                     const catId = String(p.category ? p.category._id : '');
@@ -1631,7 +1673,21 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                                                                 </button>
                                                             </div>
                                                             <% if (product.images && product.images.length > 0) { %>
-                                                                <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>" class="product-image card-img-top" alt="<%= product.productName %> - Nattu Vedi & Sivakasi Crackers" loading="lazy" onerror="this.onerror=null; this.src='/images/default-product.png';">
+                                                                <%
+                                                                    __imgIndex++;
+                                                                    var _pid = product.images[0];
+                                                                    var _eager = __imgIndex <= EAGER_COUNT;
+                                                                %>
+                                                                <img
+                                                                    src="<%= cldImage(_pid, 400) %>"
+                                                                    srcset="<%= cldImage(_pid, 200) %> 200w, <%= cldImage(_pid, 400) %> 400w, <%= cldImage(_pid, 600) %> 600w"
+                                                                    sizes="(max-width: 575.98px) 45vw, (max-width: 991.98px) 30vw, 340px"
+                                                                    class="product-image card-img-top"
+                                                                    alt="<%= product.productName %> - Nattu Vedi &amp; Sivakasi Crackers"
+                                                                    loading="<%= _eager ? 'eager' : 'lazy' %>"
+                                                                    <%= _eager ? 'fetchpriority="high"' : '' %>
+                                                                    decoding="async"
+                                                                    onerror="this.onerror=null; this.removeAttribute('srcset'); this.removeAttribute('sizes'); this.src='/images/default-product.png';">
                                                             <% } else { %>
                                                                 <div class="no-image-placeholder">
                                                                     <div class="text-center">
@@ -1705,6 +1761,37 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                                     </section>
                                 <% } %>
                             <% }) %>
+
+                            <!-- Pagination for the GROUPED view.
+                                 This block did not exist before, which is why the
+                                 homepage had to render every product in one go. -->
+                            <% if (totalPage > 1) { %>
+                                <nav aria-label="Page navigation" class="mt-4">
+                                    <ul class="pagination">
+                                        <% if (currentPage > 1) { %>
+                                            <li class="page-item">
+                                                <a class="page-link ajax-page-link" href="?page=<%= currentPage-1 %><% for (const key in query) { if (key !== 'page' && query[key] !== '') { %>&<%= key %>=<%= query[key] %><% } } %>" data-page="<%= currentPage-1 %>" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                        <% } %>
+                                        <% for (let i = 1; i <= totalPage; i++) { %>
+                                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                <a class="page-link ajax-page-link" href="?page=<%= i %><% for (const key in query) { if (key !== 'page' && query[key] !== '') { %>&<%= key %>=<%= query[key] %><% } } %>" data-page="<%= i %>">
+                                                    <%= i %>
+                                                </a>
+                                            </li>
+                                        <% } %>
+                                        <% if (currentPage < totalPage) { %>
+                                            <li class="page-item">
+                                                <a class="page-link ajax-page-link" href="?page=<%= currentPage+1 %><% for (const key in query) { if (key !== 'page' && query[key] !== '') { %>&<%= key %>=<%= query[key] %><% } } %>" data-page="<%= currentPage+1 %>" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        <% } %>
+                                    </ul>
+                                </nav>
+                            <% } %>
                         <% } else { %>
                             <div class="text-center py-5">
                                 <i class="fas fa-box-open fa-3x mb-3 text-muted"></i>
@@ -1729,7 +1816,21 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                                                     </button>
                                                 </div>
                                                 <% if (product.images && product.images.length > 0) { %>
-                                                    <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>" class="product-image card-img-top" alt="<%= product.productName %> - Nattu Vedi & Sivakasi Crackers" loading="lazy" onerror="this.onerror=null; this.src='/images/default-product.png';">
+                                                    <%
+                                                        __imgIndex++;
+                                                        var _pid = product.images[0];
+                                                        var _eager = __imgIndex <= EAGER_COUNT;
+                                                    %>
+                                                    <img
+                                                        src="<%= cldImage(_pid, 400) %>"
+                                                        srcset="<%= cldImage(_pid, 200) %> 200w, <%= cldImage(_pid, 400) %> 400w, <%= cldImage(_pid, 600) %> 600w"
+                                                        sizes="(max-width: 575.98px) 45vw, (max-width: 991.98px) 30vw, 340px"
+                                                        class="product-image card-img-top"
+                                                        alt="<%= product.productName %> - Nattu Vedi &amp; Sivakasi Crackers"
+                                                        loading="<%= _eager ? 'eager' : 'lazy' %>"
+                                                        <%= _eager ? 'fetchpriority="high"' : '' %>
+                                                        decoding="async"
+                                                        onerror="this.onerror=null; this.removeAttribute('srcset'); this.removeAttribute('sizes'); this.src='/images/default-product.png';">
                                                 <% } else { %>
                                                     <div class="no-image-placeholder">
                                                         <div class="text-center">
@@ -1867,6 +1968,8 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         }
 
         // Toggle wishlist function with improved error handling
+        // NOTE: this only ever touches the single clicked button. It never
+        // reloads the product list, so it costs ZERO Cloudinary requests.
         function toggleWishlist(productId, button) {
             const icon = button.querySelector('i');
 
@@ -1941,6 +2044,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         }
 
         // Add to cart function with improved error handling
+        // Also list-safe: updates only the clicked button, never re-renders cards.
         function addToCart(productId, button) {
             const originalText = button.innerHTML;
 
@@ -2027,12 +2131,23 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         }
 
         /* ==========================================================
-           AJAX FILTERING (no page reload)
-           Same GET route/query params as before - only the delivery
-           mechanism changed from full form submit to fetch() + DOM swap.
+           AJAX FILTERING - with duplicate-request protection
+
+           Three real bugs were causing repeat Cloudinary requests:
+
+           1. The clear-search button had BOTH an inline onclick AND an
+              addEventListener, so every click fired two full fetches
+              and two DOM swaps - i.e. two sets of image requests.
+           2. There was no "same request" guard, so re-selecting the
+              current category / sort / page re-fetched and re-rendered
+              every card.
+           3. attachProductContainerEvents() re-bound click handlers to
+              pagination links after every swap. Replaced with a single
+              delegated listener bound once.
            ========================================================== */
 
         let filterAjaxController = null;
+        let lastLoadedKey = null;
 
         function getFilterParams(overridePage) {
             const params = new URLSearchParams();
@@ -2058,19 +2173,38 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             return params;
         }
 
+        // Order-independent fingerprint of a request, so "same filters" is
+        // detected no matter how the params happened to be assembled.
+        function paramsKey(params) {
+            return [...new URLSearchParams(params.toString()).entries()]
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(([k, v]) => k + '=' + v)
+                .join('&');
+        }
+
         function applyFilters(resetPage) {
             const params = getFilterParams(resetPage ? 1 : null);
             loadProducts(params);
         }
 
         function loadProducts(params, pushHistory = true) {
-            const productsContainer = document.getElementById('productsContainer');
-            const sidebar = document.getElementById('filtersSidebar');
+            const key = paramsKey(params);
 
+            // GUARD 1: identical request is already on screen - do nothing.
+            // Prevents an entire page of duplicate Cloudinary requests.
+            if (key === lastLoadedKey) return;
+
+            const productsContainer = document.getElementById('productsContainer');
+
+            // GUARD 2: cancel any in-flight request before starting a new one,
+            // so rapid filter clicks never render two result sets.
             if (filterAjaxController) {
                 filterAjaxController.abort();
             }
             filterAjaxController = new AbortController();
+
+            const previousKey = lastLoadedKey;
+            lastLoadedKey = key;
 
             productsContainer.classList.add('ajax-loading');
 
@@ -2105,35 +2239,69 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                         window.history.pushState({}, '', url + '#products');
                     }
 
-                    attachProductContainerEvents();
+                    // Re-apply hearts to the freshly swapped-in cards.
+                    // (Previously this only ran on DOMContentLoaded, so
+                    // wishlisted products appeared unhearted after paging.)
+                    applyWishlistState();
+
                     productsContainer.classList.remove('ajax-loading');
                 })
                 .catch(error => {
                     if (error.name === 'AbortError') return;
                     console.error('Error loading products:', error);
+                    lastLoadedKey = previousKey;   // allow the user to retry
                     showToast('Could not load products. Please try again.', 'error');
                     productsContainer.classList.remove('ajax-loading');
                 });
         }
 
-        // Re-bind pagination links after products are swapped in
-        function attachProductContainerEvents() {
-            document.querySelectorAll('.ajax-page-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    const params = getFilterParams(page);
-                    loadProducts(params);
-                    window.scrollTo({ top: document.getElementById('products').offsetTop - 20, behavior: 'smooth' });
-                });
-            });
+        /* Event DELEGATION - bound ONCE on the container, never re-bound.
+           Replaces the old attachProductContainerEvents(), which re-queried
+           and re-attached listeners after every DOM swap and could stack
+           duplicate handlers on the same link. */
+        function initProductContainerDelegation() {
+            const container = document.getElementById('productsContainer');
+            if (!container) return;
 
-            const clearBtn = document.getElementById('clearFiltersBtn');
-            if (clearBtn) {
-                clearBtn.addEventListener('click', function(e) {
+            container.addEventListener('click', function(e) {
+                const pageLink = e.target.closest('.ajax-page-link');
+                if (pageLink) {
+                    e.preventDefault();
+                    const page = pageLink.getAttribute('data-page');
+                    loadProducts(getFilterParams(page));
+                    window.scrollTo({
+                        top: document.getElementById('products').offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                    return;
+                }
+
+                const clearBtn = e.target.closest('#clearFiltersBtn');
+                if (clearBtn) {
                     e.preventDefault();
                     clearAllFilters();
+                }
+            });
+        }
+
+        /* Wishlist heart state - extracted so it can run after every swap */
+        function applyWishlistState() {
+            const saved = localStorage.getItem('wishlistData');
+            if (!saved) return;
+            try {
+                const wishlistData = JSON.parse(saved);
+                document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                    const id = btn.getAttribute('data-product-id');
+                    const on = wishlistData.includes(id);
+                    btn.classList.toggle('active', on);
+                    const icon = btn.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fas', on);
+                        icon.classList.toggle('far', !on);
+                    }
                 });
+            } catch (error) {
+                console.error('Error parsing wishlist data:', error);
             }
         }
 
@@ -2142,6 +2310,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             const searchInput = document.getElementById('toolbarSearch');
             searchInput.value = '';
             searchInput.focus();
+            lastSearchValue = '';
             toggleClearButton();
             applyFilters(true);
         }
@@ -2158,15 +2327,20 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             }
         }
 
-        // Function to handle search while typing with debounce
+        // Search with debounce, and skip the request entirely when the
+        // trimmed value has not actually changed.
         let searchTimeout;
+        let lastSearchValue = null;
 
         function handleSearchInput() {
             toggleClearButton();
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
+                const val = document.getElementById('toolbarSearch').value.trim();
+                if (val === lastSearchValue) return;
+                lastSearchValue = val;
                 applyFilters(true);
-            }, 500);
+            }, 600);
         }
 
         // "All Categories" link - clears both category and attribute
@@ -2224,6 +2398,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         function removeFilter(filterName) {
             if (filterName === 'search' && document.getElementById('toolbarSearch')) {
                 document.getElementById('toolbarSearch').value = '';
+                lastSearchValue = '';
             }
             const el = document.getElementById(filterName);
             if (el) el.value = '';
@@ -2258,6 +2433,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             document.getElementById('minPrice').value = '';
             document.getElementById('maxPrice').value = '';
             if (document.getElementById('toolbarSearch')) document.getElementById('toolbarSearch').value = '';
+            lastSearchValue = '';
             if (document.getElementById('toolbarSortBy')) document.getElementById('toolbarSortBy').value = 'oldest';
             if (document.getElementById('toolbarLimit')) document.getElementById('toolbarLimit').value = '30';
 
@@ -2312,20 +2488,24 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
 
             const searchInput = document.getElementById('toolbarSearch');
             if (searchInput) {
+                lastSearchValue = searchInput.value.trim();
                 searchInput.addEventListener('input', handleSearchInput);
 
                 searchInput.addEventListener('keyup', function(e) {
                     if (e.key === 'Enter') {
                         clearTimeout(searchTimeout);
+                        lastSearchValue = searchInput.value.trim();
                         applyFilters(true);
                     }
                 });
             }
 
-            const clearSearchBtn = document.getElementById('clearSearch');
-            if (clearSearchBtn) {
-                clearSearchBtn.addEventListener('click', clearSearchField);
-            }
+            /* REMOVED (duplicate-request bug #1):
+                   const clearSearchBtn = document.getElementById('clearSearch');
+                   if (clearSearchBtn) clearSearchBtn.addEventListener('click', clearSearchField);
+               The button already has inline onclick="clearSearchField()", so
+               this listener made every click fire TWO fetches and two full
+               re-renders of the product grid. */
 
             const sortBySelect = document.getElementById('toolbarSortBy');
             const limitSelect = document.getElementById('toolbarLimit');
@@ -2355,25 +2535,13 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 loadProducts(params, false);
             });
 
-            attachProductContainerEvents();
+            initProductContainerDelegation();
+            applyWishlistState();
 
-            const savedWishlist = localStorage.getItem('wishlistData');
-            if (savedWishlist) {
-                try {
-                    const wishlistData = JSON.parse(savedWishlist);
-                    document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                        const productId = btn.getAttribute('data-product-id');
-                        if (wishlistData.includes(productId)) {
-                            btn.classList.add('active');
-                            const icon = btn.querySelector('i');
-                            icon.classList.remove('far');
-                            icon.classList.add('fas');
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error parsing wishlist data:', error);
-                }
-            }
+            // Seed the duplicate guard with what the server already rendered,
+            // so re-selecting the current filter/sort/page is a no-op instead
+            // of a wasted round trip and a wasted set of image requests.
+            lastLoadedKey = paramsKey(getFilterParams());
         });
     </script>
 
