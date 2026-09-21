@@ -96,11 +96,9 @@
         }
     </script>
 
-    <!-- ===== BOOTSTRAP & FONT-AWESOME (unchanged) ===== -->
+    <!-- ===== BOOTSTRAP & FONT-AWESOME (noUiSlider removed - price filter gone) ===== -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
     <!-- Meta Pixel Code -->
 <script>
@@ -1021,51 +1019,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             margin-bottom: 14px;
         }
 
-        /* Price range slider block */
-        .price-slider-wrap {
-            padding: 6px 4px 4px;
-        }
-
-        #priceRangeSlider {
-            margin: 10px 4px 18px;
-        }
-
-        #priceRangeSlider .noUi-connect {
-            background: var(--primary-color);
-        }
-
-        #priceRangeSlider .noUi-handle {
-            border-color: var(--primary-color);
-            box-shadow: none;
-        }
-
-        .price-range-display {
-            font-size: 0.9rem;
-            color: #495057;
-        }
-
-        .price-range-display strong {
-            color: var(--dark-color);
-        }
-
-        .btn-apply-price {
-            margin-top: 14px;
-            width: 100%;
-            font-size: 0.85rem;
-            padding: 0.5rem 0.6rem;
-            border-radius: 20px;
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .btn-apply-price:hover {
-            background-color: #3800d1;
-            border-color: #3800d1;
-            color: #fff;
-        }
-
         /* Plain visible filter link lists (category / attribute) */
         .filter-link-list {
             list-style: none;
@@ -1334,14 +1287,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 padding: 0 14px 16px;
             }
 
-            .price-slider-wrap {
-                padding: 4px 2px 2px;
-            }
-
-            #priceRangeSlider {
-                margin: 8px 4px 14px;
-            }
-
             .categories-tree {
                 margin-top: 2px;
             }
@@ -1424,12 +1369,11 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 return String(a.name || '').localeCompare(String(b.name || ''));
             });
 
-            // Whether each mobile dropdown should start expanded - only
-            // relevant on mobile (CSS neutralizes this on tablet/desktop).
-            // Opens automatically if that filter is already active, so the
-            // user's current selection is never hidden behind a collapsed
-            // dropdown on page load.
-            var priceGroupOpen = !!(currentFilters.minPrice || currentFilters.maxPrice);
+            // Whether the mobile category dropdown should start expanded -
+            // only relevant on mobile (CSS neutralizes this on tablet/desktop).
+            // Opens automatically if the category filter is already active,
+            // so the user's current selection is never hidden behind a
+            // collapsed dropdown on page load.
             var categoryGroupOpen = !!(currentFilters.category || currentFilters.categoryAttribute);
 
             /* ==========================================================
@@ -1477,7 +1421,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 </div>
 
                 <!-- Active Filters -->
-                <div class="filter-group" id="activeFiltersGroup" <%= (currentFilters.category || currentFilters.categoryAttribute || currentFilters.minPrice || currentFilters.maxPrice || currentFilters.search) ? '' : 'style="display:none;"' %>>
+                <div class="filter-group" id="activeFiltersGroup" <%= (currentFilters.category || currentFilters.categoryAttribute || currentFilters.search) ? '' : 'style="display:none;"' %>>
                     <div class="filter-group-title">Active Filters</div>
                     <div class="active-filters" id="activeFiltersBody">
                         <% if (currentFilters.category) { %>
@@ -1490,12 +1434,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                                 Attribute: <%= currentFilters.categoryAttribute %> <span class="close" onclick="removeFilter('categoryAttribute')">&times;</span>
                             </span>
                         <% } %>
-                        <% if (currentFilters.minPrice || currentFilters.maxPrice) { %>
-                            <span class="filter-badge">
-                                Price: ₹<%= currentFilters.minPrice || '0' %> - ₹<%= currentFilters.maxPrice || 'Any' %>
-                                <span class="close" onclick="removePriceFilter()">&times;</span>
-                            </span>
-                        <% } %>
                         <% if (currentFilters.search) { %>
                             <span class="filter-badge">
                                 Search: <%= currentFilters.search %> <span class="close" onclick="removeFilter('search')">&times;</span>
@@ -1506,29 +1444,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
 
                 <form id="filterForm">
                     <input type="hidden" name="page" value="1">
-
-                    <!-- Price range slider - compact collapsible dropdown on mobile only -->
-                    <div class="filter-group <%= priceGroupOpen ? 'open' : '' %>" id="priceFilterGroup">
-                        <div class="filter-group-title mobile-toggle" onclick="toggleMobileFilterGroup(this)">
-                            <span class="mobile-toggle-label">
-                                <span>Price</span>
-                                <% if (priceGroupOpen) { %>
-                                    <span class="mobile-selected-hint">₹<%= currentFilters.minPrice || 0 %>–₹<%= currentFilters.maxPrice || 5000 %></span>
-                                <% } %>
-                            </span>
-                            <i class="fas fa-chevron-down mobile-toggle-icon"></i>
-                        </div>
-                        <div class="filter-group-body">
-                            <div class="price-slider-wrap">
-                                <div class="price-range-display" id="priceRangeDisplay">
-                                    Price: <strong>₹<span id="priceMinLabel"><%= currentFilters.minPrice || 0 %></span></strong>
-                                    — <strong>₹<span id="priceMaxLabel"><%= currentFilters.maxPrice || 5000 %></span></strong>
-                                </div>
-                                <div id="priceRangeSlider"></div>
-                                <button type="button" class="btn btn-apply-price" onclick="applyPriceFilter()">Filter</button>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Category (alphabetically sorted A-Z) with its Attributes
                          nested directly underneath it. Every category and every
@@ -1573,11 +1488,9 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                         </div>
                     </div>
 
-                    <!-- hidden inputs driving the filter state -->
+                    <!-- hidden inputs driving the filter state (price filter removed) -->
                     <input type="hidden" id="category" name="category" value="<%= currentFilters.category %>">
                     <input type="hidden" id="categoryAttribute" name="categoryAttribute" value="<%= currentFilters.categoryAttribute %>">
-                    <input type="hidden" id="minPrice" name="minPrice" value="<%= currentFilters.minPrice %>">
-                    <input type="hidden" id="maxPrice" name="maxPrice" value="<%= currentFilters.maxPrice %>">
                     <input type="hidden" id="search" name="search" value="<%= currentFilters.search %>">
                     <input type="hidden" id="sortBy" name="sortBy" value="<%= currentFilters.sortBy %>">
                     <input type="hidden" id="limit" name="limit" value="<%= currentFilters.limit %>">
@@ -1762,9 +1675,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                                 <% } %>
                             <% }) %>
 
-                            <!-- Pagination for the GROUPED view.
-                                 This block did not exist before, which is why the
-                                 homepage had to render every product in one go. -->
+                            <!-- Pagination for the GROUPED view. -->
                             <% if (totalPage > 1) { %>
                                 <nav aria-label="Page navigation" class="mt-4">
                                     <ul class="pagination">
@@ -1968,8 +1879,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         }
 
         // Toggle wishlist function with improved error handling
-        // NOTE: this only ever touches the single clicked button. It never
-        // reloads the product list, so it costs ZERO Cloudinary requests.
         function toggleWishlist(productId, button) {
             const icon = button.querySelector('i');
 
@@ -2044,7 +1953,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         }
 
         // Add to cart function with improved error handling
-        // Also list-safe: updates only the clicked button, never re-renders cards.
         function addToCart(productId, button) {
             const originalText = button.innerHTML;
 
@@ -2119,10 +2027,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
         /* ==========================================================
            MOBILE-ONLY FILTER DROPDOWN TOGGLE
            Purely presentational - just adds/removes the "open" class
-           on the clicked filter-group. The CSS reset above 768px makes
-           this a no-op visually on tablet/desktop, so tapping the
-           header there has no effect on layout. Does not touch any
-           filter values or trigger a filter request by itself.
+           on the clicked filter-group.
            ========================================================== */
         function toggleMobileFilterGroup(headerEl) {
             const group = headerEl.closest('.filter-group');
@@ -2132,18 +2037,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
 
         /* ==========================================================
            AJAX FILTERING - with duplicate-request protection
-
-           Three real bugs were causing repeat Cloudinary requests:
-
-           1. The clear-search button had BOTH an inline onclick AND an
-              addEventListener, so every click fired two full fetches
-              and two DOM swaps - i.e. two sets of image requests.
-           2. There was no "same request" guard, so re-selecting the
-              current category / sort / page re-fetched and re-rendered
-              every card.
-           3. attachProductContainerEvents() re-bound click handlers to
-              pagination links after every swap. Replaced with a single
-              delegated listener bound once.
            ========================================================== */
 
         let filterAjaxController = null;
@@ -2156,16 +2049,12 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
 
             const category = document.getElementById('category').value;
             const categoryAttribute = document.getElementById('categoryAttribute').value;
-            const minPrice = document.getElementById('minPrice').value;
-            const maxPrice = document.getElementById('maxPrice').value;
             const search = document.getElementById('toolbarSearch') ? document.getElementById('toolbarSearch').value : document.getElementById('search').value;
             const sortBy = document.getElementById('toolbarSortBy') ? document.getElementById('toolbarSortBy').value : document.getElementById('sortBy').value;
             const limit = document.getElementById('toolbarLimit') ? document.getElementById('toolbarLimit').value : document.getElementById('limit').value;
 
             if (category) params.set('category', category);
             if (categoryAttribute) params.set('categoryAttribute', categoryAttribute);
-            if (minPrice) params.set('minPrice', minPrice);
-            if (maxPrice) params.set('maxPrice', maxPrice);
             if (search) params.set('search', search);
             if (sortBy) params.set('sortBy', sortBy);
             if (limit) params.set('limit', limit);
@@ -2191,13 +2080,11 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             const key = paramsKey(params);
 
             // GUARD 1: identical request is already on screen - do nothing.
-            // Prevents an entire page of duplicate Cloudinary requests.
             if (key === lastLoadedKey) return;
 
             const productsContainer = document.getElementById('productsContainer');
 
-            // GUARD 2: cancel any in-flight request before starting a new one,
-            // so rapid filter clicks never render two result sets.
+            // GUARD 2: cancel any in-flight request before starting a new one.
             if (filterAjaxController) {
                 filterAjaxController.abort();
             }
@@ -2240,8 +2127,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                     }
 
                     // Re-apply hearts to the freshly swapped-in cards.
-                    // (Previously this only ran on DOMContentLoaded, so
-                    // wishlisted products appeared unhearted after paging.)
                     applyWishlistState();
 
                     productsContainer.classList.remove('ajax-loading');
@@ -2255,10 +2140,7 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 });
         }
 
-        /* Event DELEGATION - bound ONCE on the container, never re-bound.
-           Replaces the old attachProductContainerEvents(), which re-queried
-           and re-attached listeners after every DOM swap and could stack
-           duplicate handlers on the same link. */
+        /* Event DELEGATION - bound ONCE on the container, never re-bound. */
         function initProductContainerDelegation() {
             const container = document.getElementById('productsContainer');
             if (!container) return;
@@ -2418,20 +2300,10 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
             applyFilters(true);
         }
 
-        // Function to remove price filter
-        function removePriceFilter() {
-            document.getElementById('minPrice').value = '';
-            document.getElementById('maxPrice').value = '';
-            if (priceSlider) priceSlider.set([0, 5000]);
-            applyFilters(true);
-        }
-
         // Clear all filters at once
         function clearAllFilters() {
             document.getElementById('category').value = '';
             document.getElementById('categoryAttribute').value = '';
-            document.getElementById('minPrice').value = '';
-            document.getElementById('maxPrice').value = '';
             if (document.getElementById('toolbarSearch')) document.getElementById('toolbarSearch').value = '';
             lastSearchValue = '';
             if (document.getElementById('toolbarSortBy')) document.getElementById('toolbarSortBy').value = 'oldest';
@@ -2444,47 +2316,12 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                 if (allCategoriesLink) allCategoriesLink.classList.add('active');
             }
 
-            if (priceSlider) priceSlider.set([0, 5000]);
-
-            applyFilters(true);
-        }
-
-        // Price range slider (noUiSlider)
-        let priceSlider = null;
-
-        function initPriceSlider() {
-            const sliderEl = document.getElementById('priceRangeSlider');
-            if (!sliderEl || typeof noUiSlider === 'undefined') return;
-
-            const startMin = parseInt(document.getElementById('minPrice').value, 10) || 0;
-            const startMax = parseInt(document.getElementById('maxPrice').value, 10) || 5000;
-
-            priceSlider = noUiSlider.create(sliderEl, {
-                start: [startMin, startMax],
-                connect: true,
-                range: { min: 0, max: 5000 },
-                step: 10
-            });
-
-            priceSlider.on('update', function(values) {
-                const minVal = Math.round(values[0]);
-                const maxVal = Math.round(values[1]);
-                document.getElementById('priceMinLabel').textContent = minVal;
-                document.getElementById('priceMaxLabel').textContent = maxVal;
-                document.getElementById('minPrice').value = minVal;
-                document.getElementById('maxPrice').value = maxVal;
-            });
-        }
-
-        function applyPriceFilter() {
             applyFilters(true);
         }
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             toggleClearButton();
-
-            initPriceSlider();
 
             const searchInput = document.getElementById('toolbarSearch');
             if (searchInput) {
@@ -2499,13 +2336,6 @@ src="https://www.facebook.com/tr?id=1721419622304857&ev=PageView&noscript=1"
                     }
                 });
             }
-
-            /* REMOVED (duplicate-request bug #1):
-                   const clearSearchBtn = document.getElementById('clearSearch');
-                   if (clearSearchBtn) clearSearchBtn.addEventListener('click', clearSearchField);
-               The button already has inline onclick="clearSearchField()", so
-               this listener made every click fire TWO fetches and two full
-               re-renders of the product grid. */
 
             const sortBySelect = document.getElementById('toolbarSortBy');
             const limitSelect = document.getElementById('toolbarLimit');

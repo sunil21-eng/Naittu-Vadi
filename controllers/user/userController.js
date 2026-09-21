@@ -570,6 +570,7 @@ const applyOffers = async (products) => {
 
 const DEFAULT_LIMIT  = 30;
 const ALLOWED_LIMITS = [30, 60, 90];
+
 const loadHome = async function (req, res) {
     try {
         const user = req.session.user;
@@ -583,7 +584,7 @@ const loadHome = async function (req, res) {
 
         const listedCategoryIds = categories.map(c => c._id);
 
-        // ---------------- FILTER (unchanged semantics) ----------------
+        // ---------------- FILTER (price filter removed) ----------------
         let filter = {
             isBlocked: false,
             category: { $in: listedCategoryIds }
@@ -597,11 +598,9 @@ const loadHome = async function (req, res) {
         if (req.query.categoryAttribute) {
             filter.categoryAttribute = new RegExp(req.query.categoryAttribute, "i");
         }
-        if (req.query.minPrice || req.query.maxPrice) {
-            filter.salePrice = {};
-            if (req.query.minPrice) filter.salePrice.$gte = parseInt(req.query.minPrice);
-            if (req.query.maxPrice) filter.salePrice.$lte = parseInt(req.query.maxPrice);
-        }
+        // NOTE: minPrice / maxPrice filtering has been intentionally removed
+        // along with the sidebar price slider. Requests no longer carry those
+        // query params, and no code path here reads them anymore.
         if (req.query.status && req.query.status !== 'all') {
             filter.status = req.query.status;
         }
@@ -626,19 +625,19 @@ const loadHome = async function (req, res) {
             default:           sortOptions = { createdOn: 1 };
         }
 
+        // Price params removed - a pagination / items-per-page / sort click
+        // on the default homepage now cleanly falls into the grouped view.
         const hasActiveFilter = !!(
             req.query.category ||
             req.query.categoryAttribute ||
-            req.query.minPrice ||
-            req.query.maxPrice ||
             (req.query.status && req.query.status !== 'all') ||
             req.query.search
         );
 
         const isGroupedView = !hasActiveFilter;
-        
-        // ---------------- PAGINATION (the fix) ----------------
-        // limit is now a REAL limit in every view, including the grouped
+
+        // ---------------- PAGINATION ----------------
+        // limit is a REAL limit in every view, including the grouped
         // default homepage. It is whitelisted so ?limit=5000 cannot be used
         // to pull the whole catalogue (and the whole image set) in one request.
         let limit = parseInt(req.query.limit, 10) || DEFAULT_LIMIT;
@@ -722,22 +721,17 @@ const loadHome = async function (req, res) {
             });
         });
 
-        const priceRange = await Product.aggregate([
-            { $match: { isBlocked: false } },
-            { $group: { _id: null, minPrice: { $min: "$salePrice" }, maxPrice: { $max: "$salePrice" } } }
-        ]);
+        // NOTE: the `priceRange` aggregation has been removed along with the
+        // price slider. It was only ever read by the sidebar's min/max labels.
 
         const currentFilters = {
             category: req.query.category || '',
             categoryAttribute: req.query.categoryAttribute || '',
-            minPrice: req.query.minPrice || '',
-            maxPrice: req.query.maxPrice || '',
             status: req.query.status || 'all',
             search: req.query.search || '',
             sortBy,
-            // Was `isGroupedView ? 0 : limit`. It must now be the real limit:
-            // the view divides by it for the "Showing X–Y of Z" counter, and
-            // the toolbar <select> matches against it.
+            // The view divides by this for the "Showing X–Y of Z" counter,
+            // and the toolbar <select> matches against it.
             limit
         };
 
@@ -749,7 +743,6 @@ const loadHome = async function (req, res) {
             products: productsWithOffers,
             categories,
             attributesByCategory,
-            priceRange: priceRange[0] || { minPrice: 0, maxPrice: 100000 },
             currentFilters,
             query: req.query,
             isGroupedView
