@@ -231,6 +231,39 @@
             padding: 0.5rem 0;
         }
 
+        /* ===== FIXED SHIPPING ROW STYLES ===== */
+        .summary-item.shipping-item {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .summary-item .shipping-value {
+            text-align: right;
+            max-width: 65%;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            color: var(--success-color);
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .summary-item .shipping-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 400px) {
+            .summary-item.shipping-item {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .summary-item .shipping-value {
+                max-width: 100%;
+                text-align: left;
+            }
+        }
+
         .total-amount {
             font-size: 1.25rem;
             font-weight: 700;
@@ -533,6 +566,14 @@
             body { padding-top: 60px; }
             .sticky-order-summary { top: 70px; }
         }
+
+        /* Address error highlight */
+        #addressContainer.border-danger {
+            border: 2px solid #dc3545 !important;
+            border-radius: 8px;
+            padding: 12px;
+            background-color: #fff8f8;
+        }
     </style>
 </head>
 
@@ -598,6 +639,12 @@
                                         </div>
                                     </div>
                                 <% } %>
+                            </div>
+
+                            <!-- Address Error Message (hidden by default) -->
+                            <div id="addressError" class="alert alert-danger mt-3" style="display: none;">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <span id="addressErrorMessage">Please select a shipping address.</span>
                             </div>
 
                             <!-- Add New Address Button -->
@@ -743,25 +790,6 @@
                             </div>
                         </div>
 
-                        <!-- Coupon Section -->
-                        <div class="coupon-section mb-3">
-                            <h6 class="fw-bold mb-2">Apply Coupon</h6>
-                            <% if (appliedCoupon) { %>
-                                <div class="alert alert-success py-2">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span>Coupon Applied: <strong><%= appliedCoupon.code %></strong></span>
-                                        <button type="button" class="btn-close" onclick="removeCoupon()"></button>
-                                    </div>
-                                </div>
-                            <% } else { %>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="couponCode" placeholder="Enter coupon code">
-                                    <button class="btn btn-primary-custom" type="button" onclick="applyCoupon()">Apply</button>
-                                </div>
-                                <div id="couponMessage" class="mt-2 small"></div>
-                            <% } %>
-                        </div>
-
                         <!-- Order Totals -->
                         <div class="border-top pt-3">
                             <div class="summary-item">
@@ -783,9 +811,10 @@
                                 </div>
                             <% } %>
 
-                            <div class="summary-item">
-                                <span>Shipping</span>
-                                <span class="text-success">📦 Pay at Courier Office: Rs. 200 - Rs. 500</span>
+                            <!-- ===== FIXED SHIPPING ROW ===== -->
+                            <div class="summary-item shipping-item">
+                                <span class="shipping-label">Shipping</span>
+                                <span class="shipping-value">📦 Pay at Courier Office: Rs. 200 - Rs. 500</span>
                             </div>
 
                             <div class="summary-item border-top pt-2 mt-2">
@@ -1052,6 +1081,12 @@
             element.classList.add('selected');
             selectedAddressId = addressId;
             updateCourierInfo(element);
+
+            // Hide address error and remove highlight
+            const addressError = document.getElementById('addressError');
+            if (addressError) addressError.style.display = 'none';
+            const addressContainer = document.getElementById('addressContainer');
+            if (addressContainer) addressContainer.classList.remove('border-danger');
         }
 
         function selectPaymentMethod(element, method) {
@@ -1060,37 +1095,6 @@
             });
             element.classList.add('selected');
             document.querySelector('input[value="' + method + '"]').checked = true;
-        }
-
-        function applyCoupon() {
-            var couponCode = document.getElementById('couponCode').value.trim();
-            var messageElement = document.getElementById('couponMessage');
-
-            if (!couponCode) {
-                messageElement.innerHTML = '<span class="text-danger">Please enter a coupon code</span>';
-                return;
-            }
-
-            messageElement.innerHTML = '<span class="text-warning">Applying coupon...</span>';
-
-            fetch('/applyCoupon', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: couponCode })
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.success) {
-                    messageElement.innerHTML = '<span class="text-success">Coupon applied successfully! Refreshing page...</span>';
-                    setTimeout(function() { window.location.reload(); }, 1000);
-                } else {
-                    messageElement.innerHTML = '<span class="text-danger">' + result.message + '</span>';
-                }
-            })
-            .catch(function(error) {
-                console.error('Error applying coupon:', error);
-                messageElement.innerHTML = '<span class="text-danger">Error applying coupon</span>';
-            });
         }
 
         function removeCoupon() {
@@ -1118,8 +1122,27 @@
                 return;
             }
 
+            // ===== ADDRESS VALIDATION WITH PROPER ERROR DISPLAY =====
             if (!selectedAddressId) {
-                alert('Please select a shipping address');
+                const addressError = document.getElementById('addressError');
+                const addressErrorMessage = document.getElementById('addressErrorMessage');
+                const hasAddresses = document.querySelectorAll('.address-card').length > 0;
+                
+                if (hasAddresses) {
+                    addressErrorMessage.textContent = 'Please select a shipping address.';
+                } else {
+                    addressErrorMessage.textContent = 'Please add a shipping address before placing the order.';
+                }
+                
+                addressError.style.display = 'block';
+                
+                // Scroll to the address error message
+                addressError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Highlight the address container
+                const addressContainer = document.getElementById('addressContainer');
+                addressContainer.classList.add('border-danger');
+                
                 return;
             }
 
