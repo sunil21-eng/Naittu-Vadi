@@ -6,34 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
  <link rel="icon" type="image/png" href="/uploads/profileImages/favicon.png?v=3">
     <!-- ===== SEO TITLE ===== -->
-    <title><%= product.productName %> – Buy Nattu Vedi &amp; Sivakasi Crackers Online | Nattuvedi.com</title>
+    <title><%= product.productName %> – Buy Sivakasi Crackers Online | Artemis Crackers</title>
 
     <!-- ===== META DESCRIPTION ===== -->
-    <meta name="description" content="Buy <%= product.productName %> – premium Nattu Vedi country crackers and Sivakasi crackers online at Nattuvedi.com. ✓ Best prices ✓ Cash on delivery ✓ Secure checkout. Shop now for Diwali and festive celebrations!" />
+    <meta name="description" content="Buy <%= product.productName %> – premium Sivakasi crackers online at Artemis Crackers. ✓ Best prices ✓ Cash on delivery ✓ Secure checkout. Shop now for Diwali and festive celebrations!" />
 
     <!-- ===== META KEYWORDS ===== -->
-    <meta name="keywords" content="<%= product.productName %>, nattu vedi, nattu vedi online shopping, valangaiman nattu vedi, nattu vedi crackers, Sivakasi crackers online shopping, country crackers, crackers online shopping cash on delivery, diwali crackers online, nattu vedi buy online, nattu vedi sky shot, nattu vedi rocket, nattu vedi saram, nattu vedi bomb, standard crackers online, eagle crackers online, kannan crackers online, pattasu nattuvedi, family crackers, crackers online Tamilnadu, diwali pataka online, fire crackers online delivery Bangalore, wholesale crackers online" />
+    <meta name="keywords" content="<%= product.productName %>, Sivakasi crackers online shopping, crackers online shopping cash on delivery, diwali crackers online, buy crackers online, standard crackers online, eagle crackers online, kannan crackers online, family crackers, crackers online Tamilnadu, diwali pataka online, fire crackers online delivery Bangalore, wholesale crackers online, Artemis Crackers" />
 
     <!-- ===== OPEN GRAPH TAGS ===== -->
-    <meta property="og:title" content="<%= product.productName %> – Buy Nattu Vedi &amp; Sivakasi Crackers Online | Nattuvedi.com" />
-    <meta property="og:description" content="Buy <%= product.productName %> – premium Nattu Vedi country crackers and Sivakasi crackers online at Nattuvedi.com. Best prices, cash on delivery, secure checkout." />
+    <meta property="og:title" content="<%= product.productName %> – Buy Sivakasi Crackers Online | Artemis Crackers" />
+    <meta property="og:description" content="Buy <%= product.productName %> – premium Sivakasi crackers online at Artemis Crackers. Best prices, cash on delivery, secure checkout." />
     <meta property="og:type" content="product" />
-    <meta property="og:url" content="https://www.nattuvedi.com/product/<%= product._id %>" />
+    <meta property="og:url" content="https://www.artemiscrackers.com/product/<%= product._id %>" />
     <meta property="og:image" content="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>" />
-    <meta property="og:image:alt" content="<%= product.productName %> – Nattu Vedi &amp; Sivakasi Crackers" />
-    <meta property="og:site_name" content="Nattuvedi.com" />
+    <meta property="og:image:alt" content="<%= product.productName %> – Sivakasi Crackers" />
+    <meta property="og:site_name" content="Artemis Crackers" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- ===== TWITTER CARD ===== -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="<%= product.productName %> – Buy Nattu Vedi &amp; Sivakasi Crackers Online | Nattuvedi.com" />
-    <meta name="twitter:description" content="Buy <%= product.productName %> – premium Nattu Vedi country crackers and Sivakasi crackers online at Nattuvedi.com. Best prices, cash on delivery, secure checkout." />
+    <meta name="twitter:title" content="<%= product.productName %> – Buy Sivakasi Crackers Online | Artemis Crackers" />
+    <meta name="twitter:description" content="Buy <%= product.productName %> – premium Sivakasi crackers online at Artemis Crackers. Best prices, cash on delivery, secure checkout." />
     <meta name="twitter:image" content="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>" />
 
     <!-- ===== ADDITIONAL SEO ===== -->
     <meta name="robots" content="index, follow" />
-    <meta name="author" content="Nattuvedi.com" />
-    <link rel="canonical" href="https://www.nattuvedi.com/product/<%= product._id %>" />
+    <meta name="author" content="Artemis Crackers" />
+    <link rel="canonical" href="https://www.artemiscrackers.com/product/<%= product._id %>" />
 
     <!-- ===== JSON-LD STRUCTURED DATA: Product ===== -->
     <!-- <script type="application/ld+json">
@@ -41,19 +41,19 @@
             "@context": "https://schema.org",
             "@type": "Product",
             "name": "<%= product.productName %>",
-            "description": "<%= product.description ? product.description.replace(/"/g, '\\"') : 'Premium Nattu Vedi country crackers and Sivakasi crackers.' %>",
+            "description": "<%= product.description ? product.description.replace(/"/g, '\\"') : 'Premium Sivakasi crackers.' %>",
             "image": "https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>",
             "sku": "<%= product._id %>",
             "brand": {
                 "@type": "Brand",
-                "name": "Nattuvedi – Artemis Crackers"
+                "name": "Artemis Crackers"
             },
             "offers": {
                 "@type": "Offer",
                 "price": "<%= Number(product.hasOffer && product.discountPercentage > 0 ? product.discountedPrice : (product.salePrice || product.regularPrice)).toFixed(2) %>",
                 "priceCurrency": "INR",
                 "availability": "<%= product.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' %>",
-                "url": "https://www.nattuvedi.com/product/<%= product._id %>"
+                "url": "https://www.artemiscrackers.com/product/<%= product._id %>"
             }
         }
     </script> -->
@@ -64,14 +64,14 @@
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.productName || "",
-    "description": product.description || "Premium Nattu Vedi country crackers and Sivakasi crackers.",
+    "description": product.description || "Premium Sivakasi crackers.",
     "image": product.images && product.images.length
         ? "https://res.cloudinary.com/dwne1v72e/image/upload/" + product.images[0]
         : "",
     "sku": String(product._id),
     "brand": {
         "@type": "Brand",
-        "name": "Nattuvedi – Artemis Crackers"
+        "name": "Artemis Crackers"
     },
     "offers": {
         "@type": "Offer",
@@ -84,7 +84,7 @@
         "availability": product.quantity > 0
             ? "https://schema.org/InStock"
             : "https://schema.org/OutOfStock",
-        "url": "https://www.nattuvedi.com/product/" + product._id
+        "url": "https://www.artemiscrackers.com/product/" + product._id
     }
 }) %>
 </script>
@@ -1055,7 +1055,7 @@
                     <!-- Main product image - now using Cloudinary -->
                     <img id="main-product-image" 
                          src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= product.images[0] %>"
-                         alt="<%= product.productName %> - Nattu Vedi & Sivakasi Crackers" class="product-image">
+                         alt="<%= product.productName %> - Sivakasi Crackers" class="product-image">
                     <div class="zoom-controls-container" id="zoom-controls">
                         <button class="zoom-control" id="zoom-out" title="Zoom Out">
                             <i class="fas fa-search-minus"></i>
@@ -1258,7 +1258,7 @@
                                     <div class="related-product-image-container">
                                         <!-- Related product image - now using Cloudinary -->
                                         <img src="https://res.cloudinary.com/dwne1v72e/image/upload/<%= relatedProduct.images[0] %>"
-                                            alt="<%= relatedProduct.productName %> - Nattu Vedi & Sivakasi Crackers"
+                                            alt="<%= relatedProduct.productName %> - Sivakasi Crackers"
                                             class="related-product-image" loading="lazy">
                                     </div>
                                     <div class="related-product-body">

@@ -6,47 +6,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <link rel="icon" type="image/png" href="/uploads/profileImages/favicon.png?v=3">
     <!-- ===== SEO TITLE ===== -->
-    <title><%= title || 'Order Success – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store' %></title>
+    <title><%= title || 'Order Success – Artemis Crackers – Sivakasi Crackers Online Store' %></title>
 
     <!-- ===== META DESCRIPTION ===== -->
-    <meta name="description" content="Your order has been successfully placed at Nattuvedi. Thank you for shopping premium Nattu Vedi country crackers and Sivakasi crackers online. Check your order details and track delivery." />
+    <meta name="description" content="Your order has been successfully placed at Artemis Crackers. Thank you for shopping premium Sivakasi crackers online. Check your order details and track delivery." />
 
     <!-- ===== META KEYWORDS ===== -->
-    <meta name="keywords" content="order success, order confirmation, nattu vedi online shopping, Sivakasi crackers online, nattu vedi buy online, crackers online shopping cash on delivery, diwali crackers online, nattu vedi valangaiman, nattu vedi crackers, order placed" />
+    <meta name="keywords" content="order success, order confirmation, Sivakasi crackers online, crackers online shopping cash on delivery, diwali crackers online, order placed, Artemis Crackers" />
 
     <!-- ===== OPEN GRAPH TAGS ===== -->
-    <meta property="og:title" content="<%= title || 'Order Success – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store' %>" />
-    <meta property="og:description" content="Your order has been successfully placed at Nattuvedi. Thank you for shopping premium Nattu Vedi country crackers and Sivakasi crackers online. Check your order details and track delivery." />
+    <meta property="og:title" content="<%= title || 'Order Success – Artemis Crackers – Sivakasi Crackers Online Store' %>" />
+    <meta property="og:description" content="Your order has been successfully placed at Artemis Crackers. Thank you for shopping premium Sivakasi crackers online. Check your order details and track delivery." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.nattuvedi.com/orderSuccess" />
-    <meta property="og:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
-    <meta property="og:image:alt" content="Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers" />
-    <meta property="og:site_name" content="Nattuvedi.com" />
+    <meta property="og:url" content="https://www.artemiscrackers.com/orderSuccess" />
+    <meta property="og:image" content="https://www.artemiscrackers.com/images/og-image.jpg" />
+    <meta property="og:image:alt" content="Artemis Crackers – Sivakasi Crackers" />
+    <meta property="og:site_name" content="Artemis Crackers" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- ===== TWITTER CARD ===== -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="<%= title || 'Order Success – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store' %>" />
-    <meta name="twitter:description" content="Your order has been successfully placed at Nattuvedi. Thank you for shopping premium Nattu Vedi country crackers and Sivakasi crackers online." />
-    <meta name="twitter:image" content="https://www.nattuvedi.com/images/og-image.jpg" />
+    <meta name="twitter:title" content="<%= title || 'Order Success – Artemis Crackers – Sivakasi Crackers Online Store' %>" />
+    <meta name="twitter:description" content="Your order has been successfully placed at Artemis Crackers. Thank you for shopping premium Sivakasi crackers online." />
+    <meta name="twitter:image" content="https://www.artemiscrackers.com/images/og-image.jpg" />
 
     <!-- ===== ADDITIONAL SEO ===== -->
     <meta name="robots" content="noindex, follow" />
-    <meta name="author" content="Nattuvedi.com" />
-    <link rel="canonical" href="https://www.nattuvedi.com/orderSuccess" />
+    <meta name="author" content="Artemis Crackers" />
+    <link rel="canonical" href="https://www.artemiscrackers.com/orderSuccess" />
 
     <!-- ===== JSON-LD STRUCTURED DATA: WebPage & Order ===== -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Order Success – Nattuvedi – Nattu Vedi &amp; Sivakasi Crackers Online Store",
-            "description": "Your order has been successfully placed at Nattuvedi.",
-            "url": "https://www.nattuvedi.com/orderSuccess",
+            "name": "Order Success – Artemis Crackers – Sivakasi Crackers Online Store",
+            "description": "Your order has been successfully placed at Artemis Crackers.",
+            "url": "https://www.artemiscrackers.com/orderSuccess",
             "isPartOf": {
                 "@type": "WebSite",
-                "name": "Nattuvedi.com",
-                "url": "https://www.nattuvedi.com/"
+                "name": "Artemis Crackers",
+                "url": "https://www.artemiscrackers.com/"
             }
         }
     </script>
@@ -321,7 +321,7 @@
                             <span class="payment-detail-label">
                                 <i class="fas fa-mobile-alt me-2 text-primary"></i>UPI ID / Number:
                             </span>
-                            <a href="upi://pay?pa=7092219895&pn=Nattuvedi" class="payment-detail-value text-decoration-none">7092219895</a>
+                            <a href="upi://pay?pa=7092219895&pn=ArtemisCrackers" class="payment-detail-value text-decoration-none">7092219895</a>
                         </div>
                         <div class="payment-detail-row">
                             <span class="payment-detail-label">
@@ -697,15 +697,15 @@
 
         // WhatsApp share function
         function shareOnWhatsApp() {
-            var text = 'I just placed an order on Nattuvedi! Order Number: #<%= order.displayOrderId || orderNumber || "" %> - Amount: ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>';
+            var text = 'I just placed an order on Artemis Crackers! Order Number: #<%= order.displayOrderId || orderNumber || "" %> - Amount: ₹<%= orderSummary ? Number(orderSummary.total || 0).toFixed(2) : (orderAmount ? Number(orderAmount).toFixed(2) : "0.00") %>';
             var url = 'https://wa.me/?text=' + encodeURIComponent(text);
             window.open(url, '_blank');
         }
 
         // Email share function
         function shareViaEmail() {
-            var subject = 'My Nattuvedi Order Confirmation - #<%= order.displayOrderId || orderNumber || "" %>';
-            var body = 'Hello! I wanted to share my recent purchase from Nattuvedi.\n\n' +
+            var subject = 'My Artemis Crackers Order Confirmation - #<%= order.displayOrderId || orderNumber || "" %>';
+            var body = 'Hello! I wanted to share my recent purchase from Artemis Crackers.\n\n' +
                       'Order Details:\n' +
                       '- Order Number: #<%= order.displayOrderId || orderNumber || "" %>\n' +
                       '- Order Date: <%= order.formattedDate || new Date().toLocaleDateString() %>\n' +
